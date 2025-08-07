@@ -1,0 +1,39 @@
+.live-layout-container {
+  width: 1300px;
+  height: 767px;
+  position: relative;
+  top: 182px;
+  left: 62px;
+  opacity: 1;
+}
+
+.live-title {
+  width: 155px;
+  height: 48px;
+  position: absolute;
+  left: 1145px;
+font-family: 'AraHamah1964', sans-serif;
+  font-weight: 700;
+  font-size: px;
+  line-height: 100%;
+  text-align: right;
+  background: white;
+  color: rgba(0, 0, 0, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.live-video-wrapper {
+  width: 1300px;
+  height: 700px;
+  position: absolute;
+  top: 58px;
+  border-radius: 12px;
+  background: linear-gradient(
+    270deg,
+    rgba(0, 0, 0, 0.3) 0%,
+    rgba(102, 102, 102, 0) 25%
+  );
+  overflow: hidden;
+}

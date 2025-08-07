@@ -1,0 +1,136 @@
+/* --- Header layout --- */
+.header {
+  background-color: white;
+  display: flex;
+  align-items: center;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid rgba(0,0,0,1);
+  position: relative;
+}
+
+/* --- Navigation Links --- */
+.nav-links {
+  display: flex;
+  gap: 1rem;
+  margin: 0;
+  margin-right: 0rem;
+}
+
+
+.nav-links a {
+  text-decoration: none;
+  font-family: 'TheYearofHandicrafts', sans-serif;
+  width: 52;
+  height: 30;
+  font-weight: 400;
+  font-size: 20px;
+  color: rgba(121, 121, 121, 1);
+}
+
+.nav-links a:hover {
+  color: #2563eb;
+}
+
+.nav-links a:first-child {
+  margin-left: 2rem;
+}
+
+.nav-links a:last-child {
+  margin-right: 5rem;
+}
+
+/* --- Project title --- */
+.header-text {
+  font-family: 'AraHamah1964', sans-serif;
+  font-weight: 700;
+  font-size: 50px;
+  line-height: 100%;
+  color: #1E1E1E;
+  direction: rtl;
+  text-align: right;
+}
+
+/* --- Menu icon --- */
+.menu-icon {
+  width: 48px;
+  height: 48px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.menu-icon svg {
+  width: 26px;
+  height: 30px;
+}
+
+/* --- Mobile menu dropdown --- */
+.mobile-menu {
+  position: absolute;
+  top: 100%;
+  right: 2rem;
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  z-index: 1;
+}
+
+.mobile-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mobile-menu a {
+  text-decoration: none;
+  font-family: 'AraHamah1964', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: #1E1E1E;
+  direction: rtl;
+  text-align: right;
+}
+
+.mobile-menu a:hover {
+  color: #2563eb;
+}
+
+/* --- Live logo + Search icon --- */
+.live-logo {
+  background-color: rgba(240, 27, 27, 1);
+  color: white;
+  font-size: 14px;
+  border-radius: 10px;
+  font-weight: bold;
+  width: 155px;
+  height: 40px;
+  opacity: 1;
+}
+
+.search-logo {
+  width: 42px;
+  height: 39px;
+  opacity: 1;
+}
+
+/* --- Grouping icons to the left --- */
+.left-group {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-right: auto; /* يدفشها لأقصى اليسار */
+}
+
+.right-group {
+  display: flex;
+  align-items: center;
+  margin-left: auto; /* يدفشها لأقصى اليمين */
+}
+
+

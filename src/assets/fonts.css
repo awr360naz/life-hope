@@ -1,0 +1,17 @@
+/* خط The Year of Handicrafts */
+@font-face {
+  font-family: 'TheYearofHandicrafts';
+  src: url('./fonts/TheYearofHandicrafts-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+
+/* خط AraHamah1964 */
+@font-face {
+  font-family: 'AraHamah1964';
+  src: url('./fonts/AraHamah1964%20Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
