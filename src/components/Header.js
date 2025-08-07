@@ -35,7 +35,6 @@ export default function Header() {
   <img src={livelogo} alt="بث مباشر" className="live-logo" />
 </Link>
       </div>
-
       {/* وسط: روابط */}
       <nav className="nav-links">
         <Link to="/story">قصتنا</Link>

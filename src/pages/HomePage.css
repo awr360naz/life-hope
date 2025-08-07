@@ -1,39 +1,42 @@
 .live-layout-container {
-  width: 1300px;
-  height: 767px;
-  position: relative;
-  top: 182px;
-  left: 62px;
-  opacity: 1;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end; /* يمين */
+  padding: 2rem; /* ⬅️ نفس اللي بالهيدر */
+  gap: 1rem;
 }
 
+
 .live-title {
-  width: 155px;
-  height: 48px;
-  position: absolute;
-  left: 1145px;
-font-family: 'AraHamah1964', sans-serif;
+  font-family: 'AraHamah1964', sans-serif;
   font-weight: 700;
-  font-size: px;
+  font-size: 2rem;
   line-height: 100%;
   text-align: right;
   background: white;
   color: rgba(0, 0, 0, 1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
 }
 
 .live-video-wrapper {
-  width: 1300px;
-  height: 700px;
-  position: absolute;
-  top: 58px;
-  border-radius: 12px;
-  background: linear-gradient(
-    270deg,
-    rgba(0, 0, 0, 0.3) 0%,
-    rgba(102, 102, 102, 0) 25%
-  );
+  width: 100%;
+  max-width: 100%;
+  aspect-ratio: 16 / 9;
+
+  border: 2px solid #d9d9d9;         /* ✅ إطار بلون خفيف */
+  border-radius: 16px;               /* ✅ زوايا منحنية */
   overflow: hidden;
+
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,1) 0%,
+    rgba(246,243,238,1) 120%
+  );
 }
+
+
+
+

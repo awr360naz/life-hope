@@ -11,9 +11,9 @@
 /* --- Navigation Links --- */
 .nav-links {
   display: flex;
-  gap: 1rem;
+  gap: 2rem;
   margin: 0;
-  margin-right: 0rem;
+  margin-right: 1rem;
 }
 
 
@@ -46,7 +46,6 @@
   font-size: 50px;
   line-height: 100%;
   color: #1E1E1E;
-  direction: rtl;
   text-align: right;
 }
 
@@ -132,5 +131,43 @@
   align-items: center;
   margin-left: auto; /* يدفشها لأقصى اليمين */
 }
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1rem;
+  }
 
+  .header-text {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
 
+  .nav-links {
+    display: none; /* نخفيها على الموبايل */
+  }
+
+  .menu-icon {
+    display: block;
+    margin-top: 0.5rem;
+  }
+
+  .left-group,
+  .right-group {
+    width: 100%;
+    justify-content: space-between;
+    margin: 0;
+  }
+
+  .mobile-menu {
+    display: block;
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+
+  .mobile-menu ul {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+}
