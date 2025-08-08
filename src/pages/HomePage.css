@@ -22,20 +22,16 @@
 }
 
 .live-video-wrapper {
-  width: 100%;
-  max-width: 100%;
-  aspect-ratio: 16 / 9;
-
-  border: 2px solid #d9d9d9;         /* ✅ إطار بلون خفيف */
-  border-radius: 16px;               /* ✅ زوايا منحنية */
+  width: 100%;                 
+  height: 36vh;                
+  border: 1px solid #d9d9d9;
+  border-radius: 16px;
   overflow: hidden;
-
-  background: linear-gradient(
-    180deg,
-    rgba(255,255,255,1) 0%,
-    rgba(246,243,238,1) 120%
-  );
+  
 }
+
+
+
 
 
 
