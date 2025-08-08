@@ -1,28 +1,29 @@
-// src/index.js
-import React from 'react';
-import ReactDOM from 'react-dom/client';
+
 import './index.css';
+
+
+// داخل src/index.js أو App.jsx
+import React, { useEffect } from 'react';
+import ReactDOM from 'react-dom/client';
 import App from './App';
 
+function Root() {
+  useEffect(() => {
+    // 1) خذ لغة المتصفح (مثلاً "ar" أو "en-US")
+    const lang = navigator.language || navigator.userLanguage || 'en';
+    const shortLang = lang.split('-')[0]; // ["ar","en",...]
+
+    // 2) حدد هل هي RTL
+    const rtlLangs = ['ar', 'he', 'fa', 'ur'];
+    const dir = rtlLangs.includes(shortLang) ? 'rtl' : 'ltr';
+
+    // 3) اضبط على html
+    document.documentElement.setAttribute('lang', shortLang);
+    document.documentElement.setAttribute('dir', dir);
+  }, []);
+
+  return <App />;
+}
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
-
-// تحديد لغة المتصفح
-const userLang = navigator.language || navigator.userLanguage;
-
-// تحديد الاتجاه
-const isRTL = userLang.startsWith('ar') || userLang.startsWith('he') || userLang.startsWith('fa');
-
-// ضبط اتجاه الصفحة
-document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
-
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
-
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-
+root.render(<Root />);
