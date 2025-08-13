@@ -1,12 +1,12 @@
 import React from 'react';
 import Header from '../components/Header';
 
-export default function AboutPage() {
+export default function askforpray() {
   return (
     <>
       
       <main className="container mx-auto p-6">
-       <h2>about us page </h2>
+       <h2>'praaaay '</h2>
       </main>
     </>
   );

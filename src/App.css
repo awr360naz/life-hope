@@ -13,6 +13,8 @@
   }
 }
 
+
+
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
@@ -27,6 +29,23 @@
 .App-link {
   color: #61dafb;
 }
+/* مهم جدًا */
+html, body, #root {
+  height: 100%;
+  margin: 0; /* يشيل حافة البودي */
+}
+
+.app-shell {
+  min-height: 100vh;          /* يخلي ارتفاع الحاوية طول الشاشة */
+  display: flex;
+  flex-direction: column;     /* عمودي: هيدر / مين / فوتر */
+}
+
+.app-main {
+  flex: 1;                    /* يدفش الفوتر لتحت لما المحتوى قليل */
+  display: block;             /* أو flex لو بدك */
+}
+
 
 @keyframes App-logo-spin {
   from {
@@ -35,12 +54,5 @@
   to {
     transform: rotate(360deg);
   }
-}
-body {
-  background: linear-gradient(
-    180deg,
-    rgba(255,255,255,1) 0%,
-    rgba(246,243,238,1) 100%
-  );
 }
 

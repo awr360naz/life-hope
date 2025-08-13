@@ -4,7 +4,7 @@ import Header from '../components/Header';
 export default function LivePage() {
   return (
     <>
-      <Header />
+       
  
       <div className="live-container">
         <div className="video-wrapper">
