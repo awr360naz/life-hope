@@ -1,14 +1,14 @@
 import React from 'react';
-import Header from '../components/Header';
 
 export default function ArticlesPage() {
   return (
     <>
       
       <main className="container mx-auto p-6">
-<h2>ArticlesPage </h2>
+        <h2>صفحة المقالات</h2>
+        <p>هذا نص تجريبي يظهر عند فتح صفحة المقالات.</p>
       </main>
+     
     </>
   );
 }
-

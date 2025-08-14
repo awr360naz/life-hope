@@ -5,6 +5,11 @@ import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
 import './assets/fonts.css';
 import './App.css';
+import ArticlesPage from './pages/ArticlesPage';
+import ProgramsPage from './pages/ProgramsPage';
+import StoriesPage from './pages/StoriesPage';
+import LivePage from './pages/LivePage';
+import Askforpray from './pages/Askforpray';
 
 
 export default function App() {
@@ -18,6 +23,13 @@ export default function App() {
         <main className="app-main">
           <Routes>
             <Route path="/" element={<HomePage />} />
+             <Route path="/articles" element={<ArticlesPage />} />
+             <Route path="/programs" element={<ProgramsPage />} />
+             <Route path="/stories" element={<StoriesPage />} />
+             <Route path="/live" element={<LivePage />} />
+             <Route path="/askforpray" element={<Askforpray/>} />
+             
+             
           </Routes>
         </main>
         <Footer />

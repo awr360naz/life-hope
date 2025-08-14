@@ -1,26 +1,16 @@
-:root{
-
-  --live-w: 1280px;
-  --live-h: 720px;
-    --zoom: 1.6;       /* تكبير */
-  --shift-x: -140px; /* إزاحة أفقية (سالب = لليسار) */
-  --shift-y: -90px; 
-}
-
 .live-layout-container {
-  width: 100%;
-  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  padding: 2rem;
-  gap: .25rem;
-  overflow-x: auto; /* لو الشاشة أضيق يطلع سكرول أفقي */
+  align-items:end;
+  gap: 1rem;
+  margin-right: 3vw;
+  margin-top: 2vw;
+  
+  
 }
 
-
 .live-title {
-  margin: 0 0 .25rem auto;
+  margin: 0 0 .30rem auto;
   padding: .25rem .75rem;
   font-family: "AraHamah1964", sans-serif;
   font-weight: 700;
@@ -28,28 +18,32 @@
   line-height: 1;
   text-align: right;
   color: #000;
-  width: var(--live-w);
-}
+  
 
+}
 
 .live-video-wrapper {
-  width: var(--live-w);
-  height: var(--live-h);
-  margin-left: auto;           
   position: relative;
-  background: #ffffff;        
-  border: none;           
-  border-radius: 16px; 
+  width: 565px;  /* عرض ثابت */
+  height: 321px; /* ارتفاع ثابت */
+  
 }
 
-/* خلي الـ iframe يعبي الإطار */
-.live-video-wrapper iframe,
-.live-video-wrapper video {
+.live-video-wrapper iframe {
+  width: 565px;  /* نفس حجم الثابت */
+  height: 321px;
+  border: 8px;
+  
+}
+
+.live-border {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  border: 0;
-  display: block;
+  top: 0;
+  left: 0;
+  width: 565px;  
+  height: 321px;
+  border: 2px solid #ccc; /* لون البوردير */
+  border-radius: 8px;
+  pointer-events: none; /* حتى لا يمنع التفاعل مع الفيديو */
+  
 }
-

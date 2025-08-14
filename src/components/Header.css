@@ -17,18 +17,23 @@
 
 /* ===== Header: ثابت دايمًا — منيو → شعار → روابط → (بث + بحث) ===== */
 .header{
-  position: sticky; top:0; z-index:1000;
-  display:flex; align-items:center; gap:.75rem;
-  padding:0.20rem 2.5rem;               /* عدّلها إذا بدك */
+  position: sticky; top:0; 
+  z-index:1000;
+  display:flex; 
+  align-items:last baseline;
+  gap:.75rem;
+  padding:0.20rem 2.5rem;              
   background:#fff;
-  border-bottom:1px solid rgba(0,0,0,.1);
+  border-bottom:none;
   direction: rtl;                    /* ما بنعكس الترتيب حسب اللغة */
   font-family:'The Year of Handicrafts','AraHamah1964',sans-serif;
 }
 
 /* الروابط بالوسط: تبعيد بسيط بعد الشعار + دفع الـ actions للنهاية */
 .nav-links{
-  display:flex; align-items:center; gap:3rem;
+  display:flex; 
+  align-items:center;
+  gap:3rem;
   margin-inline-start:7rem;   /* بعد الشعار */
   margin-inline-end:auto;     /* يدفع actions لنهاية الشريط */
 }
@@ -40,7 +45,7 @@
   font-family: "The Year of Handicrafts", sans-serif;
   font-weight: 400;                  /* Regular */
   font-style: normal;
-  font-size: clamp(1.25rem, 1.25rem + 0vw, 1.25rem); /* 20px ثابت */
+  font-size: clamp(1rem, 1rem + 0vw, 1rem); /* 20px ثابت */
   line-height: 1;                    /* 100% */
   letter-spacing: 0;
   text-align: center;
@@ -62,23 +67,24 @@
   border:none; 
   border-radius:10px;
   display: grid; place-items: center;
-  width:  clamp(120px, 10.764vw, 155px); /* 155px @1440 */
-  height: clamp(36px,  3.125vw, 45px);   /* 45px @1440 */
+  width: clamp(96px, 8.6112vw, 124px);
+  height: clamp(28.8px, 2.5vw, 36px);
   padding: 0;
   font-weight: 700;
   font-style: Bold;
-  font-size: 1.65rem;
+  font-size: 1.rem;
   line-height: 100%;
   letter-spacing: 0%;
   text-align: center;
   vertical-align: middle;
-
+  text-decoration: none;
+  border-bottom: none;
   
   cursor:pointer ; 
 }
 .search-icon{ 
-  width:42px;
-  height:39px;
+  width:30px;
+  height:27px;
   cursor:pointer; }
 
 /* الشعار (نص—not link) بمواصفات AraHamah1964 Bold */
@@ -86,7 +92,7 @@
   font-family: "AraHamah1964", sans-serif;  
   font-weight: 700;
   font-style: normal;
-  font-size: clamp(1.5rem, 1rem + 2.2vw, 3.125rem); /* حتى 50px كحد أقصى */
+  font-size: (1.50rem, 1.50rem + 0vw, 1.50rem);
   line-height: 1;                 /* 100% */
   letter-spacing: 0;
   text-align: right;
@@ -96,16 +102,25 @@
 
 /* زر المنيو (الهامبرغر) */
 .menu-toggle{
-  display:flex; flex-direction:column; justify-content:space-between;
-  width:28px; height:20px; background:transparent; border:none; padding:0; cursor:pointer;
+  display:flex;  
+  flex-direction:column; 
+  justify-content:space-between;
+  width:20px; 
+  height:15px; 
+  background:transparent; 
+  border:none; 
+  padding:0;
+  cursor:pointer;
 }
 .menu-toggle .bar{ height:3px; width:100%; background:#000; border-radius:2px; }
 
 /* خلفية عند فتح المنيو (للإغلاق بالضغط خارجها) */
 .backdrop{
-  position: fixed; inset: 0;
+  position: fixed; 
+  inset: 0;
   background: rgba(0,0,0,.35);
-  opacity: 0; visibility: hidden;
+  opacity: 0; 
+  visibility: hidden;
   transition: opacity .2s ease;
   z-index: 1200; /* فوق الهيدر */
 }

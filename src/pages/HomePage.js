@@ -14,11 +14,14 @@ export default function HomePage() {
         <div className="live-video-wrapper">
           <iframe
             src="https://closeradio.tv/awrara/"
+            width={565}
+            height={321}
             title="البث المباشر"
             allow="accelerometer; autoplay;  encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
             
           />
+          <div className="live-border"></div>
            
         </div>
       </div>
