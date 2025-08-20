@@ -23,7 +23,7 @@
   align-items:last baseline;
   gap:.75rem;
   padding:0.20rem 2.5rem;              
-  background:#fff;
+  background:transparent;
   border-bottom:none;
   direction: rtl;                    /* ما بنعكس الترتيب حسب اللغة */
   font-family:'The Year of Handicrafts','AraHamah1964',sans-serif;

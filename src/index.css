@@ -5,7 +5,7 @@ html, body, #root {
 
 body {
   margin: 0;
-  background: linear-gradient(180deg, #FFFFFF 0%, rgba(246, 243, 238, 1) 100%);
+  background: linear-gradient(180deg, #FFFFFF 0%, #F6F3EE 20%);
   background-repeat: no-repeat;
   background-size: 100% 100%;
 }

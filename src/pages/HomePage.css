@@ -1,49 +1,210 @@
-.live-layout-container {
+/* ===== الخطوط المطلوبة ===== */
+@font-face {
+  font-family: "AraHamah1964";
+  src: url("../assets/fonts/AraHamah1964 Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "The Year of Handicrafts";
+  src: url("../assets/fonts/TheYearofHandicrafts-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
+
+/* ===== صفحة RTL وخلفية فاتحة ===== */
+.homepage-rtl {
+  direction: rtl;
+  position: relative;
+  min-height: 100%;     /* بدل 100vh */
+  background: linear-gradient(180deg,#FFFFFF 0%, #F6F3EE 100%);
+  font-family: Cairo, sans-serif;
+}
+html, body {
+  height: 100%;
+}
+
+/* ===== شريط تمركز الإطارات بالمنتصف ===== */
+/* عرض الشريط = (576 + 37 + 187 + 36 + 576) = 1412px */
+.frames-center{
+  position: relative;
+  width: 1412px;
+  margin: 100px auto 0;  /* بدل 215px */
+}
+
+
+/* ===== الهيدر الصغير العام داخل الإطارات ===== */
+.frame-header{
+  display: flex;
+  justify-content: center; /* عناوين وسط */
+  align-items: center;
+  gap: .6rem;              /* 0.5rem ×1.2 */
+  padding: 7px 10px;       /* (6×1.2 , 8×1.2) */
+  /* إزالة الخط الرمادي تحت العناوين */
+  /* border-bottom: none;  <-- (محوّر) */
+  color: #000;
+}
+.frame-header.center{ justify-content: center; }
+
+/* ===== عنوان وتاريخ البث فوق الإطار (خارج الصندوق) ===== */
+.live-topline{
+  position: absolute;
+  /* يتموضع فوق الإطار مباشرة */
+  left: 836px;           /* نفس يسار الإطار بعد التكبير */
+  top: -32px;            /* مسافة بسيطة فوق الصندوق */
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  width: 576px;          /* يساوي عرض الإطار */
+  padding: 0 2px;
+}
+.live-title{
+  font-weight: 700;
+  font-size: 18px;       /* 15px ×1.2 */
+  color: #000;
+  font-family: "AraHamah1964", Cairo, sans-serif;
+}
+.live-date{
+  font-weight: 700;
+  font-size: 12px;       /* 10px ×1.2 */
+  color: #000;
+  font-family: "The Year of Handicrafts", Cairo, sans-serif;
+}
+
+/* ===== الإطار 1: البث المباشر ===== */
+.live-frame{
+  position: absolute;
+  top: 0px; left: 836px; /* 697×1.2 ≈ 836 */
+  width: 576px;          /* 480×1.2 */
+  height: 330px;         /* 275×1.2 */
+  border: 1px solid #000;
+  border-radius: 6px;    /* 5×1.2 ≈ 6 */
+  background: transparent;
   display: flex;
   flex-direction: column;
-  align-items:end;
-  gap: 1rem;
-  margin-right: 3vw;
-  margin-top: 2vw;
-  
-  
+  box-sizing: border-box;
 }
 
-.live-title {
-  margin: 0 0 .30rem auto;
-  padding: .25rem .75rem;
-  font-family: "AraHamah1964", sans-serif;
+/* الفيديو يملأ بقية المساحة بدون Scroll */
+.live-box{
+  flex: 1;
+  overflow: hidden;
+  border-radius: 0 0 6px 6px;
+}
+.live-iframe{
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* ===== الإطار 2: برنامج اليوم ===== */
+.schedule-frame{
+  position: absolute;
+  top: 0px; left: 613px;  /* 511×1.2 ≈ 613 */
+  width: 187px;           /* 156×1.2 ≈ 187 */
+  height: 330px;          /* 275×1.2 */
+  border: 1px solid #000;
+  border-radius: 6px;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+/* عنوان الإطار */
+.schedule-title{
   font-weight: 700;
-  font-size: 2rem;
-  line-height: 1;
+  font-size: 14px;        /* 12×1.2 */
+  color: #000;
+  text-decoration: underline;
+}
+
+/* نافذة العناصر (تيكر) */
+.schedule-viewport{
+  flex: 1;
+  overflow: hidden;       /* ما بيطلع خارج الإطار */
+  color: #000;
+}
+
+/* قائمة التيكر */
+.schedule-list{
+  list-style: none;
+  margin: 0;
+  padding: 7px 10px;      /* 6/8 ×1.2 */
+  transition: transform .5s ease-in-out;
+  font-weight: 600;
+  font-size: 11px;        /* 9×1.2 ≈ 10.8 */
+  line-height: 24px;      /* 20×1.2 */
+  text-align: right;
+}
+.schedule-row{
+  display: flex;
+  justify-content: space-between;
+  height: 24px;           /* يساوي line-height */
+}
+.row-time{ min-width: 4.2ch; } /* 3.5×1.2 تقريبا */
+.row-title{}
+
+/* ===== الإطار 3: تأمل هذا الأسبوع ===== */
+.text-frame{
+  position: absolute;
+  top: 0px; left: 0px;
+  width: 576px;
+  height: 330px;
+  border: 1px solid #000;
+  border-radius: 6px;
+  background: transparent; /* نفس خلفية الصفحة */
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.text-title{
+  font-weight: 700;
+  font-size: 14px;
+  color: #000;
+}
+
+/* الجسم = نص يمين وصورة شمال */
+/* جسم الإطار الثالث: نص يمين + صورة شمال */
+.text-body{
+  flex: 1;
+  display: flex;
+  flex-direction: row;     /* نخلي المحور أفقي */
+  align-items: flex-start;
+  gap: 12px;
+  padding: 7px 10px;
+  /* مهم: خلي الهيدر فوق والجسم ما يغطيه */
+  /* لو حسّيت تضارب ارتفاع، ممكن تضيف: height: calc(100% - 44px); */
+}
+
+/* النص: عطِه القدرة يصغَر و ما يختفي */
+.text-content{
+  order: 1;                /* النص أول (يمين) */
+  flex: 1 1 60%;
+  min-width: 0;            /* أهم سطر: بدونُه بيختنق العنصر ويختفي */
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 29px;
   text-align: right;
   color: #000;
-  
-
+  overflow: auto;
 }
 
-.live-video-wrapper {
-  position: relative;
-  width: 565px;  /* عرض ثابت */
-  height: 321px; /* ارتفاع ثابت */
-  
+/* الصورة: ثبّت مكانها على الشمال وحجمها */
+.text-image{
+  order: 2;                /* الصورة بعد النص (فتصير شمال بالإتجاه RTL) */
+  flex: 0 0 38%;           /* عرض ثابت تقريبا 38% */
+  max-width: 45%;
 }
-
-.live-video-wrapper iframe {
-  width: 565px;  /* نفس حجم الثابت */
-  height: 321px;
-  border: 8px;
-  
-}
-
-.live-border {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 565px;  
-  height: 321px;
-  border: 2px solid #ccc; /* لون البوردير */
-  border-radius: 8px;
-  pointer-events: none; /* حتى لا يمنع التفاعل مع الفيديو */
-  
+.text-image img{
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 6px;
+  object-fit: cover;
 }

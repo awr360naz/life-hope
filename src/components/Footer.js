@@ -19,37 +19,20 @@ const Footer = () => {
             {/* النص التعريفي */}
             <p className="footer-tagline" dir='rt1'>
              مؤسسة إذاعية مسيحية تبشيرية، تابعة لمؤسسة <span dir="ltr">AWR</span> العالمية، وتبث للعالم العربي
-</p>
+</p><br></br>
 
-            {/* البريد الإلكتروني */}
-            <p className="footer-contact">
-              البريد الإلكتروني:<br></br> <a href="mailto:hope@awr.org" className="footer-email">hope@awr.org</a>
+              <p className='footer-text'>
+             . أينما كنتم، نحن معكم ولأجلكم<br></br>
             </p>
-
-            {/* حقوق النشر */}
-            <p className="footer-copy">2025 - جميع الحقوق محفوظة</p>
-          </div>
-
-          {/* العمود الشمال */}
+          
+           
+</div>
           <div className="footer-left-block">
 
-            {/* الواتساب */}
-           <p className="footer-whatsapp">
-  للمراسلة عبر الواتس اب:<br />
-  <a href="https://wa.me/12409009939" target="_blank" rel="noopener noreferrer">
-    +12409009939
-  </a>
-</p>
-
-
-            {/* أطلب صلاة */}
-           <div className="footer-ask-pray">
-  <Link to="/askforpray">أطلب صلاة</Link>
-</div>
 
 
             {/* تابعنا أيضا على */}
-            <p className="footer-follow-label">تابعنا ايضا على:</p>
+            <p className="footer-follow-label">: تابعنا ايضا على</p>
 
             {/* أيقونات السوشال */}
             <div className="footer-social-icons">
@@ -58,9 +41,11 @@ const Footer = () => {
               <a href="https://www.tiktok.com/@awr_arabic" target="_blank" rel="noopener noreferrer"><FaTiktok /></a>
               <a href="https://www.youtube.com/channel/UCc6W4vs9rTKvl-5arOBs7WA" target="_blank" rel="noopener noreferrer"><FaYoutube /></a>
               <a href="https://twitter.com/awr_arabic" target="_blank" rel="noopener noreferrer"><FaTwitter /></a>
-            </div>
-
+            </div><br></br><br></br><br></br>
+             <p className="footer-copy">2025 - جميع الحقوق محفوظة</p>
           </div>
+
+          
         </div>
       </div>
     </footer>

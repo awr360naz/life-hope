@@ -32,6 +32,7 @@
 .footer-logo-mark {
   font-family: 'AraHamah1964', sans-serif;
   font-weight: 700;
+  font-style: bold;
   font-size: clamp(1.6rem, 6vh, 3.125rem);
   line-height: 1;
   color: #000;
@@ -41,8 +42,7 @@
 }
 
 .footer-tagline,
-.footer-contact,
-.footer-copy {
+.footer-text {
   font-family: 'The Year of Handicrafts', sans-serif;
   font-weight: 400;
   font-size: clamp(1rem, 2.6vh, 1.375rem);
@@ -52,18 +52,9 @@
   
 }
 
-.footer-email {
-  text-decoration: none;
-  color: inherit;
-  
-}
-.footer-email:hover {
-  text-decoration: underline;
-}
 
-.footer-copy {
-  font-size: clamp(0.95rem, 2.2vh, 1.125rem);
-}
+
+
 
 /* ===== العمود الشمال ===== */
 .footer-left-block {
@@ -71,31 +62,21 @@
   flex-direction: column;
   align-items: flex-end; /* لليمين */
   order: 1; /* الشمال */
-  gap: 0.6rem;
+
 }
 
 /* ترتيب العناصر داخل العمود الشمال */
-.footer-whatsapp { order: 1; }
-.footer-ask-pray { order: 2; }
-.footer-follow-label { order: 3; }
-.footer-social-icons { order: 4; }
 
-.footer-whatsapp,
-.footer-ask-pray,
+
+
+
 .footer-follow-label {
   font-family: 'The Year of Handicrafts', sans-serif;
   font-weight: 400;
 }
 
-.footer-whatsapp {
-  font-size: clamp(1rem, 2.6vh, 1.375rem);
-  color: #000;
-}
-.footer-ask-pray a {
-  font-size: calc(33 / 16 * 1rem);
-  color: rgba(240, 27, 27, 1);
-  text-decoration: underline;
-}
+
+
 .footer-follow-label {
   font-size: 1.125rem;
   color: rgba(0, 0, 0, 1);
@@ -103,7 +84,7 @@
 .footer-social-icons {
   display: flex;
   gap: 1rem;
-  margin-top: 0.5vh;
+ 
 }
 .footer-social-icons a {
   color: rgba(0, 0, 0, 1);
@@ -113,6 +94,16 @@
 .footer-social-icons a:hover {
   color: rgba(240, 27, 27, 1);
   transform: scale(1.1);
+}
+.footer-copy {
+   font-family: 'The Year of Handicrafts', sans-serif;
+  font-weight: 400;
+  font-size: clamp(1rem, 2.6vh, 1.375rem);
+  color: #000;
+  margin: 0;
+  max-width: 24rem;
+  font-size: clamp(0.95rem, 2.2vh, 1.125rem);
+  margin-top: 1.5rem;
 }
 
 /* ===== موبايل ===== */
