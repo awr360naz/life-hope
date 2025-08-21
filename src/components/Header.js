@@ -1,84 +1,64 @@
-// src/components/Header.js
-import React, { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import "./Header.css";
-import SearchLogo from "./SearchLogo.png";
+import { FiSearch } from "react-icons/fi";
+import LiveButtonImg from "../components/livebutton.png"; // عدّل المسار لو لزم
 
 export default function Header() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const location = useLocation();
-
-  useEffect(() => {
-    document.body.style.overflow = menuOpen ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
-  }, [menuOpen]);
-
-  useEffect(() => {
-    const onKey = (e) => e.key === "Escape" && setMenuOpen(false);
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
-
-  useEffect(() => {
-    setMenuOpen(false);
-  }, [location.pathname]);
-
-  useEffect(() => {
-    const onResize = () => window.innerWidth >= 768 && setMenuOpen(false);
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
+  const [open, setOpen] = useState(false);
 
   return (
-    <header className="header">
-      {/* منيو الهامبرغر */}
-      <button
-        type="button"                      // ✅ مهم
-        className="menu-toggle"
-        onClick={() => setMenuOpen((v) => !v)}
-        aria-label="فتح/إغلاق القائمة"
-        aria-expanded={menuOpen}
-      >
-        <span className="bar" aria-hidden="true" />
-        <span className="bar" aria-hidden="true" />
-        <span className="bar" aria-hidden="true" />
-      </button>
+    <header className="header" dir="rtl">
+      <div className="header-inner">
+        {/* همبرغر */}
+        <button
+          className={`hamburger ${open ? "is-open" : ""}`}
+          aria-label="فتح القائمة"
+          aria-expanded={open}
+          onClick={() => setOpen((v) => !v)}
+        >
+          <span />
+          <span />
+          <span />
+        </button>
 
-      {/* الشعار */}
-      <h1 className="brand-text">الحياة والأمل</h1>
+        {/* الشعار */}
+        <Link to="/" className="logo" aria-label="الانتقال للصفحة الرئيسية">
+          <span className="logo-mark">الحَياة والأمْل</span>
+        </Link>
 
-      {/* الروابط (وسط) */}
-      <nav className="nav-links">
-        <Link to="/articles">مقالات</Link>
-        <Link to="/programs">برامجنا</Link>
-        <Link to="/stories">قصتنا</Link>
-      </nav>
+        {/* الروابط (ديسكتوب/تابلت) */}
+        <nav className="main-nav" aria-label="روابط الموقع">
+          <Link to="/articles" className="nav-link">مقالات</Link>
+          <Link to="/programs" className="nav-link">برامجنا</Link>
+          <Link to="/about" className="nav-link">قصتنا</Link>
+        </nav>
 
-      {/* نهاية الشريط: البث + البحث */}
-      <div className="actions">
-        <Link to="/live" className="btn-live">البث المباشر</Link>
-        <img src={SearchLogo} alt="بحث" className="search-icon" />
+        {/* زر البث (صورة) */}
+        <Link to="/live" className="live-btn" aria-label="البث المباشر">
+          <img src={LiveButtonImg} alt="البث المباشر" />
+        </Link>
+
+        {/* يدفع البحث للطرف الشمالي */}
+        <div className="spacer" />
+
+      
+       <form className="search" role="search" onSubmit={(e)=>e.preventDefault()}>
+  <FiSearch className="search-icon" />
+  <input type="search" placeholder="Search" className="search-input" />
+</form>
+
       </div>
 
-      {/* خلفية تضغطها تسكّر */}
-      <button
-        type="button"                      // ✅ مهم
-        className={`backdrop ${menuOpen ? "show" : ""}`}
-        onClick={() => setMenuOpen(false)}
-        aria-label="إغلاق القائمة"
-      />
-
-      {/* سايد منيو */}
-      <nav className={`side-menu ${menuOpen ? "open" : ""}`}>
-        <ul onClick={(e) => { if (e.target.tagName === "A") setMenuOpen(false); }}>
-          <li><Link to="/live" className="btn-live">البث المباشر</Link></li>
-          <li><Link to="/">الصفحة الرئيسية</Link></li>
-          <li><Link to="/articles">مقالات</Link></li>
-          <li><Link to="/programs">برامجنا</Link></li>
-          <li><Link to="/stories">قصتنا</Link></li>   {/* ✅ تصحيح /story -> /stories */}
-          <li><Link to="/contact">تواصل معنا</Link></li>
-        </ul>
-      </nav>
+      {/* أوف-كانفاس (موبايل) */}
+      <div className={`drawer ${open ? "drawer--open" : ""}`} onClick={() => setOpen(false)}>
+        <nav className="drawer-panel" onClick={(e)=>e.stopPropagation()}>
+          <Link to="/articles" className="drawer-link" onClick={()=>setOpen(false)}>مقالات</Link>
+          <Link to="/programs" className="drawer-link" onClick={()=>setOpen(false)}>برامجنا</Link>
+          <Link to="/about" className="drawer-link" onClick={()=>setOpen(false)}>قصتنا</Link>
+          <Link to="/live" className="drawer-live" onClick={()=>setOpen(false)}>البث المباشر</Link>
+        </nav>
+      </div>
     </header>
   );
 }

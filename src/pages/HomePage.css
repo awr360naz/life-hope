@@ -150,61 +150,262 @@ html, body {
 .row-title{}
 
 /* ===== الإطار 3: تأمل هذا الأسبوع ===== */
+/* قالب عام لكل الإطارات: بدون تموضع ثابت */
 .text-frame{
-  position: absolute;
-  top: 0px; left: 0px;
   width: 576px;
   height: 330px;
   border: 1px solid #000;
   border-radius: 6px;
-  background: transparent; /* نفس خلفية الصفحة */
+  background:transparent;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  overflow: hidden;           /* يمنع خروج الصورة */
+  padding: 0;                 /* نخلي الحسابات دقيقة */
 }
 
+/* تموضع الإطار الثالث فقط (غيّر القيم حسب مكانه المطلوب) */
+.frame-3{
+  position: absolute;
+  top: 0px;                   /* ← عدّل لمكان الإطار الثالث */
+  left: 0px;                  /* ← عدّل لمكان الإطار الثالث */
+}
+
+/* العنوان أعلى يمين */
 .text-title{
+  margin: 0;
+  padding: 6px 10px 4px 20px; /* يمين 10px */
   font-weight: 700;
   font-size: 14px;
+  line-height: 1;             /* ارتفاع سطر واضح */
   color: #000;
+  text-align: right;
 }
 
-/* الجسم = نص يمين وصورة شمال */
-/* جسم الإطار الثالث: نص يمين + صورة شمال */
+/* الجسم تحت العنوان مباشرة */
 .text-body{
-  flex: 1;
+  /* احسب ارتفاع الجسم = ارتفاع الإطار - ارتفاع صف العنوان (تقريباً 26px) */
+  height: calc(100% - 26px);
   display: flex;
-  flex-direction: row;     /* نخلي المحور أفقي */
-  align-items: flex-start;
-  gap: 12px;
-  padding: 7px 10px;
-  /* مهم: خلي الهيدر فوق والجسم ما يغطيه */
-  /* لو حسّيت تضارب ارتفاع، ممكن تضيف: height: calc(100% - 44px); */
+  flex-direction: row;
+  align-items: stretch;       /* النص والصورة نفس الارتفاع */
+  gap: 60px;
+  padding: 0 10px 10px;       /* يمين/شمال/أسفل */
+  box-sizing: border-box;
+  direction: rtl;             /* أول عنصر على اليمين */
 }
 
-/* النص: عطِه القدرة يصغَر و ما يختفي */
+/* النص (يمين) */
 .text-content{
-  order: 1;                /* النص أول (يمين) */
-  flex: 1 1 60%;
-  min-width: 0;            /* أهم سطر: بدونُه بيختنق العنصر ويختفي */
+  flex: 1 1 20%;
+  min-width: 0;
   font-weight: 500;
   font-size: 12px;
-  line-height: 29px;
+  line-height: 22px;
   text-align: right;
   color: #000;
-  overflow: auto;
+  overflow-y: auto;
+  padding-top: 2px;           /* يبدأ تقريبًا من مستوى الصورة */
 }
 
-/* الصورة: ثبّت مكانها على الشمال وحجمها */
+/* الصورة (شمال) */
 .text-image{
-  order: 2;                /* الصورة بعد النص (فتصير شمال بالإتجاه RTL) */
-  flex: 0 0 38%;           /* عرض ثابت تقريبا 38% */
-  max-width: 45%;
+  flex: 0 0 60%;
+  display: flex;
+  align-items: flex-start;    /* تلتصق من أعلى الجسم */
 }
+
 .text-image img{
   width: 100%;
-  height: auto;
+  height: 100%;               /* تمتد لنهاية النص */
   display: block;
   border-radius: 6px;
   object-fit: cover;
+  object-position: center top;/* تبدأ من الأعلى */
+}
+
+/* =========================================================
+   1) تحسينات خفيفة للأساسيات (تبقى شغّالة للديسكتوب)
+   ========================================================= */
+.homepage-rtl{
+  direction: rtl;
+}
+html, body { height: 100%; }
+
+.frames-center{
+  /* تبقى قيمتك القديمة للديسكتوب كما هي */
+  width: 1412px;
+  margin: 100px auto 0;
+}
+
+/* =========================================================
+   2) لابتوب/شاشات متوسطة: ≤ 1200px
+   - نلغي الـ absolute ونحوّل Grid بثلاثة أعمدة
+   ========================================================= */
+@media (max-width: 1200px){
+  .frames-center{
+    width: min(100%, 1040px);
+    margin: 72px auto 0;
+    display: grid;
+    grid-template-columns: 1fr 180px 1fr; /* نص | برنامج اليوم | بث */
+    gap: 16px;
+    /* نحتاج أن تصبح العناصر داخلها تدفّق طبيعي بدل تموضع مطلق */
+    position: relative;
+  }
+
+  /* العنوان والتاريخ فوق البث يصبحا عنصرًا عاديًا */
+  .live-topline{
+    position: static;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    width: 100%;
+    padding: 0 2px 4px;
+    grid-column: 3; /* فوق البث */
+    order: 2;       /* يأتي قبل صندوق البث */
+  }
+
+  /* إلغاء التموضع المطلق للإطارات واعتماد الشبكة */
+  .live-frame,
+  .schedule-frame,
+  .text-frame{
+    position: static;
+    width: 100%;
+    height: auto;          /* نسمح بالتمدّد الطبيعي */
+    box-sizing: border-box;
+  }
+
+  /* أماكن الإطارات على الشبكة (يمين = بث، وسط = برنامج، يسار = نص) */
+  .text-frame{     grid-column: 1; order: 1; }
+  .schedule-frame{ grid-column: 2; order: 2; }
+  .live-frame{     grid-column: 3; order: 3; }
+
+  /* البث: اجعله بنسبة 16:9 بدل ارتفاع ثابت */
+  .live-box{
+    aspect-ratio: 16 / 9;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .live-iframe{
+    width: 100%;
+    height: 100%;
+  }
+
+  /* برنامج اليوم: ارتفاع مناسب مع نفس التيكر */
+  .schedule-frame{
+    max-height: 360px;
+    display: flex;
+    flex-direction: column;
+  }
+  .schedule-viewport{
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* نص التأمل والصورة يتقاسمان العرض */
+  .text-body{
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 7px 10px;
+  }
+  .text-content{ flex: 1 1 60%; min-width: 0; }
+  .text-image{   flex: 0 0 38%; max-width: 45%; }
+  .text-image img{ width: 100%; height: auto; object-fit: cover; }
+
+  /* تكبيرات خفيفة للنصوص على اللابتوب */
+  .live-title{ font-size: 18px; }
+  .live-date{  font-size: 12px; }
+  .schedule-title, .text-title{ font-size: 14px; }
+}
+
+/* =========================================================
+   3) موبايل/تابلت: ≤ 768px
+   - عمود واحد بالترتيب: البث → برنامج اليوم → التأمل
+   ========================================================= */
+@media (max-width: 768px){
+  .frames-center{
+    width: min(100%, 640px);
+    margin: 56px auto 16px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .live-topline{
+    position: static;
+    width: 100%;
+    padding: 0 4px;
+    margin-bottom: -6px; /* يقرب العنوان من الإطار */
+    grid-column: 1;
+    order: 1;
+  }
+
+  .live-frame,
+  .schedule-frame,
+  .text-frame{
+    position: static;
+    width: 100%;
+    height: auto;
+    grid-column: 1;
+  }
+
+  .live-frame{     order: 2; }
+  .schedule-frame{ order: 3; }
+  .text-frame{     order: 4; }
+
+  /* البث بنسبة 16:9 ملء العرض */
+  .live-box{
+    aspect-ratio: 16/9;
+    overflow: hidden;
+    border-radius: 6px;
+  }
+
+  /* برنامج اليوم: خط أكبر قليلًا وارتفاع مناسب */
+  .schedule-title{
+    font-size: 15px;
+  }
+  .schedule-list{
+    font-size: 12px;       /* يحافظ على line-height:24px */
+    line-height: 24px;
+  }
+  .schedule-frame{
+    max-height: 320px;
+  }
+
+  /* التأمل: نكدّس الصورة تحت النص */
+  .text-body{
+    flex-direction: column;
+    gap: 10px;
+  }
+  .text-content{
+    font-size: 13px;
+    line-height: 26px;
+    overflow: visible; /* نسمح بتمدد طبيعي بالموبايل */
+  }
+  .text-image{
+    flex: 0 0 auto;
+    max-width: 100%;
+  }
+  .text-image img{
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 6px;
+  }
+
+  /* أحجام العناوين */
+  .live-title{ font-size: 16px; }
+  .live-date{  font-size: 12px; }
+  .text-title{ font-size: 15px; }
+}
+
+/* =========================================================
+   4) شاشات صغيرة جدًا: ≤ 380px (تحسين القراءة)
+   ========================================================= */
+@media (max-width: 380px){
+  .schedule-list{ font-size: 11px; line-height: 22px; }
+  .schedule-row{  height: 22px; }
 }

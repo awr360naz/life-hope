@@ -14,7 +14,7 @@ const Footer = () => {
           {/* العمود اليمين */}
           <div className="footer-right-stack">
             {/* العنوان */}
-            <h2 className="footer-logo-mark">الحياة والأمل</h2>
+            <span className="logo-mark">الحَياة والأمْل</span>
 
             {/* النص التعريفي */}
             <p className="footer-tagline" dir='rt1'>

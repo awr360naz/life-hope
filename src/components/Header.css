@@ -1,152 +1,173 @@
-/* ===== Fonts (from src/assets/fonts) ===== */
-@font-face {
-  font-family: "AraHamah1964";
-  src: url("../assets/fonts/AraHamah1964 Bold.ttf") format("truetype");
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "The Year of Handicrafts";
-  src: url("../assets/fonts/TheYearofHandicrafts-Regular.ttf") format("truetype");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* ===== Header: ثابت دايمًا — منيو → شعار → روابط → (بث + بحث) ===== */
+/* الهيدر الأساسي */
 .header{
-  position: sticky; top:0; 
-  z-index:1000;
-  display:flex; 
-  align-items:last baseline;
-  gap:.75rem;
-  padding:0.20rem 2.5rem;              
-  background:transparent;
-  border-bottom:none;
-  direction: rtl;                    /* ما بنعكس الترتيب حسب اللغة */
-  font-family:'The Year of Handicrafts','AraHamah1964',sans-serif;
-}
-
-/* الروابط بالوسط: تبعيد بسيط بعد الشعار + دفع الـ actions للنهاية */
-.nav-links{
-  display:flex; 
-  align-items:center;
-  gap:3rem;
-  margin-inline-start:7rem;   /* بعد الشعار */
-  margin-inline-end:auto;     /* يدفع actions لنهاية الشريط */
-}
-
-/* روابط القائمة — حجم ثابت 20px باستخدام rem+vw (لا يتغيّر) */
-.nav-links a,
-.nav-links a:link,
-.nav-links a:visited{
-  font-family: "The Year of Handicrafts", sans-serif;
-  font-weight: 400;                  /* Regular */
-  font-style: normal;
-  font-size: clamp(1rem, 1rem + 0vw, 1rem); /* 20px ثابت */
-  line-height: 1;                    /* 100% */
-  letter-spacing: 0;
-  text-align: center;
-  display: inline-flex;              /* لتوسيط عمودي */
-  align-items: center;
-  white-space: nowrap;
-  color: rgba(121,121,121,1);
-  text-decoration: none;
-}
-.nav-links a:hover { opacity: .9; }
-.nav-links a:focus-visible { outline:2px solid #000; outline-offset:2px; }
-
-/* نهاية الشريط */
-.actions{ display:flex; align-items:center; gap:.75rem; }
-.btn-live{
-  font-family: "AraHamah1964", sans-serif;
-  background:#E32020; 
-  color:#fff; 
-  border:none; 
-  border-radius:10px;
-  display: grid; place-items: center;
-  width: clamp(96px, 8.6112vw, 124px);
-  height: clamp(28.8px, 2.5vw, 36px);
-  padding: 0;
-  font-weight: 700;
-  font-style: Bold;
-  font-size: 1.rem;
-  line-height: 100%;
-  letter-spacing: 0%;
-  text-align: center;
-  vertical-align: middle;
-  text-decoration: none;
+  position: sticky; top: 0;
+  z-index: 1000;
+  background: transparent;
   border-bottom: none;
+}
+
+
+.header-inner{
+  padding-inline-start: 10%;
+  padding-inline-end: 15%;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  gap: .5rem;                 /* قربنا العناصر لبعض */
+  direction: rtl;
+}
+
+
+.hamburger{
+  width: 23.5px;
+  height: 17.5px;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: none;
+  border: 0;
+  padding: 0; 
+  cursor: pointer;
   
-  cursor:pointer ; 
 }
-.search-icon{ 
-  width:30px;
-  height:27px;
-  cursor:pointer; }
+.hamburger span{
+  display: block;
+  height: 2px; border-radius: 2px;
+  background: #000;
+  transition: transform .25s ease, opacity .2s ease;
+}
+.hamburger.is-open span:nth-child(1){ transform: translateY(9px) rotate(45deg); }
+.hamburger.is-open span:nth-child(2){ opacity: 0; }
+.hamburger.is-open span:nth-child(3){ transform: translateY(-9px) rotate(-45deg); }
 
-/* الشعار (نص—not link) بمواصفات AraHamah1964 Bold */
-.brand-text{
-  font-family: "AraHamah1964", sans-serif;  
+
+.logo{
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+.logo-mark{
+  font-family: "AraHamah1964", sans-serif;
   font-weight: 700;
-  font-style: normal;
-  font-size: (1.50rem, 1.50rem + 0vw, 1.50rem);
-  line-height: 1;                 /* 100% */
-  letter-spacing: 0;
-  text-align: right;
-  white-space: nowrap;
-  cursor: default;                /* ليس رابط */
+  font-size: 3rem;          
+  line-height: 1;
+  color: #000;
 }
 
-/* زر المنيو (الهامبرغر) */
-.menu-toggle{
-  display:flex;  
-  flex-direction:column; 
-  justify-content:space-between;
-  width:20px; 
-  height:15px; 
-  background:transparent; 
-  border:none; 
-  padding:0;
-  cursor:pointer;
-}
-.menu-toggle .bar{ height:3px; width:100%; background:#000; border-radius:2px; }
 
-/* خلفية عند فتح المنيو (للإغلاق بالضغط خارجها) */
-.backdrop{
-  position: fixed; 
-  inset: 0;
+.main-nav{
+  display: inline-flex;
+  align-items: center;
+  gap: 3.5rem;                  /* قربنا الروابط */
+  margin-inline-start: 5rem; /* مسافة خفيفة بعد الشعار */
+}
+.nav-link{
+  text-decoration: none;
+  font-family: "Cairo", sans-serif;
+  font-weight: 600;
+  font-size: 1.5rem;
+  color: #797979;
+}
+.nav-link:hover{ color: #000; }
+
+
+.live-btn{
+  display: inline-flex; 
+  align-items: center;
+  justify-content: center;
+  margin-inline-start: 3.5rem; /* قريب من الروابط */
+}
+.live-btn img{
+  height: 28px;               /* صغرناه */
+  display: block;
+}
+
+/* يدفش البحث للطرف الشمالي */
+.spacer{ flex: 1 1 auto; }
+
+/* البحث */
+.search{
+  display: inline-flex;
+  align-items: center;
+  width: 236px;
+  height: 35px;
+  gap: .5rem;
+  background: rgba(120,120,128,0.16);   /* Fills/Secondary */
+  border-radius: 100px;
+  padding: 0 .9rem;
+  cursor: text;
+}
+
+.search-icon{
+  font-size: 18px;
+  color: #666;           /* لون أيقونة البحث */
+}
+
+.search-text{
+  font-family: "Cairo", sans-serif;
+  font-size: 16px;
+  color: #999;           /* لون نص Search */
+}
+
+.search-input{
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 16px;
+  color: #000;
+}
+.search-input::placeholder{
+  color: #999;
+}
+
+/* ——— موبايل ——— */
+@media (max-width: 992px){
+  .header-inner{ height: 58px; padding-inline: 10%; }
+  .main-nav, .live-btn{ display: none; } /* بالموبايل منخليهم بالمنيو */
+  .logo-mark{ font-size: 1.7rem; }       /* توازن على الشاشات الصغيرة */
+  .search input{ width: 180px; height: 32px; }
+}
+
+/* أوف-كانفاس */
+.drawer{
+  position: fixed; inset: 0;
   background: rgba(0,0,0,.35);
-  opacity: 0; 
-  visibility: hidden;
-  transition: opacity .2s ease;
-  z-index: 1200; /* فوق الهيدر */
+  opacity: 0; pointer-events: none;
+  transition: opacity .25s ease;
 }
-.backdrop.show{ opacity:1; visibility:visible; }
+.drawer--open{ opacity: 1; pointer-events: auto; }
 
-/* سايد منيو – دائمًا من اليمين */
-.side-menu{
-  position: fixed; top:0; bottom:0; right:0;
-  width: min(80vw, 300px);
-  background:#fff;
+.drawer-panel{
+  position: absolute; top: 0; right: 0; /* RTL: من اليمين */
+  width: min(80vw, 320px); height: 100%;
+  background: #fff;
+  box-shadow: -2px 0 12px rgba(0,0,0,.08);
+  padding: 1rem 1.25rem;
+  display: flex; flex-direction: column; gap: .75rem;
   transform: translateX(100%);
-  transition: transform .25s ease-in-out;
-  box-shadow: -2px 0 8px rgba(0,0,0,.1);
-  z-index: 1300; /* فوق الـ backdrop */
+  transition: transform .25s ease;
 }
-.side-menu.open{ transform: translateX(0); }
+.drawer--open .drawer-panel{ transform: translateX(0); }
 
-.side-menu ul{
-  list-style:none; margin:6rem 1rem 0; padding:0;
-  display:flex; flex-direction:column; gap:1.25rem;
+.drawer-link{
+  text-decoration: none;
+  font-family: "Cairo", sans-serif;
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: #222;
+  padding: .5rem .25rem;
+  border-radius: 8px;
 }
-.side-menu a{ text-decoration:none; color:#111; font-size:1rem; }
+.drawer-link:hover{ background: rgba(0,0,0,.04); }
 
-
-/* (اختياري) إخفاء السايد منيو والزر على الديسكتوب */
-@media (min-width: 1024px){
-  /* احذف السطرين لو بدك تبقي المنيو على الديسكتوب */
-  /* .menu-toggle, .side-menu{ display:none; } */
+.drawer-live{
+  margin-top: .5rem;
+  display: inline-block;
+  padding: .6rem .9rem;
+  border-radius: 999px;
+  border: 1px solid rgba(0,0,0,.1);
+  text-decoration: none;
+  font-weight: 700;
+  text-align: center;
+  color: #c0162e;
 }

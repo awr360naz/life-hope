@@ -78,7 +78,7 @@ export default function HomePage() {
           <div className="schedule-viewport">
             <ul
               className="schedule-list"
-              style={{ transform: `translateY(${-(index * 24)}px)` }} /* 24px بعد التكبير */
+              style={{ transform: `translateY(${-(index * 24)}px)` }} 
             >
               {RAW_ITEMS.map((it, i) => (
                 <li key={i} className="schedule-row">
@@ -92,25 +92,19 @@ export default function HomePage() {
 
          {/* ===== الإطار 3: تأمل هذا الأسبوع ===== */}
          
-        <section className="text-frame">
-          <div className="frame-header center">
-            <span className="text-title">تأمل هذا الاسبوع</span>
-          </div>
-          <div className="text-body">
-            {/* النصوص عاليمين */}
-            <div className="text-content">
-              حتى في أصعب اللحظات، يُظهر الله حضوره كضوء لا ينطفئ، يرشد القلوب
-              المتعبة ويمنحها السلام. عندما نشعر بالعجز أو الخوف، يدعونا الإيمان
-              لنثق بأن كل شيء تحت سيطرته، وأنه يعمل للخير رغم الظلام المحيط. استمع
-              لصوت الروح، وامنح نفسك الوقت لتستقر في حضن الله، فالقوة الحقيقية لا
-              تأتي من الذات، بل من الاستسلام لمحبة الله التي لا تنتهي.
-            </div>
-            {/* الصورة عالشمال */}
-            <div className="text-image">
-              <img src={hopeImage} alt="Hope" />
-            </div>
-          </div>
-        </section>
+<section className="text-frame frame-3" dir="rtl">
+  <h3 className="text-title">تأمل هذا الاسبوع</h3>
+  <div className="text-body">
+    <div className="text-content">
+حتى في أصعب اللحظات، يُظهر الله حضوره كضوء لا ينطفئ، يرشد القلوب المتعبة ويمنحها السلام. عندما نشعر بالعجز أو الخوف، يدعونا الإيمان لنثق بأن كل شيء تحت سيطرته، وأنه يعمل للخير رغم الظلام المحيط. استمع لصوت الروح، وامنح نفسك الوقت لتستقر في حضن الله، فالقوة الحقيقية لا تأتي من الذات، بل من الاستسلام لمحبة الله التي لا تنتهي.
+    </div>
+    <div className="text-image">
+      <img src={hopeImage} alt="Hope" />
+    </div>
+  </div>
+</section>
+
+
       </div>
     </main>
   );
