@@ -1,6 +1,9 @@
+// src/pages/HomePage.js
 import React, { useEffect, useMemo, useState } from "react";
 import "./HomePage.css";
-import hopeImage from "./hopeimage.jpg"; 
+import hopeImage from "./hopeimage.jpg";
+import api from "../lib/api"; // مهم: تأكدي من المسار حسب هيكلة مشروعك
+
 export default function HomePage() {
   // تاريخ اليوم بأرقام إنجليزية (Asia/Jerusalem)
   const todayStr = useMemo(() => {
@@ -14,26 +17,35 @@ export default function HomePage() {
     return fmt.format(new Date()); // مثل: 20/08/2025
   }, []);
 
-  // عناصر برنامج اليوم
-  const RAW_ITEMS = [
-    { time: "00:20", title: "اية وحكاية" },
-    { time: "01:30", title: "فتح نبؤات" },
-    { time: "02:30", title: "الحياة والصحة" },
-    { time: "03:20", title: "اية وحكاية" },
-    { time: "03:30", title: "رؤيا" },
-    { time: "06:30", title: "رؤيا" },
-    { time: "07:00", title: "الكتاب المقدس" },
-    { time: "08:00", title: "المزامير" },
-    { time: "09:00", title: "خطوات الى المسيح" },
-    { time: "10:20", title: "اية وحكاية" },
-    { time: "13:30", title: "فتح نبؤات" },
-    { time: "14:30", title: "الحياة والصحة" },
-  ];
-
-  // تيكر: يقلب كل 5 ثوانٍ ويتوقف عند المرور بالماوس
+  // ===== برنامج اليوم =====
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
-  const max = RAW_ITEMS.length;
+  const [items, setItems] = useState([]);
+  const [err, setErr] = useState("");
+  const [loading, setLoading] = useState(true);
+  const max = items.length;
+
+  // ✅ تعديل normalizeItems
+  function normalizeItems(arr) {
+    if (!Array.isArray(arr)) return [];
+    return arr.map((it) => {
+      if (typeof it?.t === "string") return { time: "—", title: it.t }; // دعم Supabase {t:"..."}
+      if (typeof it === "string") return { time: "—", title: it };      // سترينغ عادي
+      return { time: it?.time ?? "—", title: it?.title ?? "" };         // شكل {time,title}
+    });
+  }
+
+  useEffect(() => {
+    api
+      .getProgramToday()
+      .then((data) => {
+        const normalized = normalizeItems(data?.program?.items);
+        setItems(normalized);
+        setIndex(0);
+      })
+      .catch((e) => setErr(e.message))
+      .finally(() => setLoading(false));
+  }, []);
 
   useEffect(() => {
     if (paused || max <= 1) return;
@@ -45,15 +57,14 @@ export default function HomePage() {
 
   return (
     <main className="homepage-rtl">
-      {/* شريط تمركز الإطارات بالمنتصف */}
       <div className="frames-center">
-        {/* ===== عنوان/تاريخ البث فوق الإطار (خارج الصندوق) ===== */}
+        {/* ===== عنوان/تاريخ البث ===== */}
         <div className="live-topline">
           <span className="live-title">البث المباشر</span>
           <span className="live-date">{todayStr}</span>
         </div>
 
-        {/* ===== الإطار 1: البث المباشر ===== */}
+        {/* ===== الإطار 1: البث ===== */}
         <section className="live-frame">
           <div className="live-box">
             <iframe
@@ -75,36 +86,56 @@ export default function HomePage() {
           <div className="frame-header center">
             <span className="schedule-title">برنامج اليوم</span>
           </div>
+
+          {err ? <div className="schedule-error">خطأ في الجلب: {err}</div> : null}
+
           <div className="schedule-viewport">
-            <ul
-              className="schedule-list"
-              style={{ transform: `translateY(${-(index * 24)}px)` }} 
-            >
-              {RAW_ITEMS.map((it, i) => (
-                <li key={i} className="schedule-row">
-                  <time className="row-time">{it.time}</time>
-                  <span className="row-title">{it.title}</span>
+            {loading ? (
+              <ul className="schedule-list">
+                <li className="schedule-row">
+                  <time className="row-time">…</time>
+                  <span className="row-title">… جاري التحميل</span>
                 </li>
-              ))}
-            </ul>
+              </ul>
+            ) : items.length === 0 ? (
+              <ul className="schedule-list">
+                <li className="schedule-row">
+                  <time className="row-time">—</time>
+                  <span className="row-title">لا يوجد فقرات مُسجّلة لليوم</span>
+                </li>
+              </ul>
+            ) : (
+              <ul
+                className="schedule-list"
+                style={{ transform: `translateY(${-(index * 24)}px)` }}
+              >
+                {items.map((it, i) => (
+                  <li key={i} className="schedule-row">
+                    <time className="row-time">{it.time}</time>
+                    <span className="row-title">{it.title}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </section>
 
-         {/* ===== الإطار 3: تأمل هذا الأسبوع ===== */}
-         
-<section className="text-frame frame-3" dir="rtl">
-  <h3 className="text-title">تأمل هذا الاسبوع</h3>
-  <div className="text-body">
-    <div className="text-content">
-حتى في أصعب اللحظات، يُظهر الله حضوره كضوء لا ينطفئ، يرشد القلوب المتعبة ويمنحها السلام. عندما نشعر بالعجز أو الخوف، يدعونا الإيمان لنثق بأن كل شيء تحت سيطرته، وأنه يعمل للخير رغم الظلام المحيط. استمع لصوت الروح، وامنح نفسك الوقت لتستقر في حضن الله، فالقوة الحقيقية لا تأتي من الذات، بل من الاستسلام لمحبة الله التي لا تنتهي.
-    </div>
-    <div className="text-image">
-      <img src={hopeImage} alt="Hope" />
-    </div>
-  </div>
-</section>
-
-
+        {/* ===== الإطار 3: تأمل هذا الأسبوع ===== */}
+        <section className="text-frame frame-3" dir="rtl">
+          <h3 className="text-title">تأمل هذا الاسبوع</h3>
+          <div className="text-body">
+            <div className="text-content">
+              حتى في أصعب اللحظات، يُظهر الله حضوره كضوء لا ينطفئ، يرشد القلوب
+              المتعبة ويمنحها السلام. عندما نشعر بالعجز أو الخوف، يدعونا الإيمان
+              لنثق بأن كل شيء تحت سيطرته، وأنه يعمل للخير رغم الظلام المحيط.
+              استمع لصوت الروح، وامنح نفسك الوقت لتستقر في حضن الله، فالقوة
+              الحقيقية لا تأتي من الذات، بل من الاستسلام لمحبة الله التي لا تنتهي.
+            </div>
+            <div className="text-image">
+              <img src={hopeImage} alt="Hope" />
+            </div>
+          </div>
+        </section>
       </div>
     </main>
   );

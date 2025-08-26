@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "./Header.css";
 import { FiSearch } from "react-icons/fi";
-import LiveButtonImg from "../components/livebutton.png"; // عدّل المسار لو لزم
+import LiveButtonImg from "../components/livebutton.png"; 
 
 export default function Header() {
   const [open, setOpen] = useState(false);
@@ -43,10 +43,10 @@ export default function Header() {
         <div className="spacer" />
 
       
-       <form className="search" role="search" onSubmit={(e)=>e.preventDefault()}>
-  <FiSearch className="search-icon" />
-  <input type="search" placeholder="Search" className="search-input" />
-</form>
+       <form className="search" role="search" onSubmit={(e)=>e.preventDefault()}dir="ltr">
+        <FiSearch className="search-icon" />
+        <input type="search" placeholder="Search" className="search-input" />
+          </form>
 
       </div>
 
@@ -57,6 +57,10 @@ export default function Header() {
           <Link to="/programs" className="drawer-link" onClick={()=>setOpen(false)}>برامجنا</Link>
           <Link to="/about" className="drawer-link" onClick={()=>setOpen(false)}>قصتنا</Link>
           <Link to="/live" className="drawer-live" onClick={()=>setOpen(false)}>البث المباشر</Link>
+        <Link to="/mp3livepage" className="drawer-live" onClick={()=>setOpen(false)}>
+  البث المباشر الصوتي
+</Link>
+
         </nav>
       </div>
     </header>

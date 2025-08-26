@@ -1,0 +1,63 @@
+import { Link } from "react-router-dom";
+import "./ArticlesPage.css";
+
+export default function ArticlesPage() {
+  // بيانات موك مؤقتة (رح نستبدلها لاحقًا بـ API)
+  const ARTICLES = [
+    {
+      id: "a1",
+      slug: "hope-message-1",
+      titleAr: "رسالة رجاء 1",
+      coverUrl: "https://picsum.photos/seed/a1/600/400",
+    },
+    {
+      id: "a2",
+      slug: "hope-message-2",
+      titleAr: "رسالة رجاء 2",
+      coverUrl: "https://picsum.photos/seed/a2/600/400",
+    },
+    {
+      id: "a3",
+      slug: "hope-message-3",
+      titleAr: "رسالة رجاء 3",
+      coverUrl: "https://picsum.photos/seed/a3/600/400",
+    },
+    {
+      id: "a4",
+      slug: "hope-message-4",
+      titleAr: "رسالة رجاء 4",
+      coverUrl: "https://picsum.photos/seed/a4/600/400",
+    },
+    {
+      id: "a5",
+      slug: "hope-message-5",
+      titleAr: "رسالة رجاء 5",
+      coverUrl: "https://picsum.photos/seed/a5/600/400",
+    },
+    {
+      id: "a6",
+      slug: "hope-message-6",
+      titleAr: "رسالة رجاء 6",
+      coverUrl: "https://picsum.photos/seed/a6/600/400",
+    },
+  ];
+
+  return (
+    <main className="articles-page" dir="rtl">
+      <h2 className="articles-title">المقالات</h2>
+
+      <div className="articles-grid">
+        {ARTICLES.map((a) => (
+          <article key={a.id} className="article-card">
+            <Link to={`/articles/${a.slug}`} className="article-link" aria-label={a.titleAr}>
+              <div className="article-image-wrap">
+                <img src={a.coverUrl} alt={a.titleAr} loading="lazy" />
+              </div>
+              <h3 className="article-title">{a.titleAr}</h3>
+            </Link>
+          </article>
+        ))}
+      </div>
+    </main>
+  );
+}

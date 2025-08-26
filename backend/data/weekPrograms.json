@@ -1,0 +1,23 @@
+{
+  "Sunday": {
+    "title": "برنامج الأحد",
+    "items": [
+      "00:20 اية وحكاية",
+      "01:30 فتح نبؤات",
+      { "time": "02:30", "title": "الحياة والصحة" }
+    ],
+    "notes": ""
+  },
+  "Monday":    {    "title": "برنامج الأحد",
+    "items": [
+      "00:20 اية وحكاية",
+      "01:30 فتح نبؤات",
+      { "time": "02:30", "title": "الحياة والصحة" }
+    ],
+    "notes": "" },
+  "Tuesday":   { "title": "", "items": [] },
+  "Wednesday": { "title": "", "items": [] },
+  "Thursday":  { "title": "", "items": [] },
+  "Friday":    { "title": "", "items": [] },
+  "Saturday":  { "title": "", "items": [] }
+}

@@ -171,3 +171,14 @@
   text-align: center;
   color: #c0162e;
 }
+.drawer-live{
+  margin-top: .5rem;
+  display: inline-block;
+  padding: .6rem .9rem;
+  border-radius: 999px;
+  border: 1px solid rgba(0,0,0,.1);
+  text-decoration: none;
+  font-weight: 700;
+  text-align: center;
+  color: #c0162e;
+}
