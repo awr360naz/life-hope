@@ -1,0 +1,54 @@
+/* يغطي كامل الشاشة ويُبقي المشغّل في الوسط */
+/* غطّي كل الشاشة بالخلفية */
+.live-fit-stage {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;        /* يملأ طول الشاشة */
+ background: linear-gradient(180deg, #FFFFFF 0%, #F6F3EE 20%);
+  box-sizing: border-box;
+}
+
+/* إطار بالحجم الأصلي ثم نكبّره بالـ scale */
+.live-fit-frame{
+  transform-origin: center center; /* تكبير من المنتصف */
+  border: none;
+  overflow: visible;                /* ما بنقص ولا طرف */
+}
+
+/* الـiframe يملأ الإطار الأصلي */
+.live-iframe{
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+.live-fit-stage {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.live-fit-frame {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem; /* مسافة بين اللايف والصورة */
+}
+
+.live-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* الصورة أسفل البث */
+.live-ad {
+  width: 80%;           /* أقل من عرض اللايف */
+  height: 220px;        /* ارتفاع قليل (مستطيل) */
+  border-radius: 8px;
+  object-fit: cover;    /* يملأ المستطيل بدون تمدد */
+  display: block;
+}
+

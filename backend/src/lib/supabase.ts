@@ -1,9 +1,2 @@
-import { createClient } from '@supabase/supabase-js';
-
-const url = process.env.SUPABASE_URL!;
-const key = process.env.SUPABASE_SERVICE_ROLE!; // آمن بالسيرفر
-export const supabase = createClient(url, key, {
-  auth: { persistSession: false }
-});
-
-export default supabase;
+// backend/src/lib/supabase.ts
+export { supabase as default, supabase } from "../supabaseClient.js";

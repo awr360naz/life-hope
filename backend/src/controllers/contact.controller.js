@@ -1,19 +1,32 @@
-// src/controllers/contact.controller.js
-const inbox = {
-  prayers: [],
-  contacts: []
-};
+import { getSupabase } from "../supabaseClient.js";
 
-export const sendPrayer = (req, res) => {
-  const { name, phone, message } = req.body;
-  const item = { id: Date.now(), name, phone, message, type: "prayer", ts: new Date().toISOString() };
-  inbox.prayers.push(item);
-  res.status(201).json({ ok: true, id: item.id });
-};
+// اتركي بقية الدوال كما هي: getLive, getArticles, getPrograms ...
 
-export const sendContact = (req, res) => {
-  const { name, email, message } = req.body;
-  const item = { id: Date.now(), name, email, message, type: "contact", ts: new Date().toISOString() };
-  inbox.contacts.push(item);
-  res.status(201).json({ ok: true, id: item.id });
-};
+export async function getHomeThirdFrame(req, res) {
+  const sb = getSupabase();
+  if (!sb) {
+    return res.status(500).json({ error: "Supabase not configured (env missing)" });
+  }
+
+  try {
+    const { data, error } = await sb
+      .from("home_third_frame_items")
+      .select("*")
+      .limit(1);
+
+    if (error) return res.status(500).json({ error: error.message });
+    if (!data || data.length === 0) return res.status(404).json({ error: "Not found" });
+
+    const row = data[0];
+    res.json({
+      ok: true,
+      content: {
+        title: row.title ?? "—",
+        body: row.body ?? row.text ?? "",
+        image_url: row.image_url ?? row.img ?? null,
+      },
+    });
+  } catch (e) {
+    res.status(500).json({ error: String(e?.message || e) });
+  }
+}

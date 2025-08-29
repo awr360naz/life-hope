@@ -1,27 +1,32 @@
-import { useEffect, useState } from "react";
-import { api } from "../lib/api"; // أو: import api from "../lib/api";
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 export default function ArticlesPage() {
-  const [items, setItems] = useState([]);
-  const [err, setErr] = useState("");
-
+  const [list, setList] = useState([]);
   useEffect(() => {
-    api.articles()
-      .then(setItems)
-      .catch(e => setErr(e.message));
+    (async () => {
+      const res = await fetch("/api/content/articles", { headers:{Accept:"application/json"} });
+      const data = await res.json();
+      setList(Array.isArray(data?.articles) ? data.articles : Array.isArray(data) ? data : []);
+    })();
   }, []);
-
-  if (err) return <p style={{color:'red'}}>خطأ: {err}</p>;
-  if (!items.length) return <p>...تحميل</p>;
-
   return (
-    <main className="container">
-      <h2>المقالات</h2>
-      <ul>
-        {items.map(a => (
-          <li key={a.id}>{a.title}</li>
-        ))}
-      </ul>
+    <main dir="rtl" style={{maxWidth:1000, margin:"2rem auto", padding:"0 1rem"}}>
+      <h1>كل المقالات</h1>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(240px,1fr))",gap:"1rem"}}>
+        {list.map(a => {
+          const slug = a.slug || a.id;
+          const img = a.cover_url || a.image_url;
+          return (
+            <Link key={slug} to={`/articles/${slug}`} style={{textDecoration:"none",color:"inherit"}}>
+              <article style={{background:"#fff",border:"1px solid #eee",borderRadius:12,padding:12}}>
+                {img && <img src={img} alt={a.title} style={{width:"100%",height:140,objectFit:"cover",borderRadius:8}}/>}
+                <h3 style={{marginTop:".5rem"}}>{a.title}</h3>
+              </article>
+            </Link>
+          );
+        })}
+      </div>
     </main>
   );
 }

@@ -19,12 +19,17 @@
 .homepage-rtl {
   direction: rtl;
   position: relative;
-  min-height: 100%;     /* بدل 100vh */
-  background: linear-gradient(180deg,#FFFFFF 0%, #F6F3EE 100%);
+  min-height: 100%;
+  background: transparent;
   font-family: Cairo, sans-serif;
 }
-html, body {
-  height: 100%;
+html, body { height: 100%; }
+
+/* (اختياري) حاوية عامة لو موجودة عندك في JSX */
+.home-wrap{
+  max-width: 1420px;   /* يلفّ frames+carousel فقط بدون تغيير القياسات */
+  margin: 0 auto;
+  padding: 0 1rem;
 }
 
 /* ===== شريط تمركز الإطارات بالمنتصف ===== */
@@ -32,64 +37,65 @@ html, body {
 .frames-center{
   position: relative;
   width: 1412px;
-  margin: 100px auto 0;  /* بدل 215px */
+  height: 330px;          /* يحجز مكانًا للإطارات المطلقة */
+  margin: 100px auto 0;   /* بدل 215px */
 }
-
 
 /* ===== الهيدر الصغير العام داخل الإطارات ===== */
 .frame-header{
   display: flex;
-  justify-content: center; /* عناوين وسط */
+  justify-content: center;
   align-items: center;
-  gap: .6rem;              /* 0.5rem ×1.2 */
-  padding: 7px 10px;       /* (6×1.2 , 8×1.2) */
-  /* إزالة الخط الرمادي تحت العناوين */
-  /* border-bottom: none;  <-- (محوّر) */
+  gap: .6rem;
+  padding: 7px 10px;
   color: #000;
 }
 .frame-header.center{ justify-content: center; }
 
-/* ===== عنوان وتاريخ البث فوق الإطار (خارج الصندوق) ===== */
+/* ===== عنوان وتاريخ البث فوق الإطار (خارج صندوق البث) ===== */
 .live-topline{
   position: absolute;
-  /* يتموضع فوق الإطار مباشرة */
-  left: 836px;           /* نفس يسار الإطار بعد التكبير */
-  top: -32px;            /* مسافة بسيطة فوق الصندوق */
+  left: 836px;            /* يحاذي يسار إطار البث */
+  top: -32px;             /* فوق الصندوق مباشرة */
   display: flex;
+  flex-direction: row-reverse;  /* العنوان يمين، التاريخ شمال */
   justify-content: space-between;
   align-items: baseline;
   gap: 12px;
-  width: 576px;          /* يساوي عرض الإطار */
+  width: 576px;           /* يساوي عرض إطار البث */
   padding: 0 2px;
+
+  .live-date{
+  font-weight: 700;
+  font-size: 12px;
+  color: #000;
+  direction: ltr;
+  unicode-bidi: plaintext;
+  font-variant-numeric: tabular-nums;
+  font-family: "The Year of Handicrafts", Cairo, sans-serif;
+}
+
 }
 .live-title{
   font-weight: 700;
-  font-size: 18px;       /* 15px ×1.2 */
+  font-size: 18px;
   color: #000;
   font-family: "AraHamah1964", Cairo, sans-serif;
-}
-.live-date{
-  font-weight: 700;
-  font-size: 12px;       /* 10px ×1.2 */
-  color: #000;
-  font-family: "The Year of Handicrafts", Cairo, sans-serif;
 }
 
 /* ===== الإطار 1: البث المباشر ===== */
 .live-frame{
   position: absolute;
-  top: 0px; left: 836px; /* 697×1.2 ≈ 836 */
-  width: 576px;          /* 480×1.2 */
-  height: 330px;         /* 275×1.2 */
+  top: 0px; left: 836px;  /* 697×1.2 ≈ 836 */
+  width: 576px;           /* 480×1.2 */
+  height: 330px;          /* 275×1.2 */
   border: 1px solid #000;
-  border-radius: 6px;    /* 5×1.2 ≈ 6 */
+  border-radius: 6px;
   background: transparent;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
 }
-
-/* الفيديو يملأ بقية المساحة بدون Scroll */
 .live-box{
   flex: 1;
   overflow: hidden;
@@ -114,298 +120,114 @@ html, body {
   flex-direction: column;
   box-sizing: border-box;
 }
-
-/* عنوان الإطار */
 .schedule-title{
   font-weight: 700;
-  font-size: 14px;        /* 12×1.2 */
+  font-size: 14px;
   color: #000;
   text-decoration: underline;
 }
-
-/* نافذة العناصر (تيكر) */
 .schedule-viewport{
   flex: 1;
-  overflow: hidden;       /* ما بيطلع خارج الإطار */
+  overflow: hidden;
   color: #000;
 }
-
-/* قائمة التيكر */
 .schedule-list{
   list-style: none;
   margin: 0;
-  padding: 7px 10px;      /* 6/8 ×1.2 */
-  transition: transform .5s ease-in-out;
+  padding: 7px 10px;
   font-weight: 600;
-  font-size: 11px;        /* 9×1.2 ≈ 10.8 */
-  line-height: 24px;      /* 20×1.2 */
+  font-size: 11px;
+  line-height: 24px;      /* يساوي ROW_H بالـ JS */
   text-align: right;
+  will-change: transform;
+  transition: transform 0.5s linear; /* سرعة حركة كل خطوة */
 }
+.schedule-list.no-anim{ transition: none !important; }
 .schedule-row{
   display: flex;
   justify-content: space-between;
   height: 24px;           /* يساوي line-height */
 }
-.row-time{ min-width: 4.2ch; } /* 3.5×1.2 تقريبا */
-.row-title{}
+.row-time{ min-width: 4.2ch; }
 
 /* ===== الإطار 3: تأمل هذا الأسبوع ===== */
-/* قالب عام لكل الإطارات: بدون تموضع ثابت */
 .text-frame{
+  position: absolute;
+  top: 0px; left: 0px;
   width: 576px;
   height: 330px;
   border: 1px solid #000;
   border-radius: 6px;
-  background:transparent;
+  background: transparent;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  overflow: hidden;           /* يمنع خروج الصورة */
-  padding: 0;                 /* نخلي الحسابات دقيقة */
+  overflow: hidden;   /* يمنع خروج الصورة */
+  padding: 0;
 }
 
-/* تموضع الإطار الثالث فقط (غيّر القيم حسب مكانه المطلوب) */
-.frame-3{
-  position: absolute;
-  top: 0px;                   /* ← عدّل لمكان الإطار الثالث */
-  left: 0px;                  /* ← عدّل لمكان الإطار الثالث */
-}
-
-/* العنوان أعلى يمين */
-.text-title{
-  margin: 0;
-  padding: 6px 10px 4px 20px; /* يمين 10px */
-  font-weight: 700;
-  font-size: 14px;
-  line-height: 1;             /* ارتفاع سطر واضح */
-  color: #000;
-  text-align: right;
-}
-
-/* الجسم تحت العنوان مباشرة */
-.text-body{
-  /* احسب ارتفاع الجسم = ارتفاع الإطار - ارتفاع صف العنوان (تقريباً 26px) */
-  height: calc(100% - 26px);
-  display: flex;
-  flex-direction: row;
-  align-items: stretch;       /* النص والصورة نفس الارتفاع */
-  gap: 60px;
-  padding: 0 10px 10px;       /* يمين/شمال/أسفل */
-  box-sizing: border-box;
-  direction: rtl;             /* أول عنصر على اليمين */
-}
-
-/* النص (يمين) */
-.text-content{
-  flex: 1 1 20%;
-  min-width: 0;
-  font-weight: 500;
-  font-size: 12px;
-  line-height: 22px;
-  text-align: right;
-  color: #000;
-  overflow-y: auto;
-  padding-top: 2px;           /* يبدأ تقريبًا من مستوى الصورة */
-}
-
-/* الصورة (شمال) */
-.text-image{
-  flex: 0 0 60%;
-  display: flex;
-  align-items: flex-start;    /* تلتصق من أعلى الجسم */
-}
-
-.text-image img{
+/* ===== ThirdFrame: عرض فقط (بدون تغيير JSX) ===== */
+.third-frame{
   width: 100%;
-  height: 100%;               /* تمتد لنهاية النص */
-  display: block;
-  border-radius: 6px;
-  object-fit: cover;
-  object-position: center top;/* تبدأ من الأعلى */
+  height: 100%;        /* يملى الإطار 576×330 */
+  padding: 12px 16px;
+  box-sizing: border-box;
+}
+.third-frame .text-body{
+  display: grid;
+  grid-template-columns: minmax(0,1fr) minmax(0,1fr);  /* نص = 1fr | صورة = 1fr */
+  gap: 16px;
+  height: 100%;
+  align-items: stretch; /* كل عمود يأخذ كامل الارتفاع */
+}
+.third-frame .text-col{ min-width: 0; height: 100%; }
+
+/* عمود النص */
+.third-frame .text-col--right{
+  display: flex;
+  flex-direction: column;
+}
+.third-frame .text-title{
+  margin: 0 0 8px;
+  font-weight: 700;
+  font-size: 1.25rem;
+  line-height: 1.3;
+  flex: 0 0 auto;
+}
+.third-frame .text-paragraph{
+  margin: 0;
+  line-height: 1.7;
+  flex: 1 1 auto;
+  overflow: auto;              /* نص طويل داخل نفس القياس */
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  font-size: .83rem;
 }
 
-/* =========================================================
-   1) تحسينات خفيفة للأساسيات (تبقى شغّالة للديسكتوب)
-   ========================================================= */
-.homepage-rtl{
-  direction: rtl;
+/* عمود الصورة */
+.third-frame .text-col--left{
+  display: flex;
+  align-items: center;         /* توسيط عمودي للصورة */
+  justify-content: center;     /* توسيط أفقي للصورة */
 }
-html, body { height: 100%; }
-
-.frames-center{
-  /* تبقى قيمتك القديمة للديسكتوب كما هي */
-  width: 1412px;
-  margin: 100px auto 0;
-}
-
-/* =========================================================
-   2) لابتوب/شاشات متوسطة: ≤ 1200px
-   - نلغي الـ absolute ونحوّل Grid بثلاثة أعمدة
-   ========================================================= */
-@media (max-width: 1200px){
-  .frames-center{
-    width: min(100%, 1040px);
-    margin: 72px auto 0;
-    display: grid;
-    grid-template-columns: 1fr 180px 1fr; /* نص | برنامج اليوم | بث */
-    gap: 16px;
-    /* نحتاج أن تصبح العناصر داخلها تدفّق طبيعي بدل تموضع مطلق */
-    position: relative;
-  }
-
-  /* العنوان والتاريخ فوق البث يصبحا عنصرًا عاديًا */
-  .live-topline{
-    position: static;
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 12px;
-    width: 100%;
-    padding: 0 2px 4px;
-    grid-column: 3; /* فوق البث */
-    order: 2;       /* يأتي قبل صندوق البث */
-  }
-
-  /* إلغاء التموضع المطلق للإطارات واعتماد الشبكة */
-  .live-frame,
-  .schedule-frame,
-  .text-frame{
-    position: static;
-    width: 100%;
-    height: auto;          /* نسمح بالتمدّد الطبيعي */
-    box-sizing: border-box;
-  }
-
-  /* أماكن الإطارات على الشبكة (يمين = بث، وسط = برنامج، يسار = نص) */
-  .text-frame{     grid-column: 1; order: 1; }
-  .schedule-frame{ grid-column: 2; order: 2; }
-  .live-frame{     grid-column: 3; order: 3; }
-
-  /* البث: اجعله بنسبة 16:9 بدل ارتفاع ثابت */
-  .live-box{
-    aspect-ratio: 16 / 9;
-    border-radius: 6px;
-    overflow: hidden;
-  }
-  .live-iframe{
-    width: 100%;
-    height: 100%;
-  }
-
-  /* برنامج اليوم: ارتفاع مناسب مع نفس التيكر */
-  .schedule-frame{
-    max-height: 360px;
-    display: flex;
-    flex-direction: column;
-  }
-  .schedule-viewport{
-    flex: 1;
-    overflow: hidden;
-  }
-
-  /* نص التأمل والصورة يتقاسمان العرض */
-  .text-body{
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 7px 10px;
-  }
-  .text-content{ flex: 1 1 60%; min-width: 0; }
-  .text-image{   flex: 0 0 38%; max-width: 45%; }
-  .text-image img{ width: 100%; height: auto; object-fit: cover; }
-
-  /* تكبيرات خفيفة للنصوص على اللابتوب */
-  .live-title{ font-size: 18px; }
-  .live-date{  font-size: 12px; }
-  .schedule-title, .text-title{ font-size: 14px; }
+.third-frame .text-image{
+  display: block;              /* يلغي baseline */
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;         /* تبين كاملة بدون قص */
+  object-position: center center;
+  
 }
 
-/* =========================================================
-   3) موبايل/تابلت: ≤ 768px
-   - عمود واحد بالترتيب: البث → برنامج اليوم → التأمل
-   ========================================================= */
-@media (max-width: 768px){
-  .frames-center{
-    width: min(100%, 640px);
-    margin: 56px auto 16px;
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 14px;
-  }
+/* (اختياري) مظهر ناعم للسكرول داخل الفقرة */
+.third-frame .text-paragraph::-webkit-scrollbar{ width: 8px; }
+.third-frame .text-paragraph::-webkit-scrollbar-thumb{ background: rgba(0,0,0,.2); border-radius: 8px; }
 
-  .live-topline{
-    position: static;
-    width: 100%;
-    padding: 0 4px;
-    margin-bottom: -6px; /* يقرب العنوان من الإطار */
-    grid-column: 1;
-    order: 1;
-  }
-
-  .live-frame,
-  .schedule-frame,
-  .text-frame{
-    position: static;
-    width: 100%;
-    height: auto;
-    grid-column: 1;
-  }
-
-  .live-frame{     order: 2; }
-  .schedule-frame{ order: 3; }
-  .text-frame{     order: 4; }
-
-  /* البث بنسبة 16:9 ملء العرض */
-  .live-box{
-    aspect-ratio: 16/9;
-    overflow: hidden;
-    border-radius: 6px;
-  }
-
-  /* برنامج اليوم: خط أكبر قليلًا وارتفاع مناسب */
-  .schedule-title{
-    font-size: 15px;
-  }
-  .schedule-list{
-    font-size: 12px;       /* يحافظ على line-height:24px */
-    line-height: 24px;
-  }
-  .schedule-frame{
-    max-height: 320px;
-  }
-
-  /* التأمل: نكدّس الصورة تحت النص */
-  .text-body{
-    flex-direction: column;
-    gap: 10px;
-  }
-  .text-content{
-    font-size: 13px;
-    line-height: 26px;
-    overflow: visible; /* نسمح بتمدد طبيعي بالموبايل */
-  }
-  .text-image{
-    flex: 0 0 auto;
-    max-width: 100%;
-  }
-  .text-image img{
-    width: 100%;
-    height: auto;
-    object-fit: cover;
-    border-radius: 6px;
-  }
-
-  /* أحجام العناوين */
-  .live-title{ font-size: 16px; }
-  .live-date{  font-size: 12px; }
-  .text-title{ font-size: 15px; }
-}
-
-/* =========================================================
-   4) شاشات صغيرة جدًا: ≤ 380px (تحسين القراءة)
-   ========================================================= */
-@media (max-width: 380px){
-  .schedule-list{ font-size: 11px; line-height: 22px; }
-  .schedule-row{  height: 22px; }
+/* ===== الكاروسول تحت الإطارات ===== */
+.articles-section{
+  max-width: 1200px;
+  margin: 24px auto 0;     /* يجي تحت الإطارات مباشرة */
+  padding: 0 1rem;
 }

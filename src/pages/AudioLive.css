@@ -1,0 +1,50 @@
+/* الصفحة كاملة */
+.mp3-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;    
+  align-items: center;        
+background: linear-gradient(180deg, #FFFFFF 0%, #F6F3EE 20%);
+  padding: 2rem 0;
+  box-sizing: border-box;
+  overflow-x: hidden; 
+
+}
+
+/* الحاوية */
+.mp3-container {
+  width: min(900px, 80%);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  box-sizing: border-box;
+}
+
+/* غلاف البث */
+.mp3-audio {
+  width: 100%;
+  overflow: hidden; /* يمنع أي بروز */
+}
+
+/* البث */
+.mp3-iframe {
+  width: 100%;        /* دايمًا بعرض الحاوية */
+  max-width: 100%;    /* ما يوسعها */
+  height: 280px;
+  border: none;
+  display: block;
+  border-radius: 6px;
+
+}
+
+/* الصورة */
+.mp3-ad {
+  width: 100%;
+  max-width: 100%;      /* ما تتعدى عرض الحاوية */
+  height: 280px;
+  object-fit: cover;
+  border-radius: 8px;
+  display: block;
+}

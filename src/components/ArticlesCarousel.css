@@ -1,0 +1,108 @@
+.carousel-viewport {
+  position: relative;
+  overflow: hidden;
+
+}
+.articles-link {
+  color: inherit;            /* يخلي اللون زي الأب (العنوان الأصلي) */
+  text-decoration: none;     /* يشيل الخط */
+}
+
+.articles-link:hover {
+  color: inherit;            /* يضل نفس اللون عند المرور */
+  text-decoration: none;     /* ما يظهرش خط */
+}
+
+
+/* استخدمي متغيّرات للتحكم السهل */
+.carousel-track {
+  --gap: 12px;     /* المسافة بين الكروت */
+  --edge: 12px;    /* حافة يمين/يسار المسار */
+
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+
+  /* المسار هو اللي بيسكرول */
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+
+  gap: var(--gap);
+  padding-inline: var(--edge);         /* حافة تمنع قصّ أول/آخر كرت */
+  scroll-padding-inline: var(--edge);  /* السناب يحتسب الحافة */
+}
+.carousel-track::-webkit-scrollbar { display: none; }
+
+
+/* عرض الكرت = (100% - مجموع الفراغات بين الكروت الظاهرة) / عدد الظاهر */
+.article-card {
+  /* إذا ظاهر 4 كروت، في 3 فراغات بينهم داخل العرض */
+  flex: 0 0 calc(
+    (100% - ( (var(--perView, 4) - 1) * var(--gap, 12px) ))
+    / var(--perView, 4)
+  );
+  box-sizing: border-box;
+  scroll-snap-align: start;
+  cursor: pointer;
+}
+
+
+/* الإطار الأبيض */
+.article-inner {
+  height: 100%;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,.08);
+  overflow: hidden;
+  padding: 6px;        /* <<< أصغر من قبل */
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* صورة */
+.article-image-wrap {
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 6px;
+}
+.article-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* عنوان المقال RTL */
+.article-card-title {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 0;
+  text-align: right;   /* <<< من اليمين لليسار */
+  direction: rtl;
+}
+
+/* الأزرار تبقى مثل قبل */
+.nav-btn {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  inline-size: 38px; block-size: 38px; border-radius: 999px;
+  border: none; background: rgba(0,0,0,.6); color: #fff;
+  font-size: 22px; display: grid; place-items: center;
+  cursor: pointer; z-index: 1;
+}
+.nav-prev { inset-inline-start: 6px; }
+.nav-next { inset-inline-end: 6px; }
+.nav-btn:disabled { opacity: .35; cursor: default; }
+.articles-link,
+.card-link {
+  color: inherit;
+  text-decoration: none;
+}
+.articles-link:hover,
+.card-link:hover {
+  text-decoration: none;
+}
+.article-card { cursor: pointer; }

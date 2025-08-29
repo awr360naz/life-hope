@@ -10,7 +10,9 @@ import ProgramsPage from './pages/ProgramsPage';
 import StoriesPage from './pages/StoriesPage';
 import LivePage from './pages/LivePage';
 import Askforpray from './pages/Askforpray';
-import Mp3LivePage from './pages/Mp3LivePage';
+import AudioLive from './pages/AudioLive';
+import VedioAudioLive from "./pages/VedioAudioLive";
+import ArticleDetail from "./pages/ArticleDetail";
  
 
 
@@ -30,7 +32,10 @@ export default function App() {
   <Route path="/stories" element={<StoriesPage />} />
   <Route path="/live" element={<LivePage />} />
   <Route path="/askforpray" element={<Askforpray />} />
-  <Route path="/Mp3LivePage" element={<Mp3LivePage />} />
+  <Route path="/AudioLive" element={<AudioLive />} />
+ <Route path="/vedio-audio-live" element={<VedioAudioLive />} />
+<Route path="/articles/:slug" element={<ArticleDetail />} />
+  
 </Routes>
         </main>
         <Footer />

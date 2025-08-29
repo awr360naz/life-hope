@@ -35,7 +35,7 @@ export default function Header() {
         </nav>
 
         {/* زر البث (صورة) */}
-        <Link to="/live" className="live-btn" aria-label="البث المباشر">
+        <Link to="/vedio-audio-live" className="live-btn" aria-label="البث المباشر">
           <img src={LiveButtonImg} alt="البث المباشر" />
         </Link>
 
@@ -57,7 +57,7 @@ export default function Header() {
           <Link to="/programs" className="drawer-link" onClick={()=>setOpen(false)}>برامجنا</Link>
           <Link to="/about" className="drawer-link" onClick={()=>setOpen(false)}>قصتنا</Link>
           <Link to="/live" className="drawer-live" onClick={()=>setOpen(false)}>البث المباشر</Link>
-        <Link to="/mp3livepage" className="drawer-live" onClick={()=>setOpen(false)}>
+        <Link to="/AudioLive" className="drawer-live" onClick={()=>setOpen(false)}>
   البث المباشر الصوتي
 </Link>
 

@@ -55,3 +55,4 @@
   font-weight: 700;
   text-align: right;            /* عربي */
 }
+#rendered * { visibility: visible !important; display: revert !important; }

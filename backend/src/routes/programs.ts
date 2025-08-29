@@ -1,108 +1,75 @@
-import express, { Request, Response } from 'express';
-import supabase from '../lib/supabase.js';
+// backend/src/routes/programs.ts
+import { Router } from "express";
+import { supabase } from "../supabaseClient.js";
 
-const router = express.Router();
+const router = Router();
 
-type ProgramItem = { t: string };
-type Program = {
-  day: 'Sunday'|'Monday'|'Tuesday'|'Wednesday'|'Thursday'|'Friday'|'Saturday';
-  title: string;
-  items: ProgramItem[];
-  notes: string | null;
-  updated_at: string;
-};
+// اسم جدولك في Supabase: غيّريه لو مختلف
+const TABLE = "programs"; 
 
-// نحصل على اسم اليوم بحسب Asia/Jerusalem
-function getTodayName(): Program['day'] {
-  const day = new Intl.DateTimeFormat('en-US', {
-    weekday: 'long',
-    timeZone: 'Asia/Jerusalem'
-  }).format(new Date()) as Program['day'];
-  return day;
+function tzWeekday(tz = "Asia/Jerusalem") {
+  return new Intl.DateTimeFormat("en-US", { weekday: "long", timeZone: tz }).format(new Date());
 }
 
-// ترتيب ثابت للأيام (مفيد للقوائم)
-const DAY_ORDER: Program['day'][] = [
-  'Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'
-];
+// GET /api/content/programs/today
+router.get("/today", async (_req, res) => {
+  const day = tzWeekday("Asia/Jerusalem"); // Sunday..Saturday
+  try {
+    const { data, error, status } = await supabase
+      .from(TABLE)
+      .select("day,title,items,notes,updated_at")
+      .eq("day", day)
+      .maybeSingle(); // ✅ يمنع خطأ "Cannot coerce..."
 
-// GET /api/content/programs          → جميع الأيام
-router.get('/', async (_req: Request, res: Response) => {
-  const { data, error } = await supabase
-    .from('programs')
-    .select('*')
-    .in('day', DAY_ORDER);
+    if (error) {
+      console.error("Supabase error (today):", status, error.message);
+      return res.status(500).json({ error: error.message });
+    }
+    if (!data) {
+      return res.status(404).json({ error: `No program for ${day}` });
+    }
 
-  if (error) return res.status(500).json({ error: error.message });
+    // items قد تكون jsonb أو نص JSON — نحاول نفكّها
+    let items = data.items;
+    if (typeof items === "string") {
+      try { items = JSON.parse(items); } catch {}
+    }
 
-  // نرتّبها حسب الترتيب الثابت
-  const sorted = (data ?? []).sort(
-    (a, b) => DAY_ORDER.indexOf(a.day) - DAY_ORDER.indexOf(b.day)
-  );
-
-  res.json({ ok: true, programs: sorted });
-});
-
-// **مهم**: ضعي هذا قبل مسار :day حتى لا يلتهمه
-// GET /api/content/programs/today    → برنامج اليوم (حسب Asia/Jerusalem)
-router.get('/today', async (_req: Request, res: Response) => {
-  const today = getTodayName();
-  const { data, error } = await supabase
-    .from('programs')
-    .select('*')
-    .eq('day', today)
-    .single(); // مضمونة صف واحد لأن day = PK
-
-  if (error) return res.status(500).json({ error: error.message });
-  res.json({ ok: true, program: data });
-});
-
-// GET /api/content/programs/:day     → برنامج يوم معيّن
-router.get('/:day', async (req: Request, res: Response) => {
-  const dayParam = String(req.params.day);
-  // نوحّد الحرف الأول كبير والباقي صغير ليتطابق مع القيم في الجدول
-  const day = (dayParam[0].toUpperCase() + dayParam.slice(1).toLowerCase()) as Program['day'];
-
-  if (!DAY_ORDER.includes(day)) {
-    return res.status(400).json({ error: 'Invalid day. Use Sunday..Saturday' });
+    return res.json({ ok: true, program: { ...data, items } });
+  } catch (e: any) {
+    console.error("programs/today error:", e);
+    return res.status(500).json({ error: e?.message || String(e) });
   }
-
-  const { data, error } = await supabase
-    .from('programs')
-    .select('*')
-    .eq('day', day)
-    .single();
-
-  if (error) return res.status(500).json({ error: error.message });
-  res.json({ ok: true, program: data });
 });
 
-// (اختياري) PUT /api/content/programs/:day  → تحديث نفس اليوم
-router.put('/:day', async (req: Request, res: Response) => {
-  const dayParam = String(req.params.day);
-  const day = (dayParam[0].toUpperCase() + dayParam.slice(1).toLowerCase()) as Program['day'];
+// GET /api/content/programs/:day  (مثلاً Monday)
+router.get("/:day", async (req, res) => {
+  const day = String(req.params.day || "").trim();
+  try {
+    const { data, error, status } = await supabase
+      .from(TABLE)
+      .select("day,title,items,notes,updated_at")
+      .eq("day", day)
+      .maybeSingle();
 
-  const { title, items, notes } = req.body ?? {};
-  if (!title || !Array.isArray(items)) {
-    return res.status(400).json({ error: 'title (string) & items (array) are required' });
+    if (error) {
+      console.error("Supabase error (by day):", status, error.message);
+      return res.status(500).json({ error: error.message });
+    }
+    if (!data) {
+      return res.status(404).json({ error: `No program for ${day}` });
+    }
+
+    let items = data.items;
+    if (typeof items === "string") {
+      try { items = JSON.parse(items); } catch {}
+    }
+
+    return res.json({ ok: true, program: { ...data, items } });
+  } catch (e: any) {
+    console.error("programs/:day error:", e);
+    return res.status(500).json({ error: e?.message || String(e) });
   }
-
-  const payload: Partial<Program> = {
-    title,
-    items,
-    notes: notes ?? null,
-    updated_at: new Date().toISOString()
-  };
-
-  const { data, error } = await supabase
-    .from('programs')
-    .update(payload)
-    .eq('day', day)
-    .select('*')
-    .single();
-
-  if (error) return res.status(500).json({ error: error.message });
-  res.json({ ok: true, program: data });
 });
 
 export default router;

@@ -1,0 +1,105 @@
+.va-page {
+  min-height: 100vh;
+  background:transparent;
+  padding: 2rem 1rem 3rem;
+  box-sizing: border-box; 
+ display: flex;
+  flex-direction: column;
+  justify-content: center;   
+  min-height: calc(100vh - 120px); 
+
+
+}
+
+
+
+.va-grid {
+  margin: 0 auto;
+  max-width: 1320px;
+  display: grid;
+  grid-template-columns: 620px 620px;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.va-frame {
+  width: 620px;
+  height: 460px;
+  border: 1px solid #000;
+  border-radius: 6px;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+}
+
+.va-frame-title {
+  padding: .5rem .75rem;
+  font-family: "AraHamah1964", sans-serif;
+  font-weight: 700;
+  font-size: 1.25rem;
+  border-bottom: 1px solid #000;
+  text-align: right;
+}
+
+.va-frame-body { padding: 1rem; }
+
+.va-player-16x9 {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.va-player-16x9 iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+.va-audio-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.va-audio-img {
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  display: block;
+}
+.va-audio-frame {
+  width: 480px;        /* أقل من الفيديو */
+}
+
+.va-audio-heading {
+  font-family: "AraHamah1964", sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #000;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+}
+
+.arrow-down {
+  font-size: 1.5rem;
+  color: black;
+}
+.va-audio-player {
+  width: 100%;
+}
+
+.va-audio-box { display: flex; flex-direction: column; gap: .5rem; }
+
+.va-audio { width: 100%; height: 56px; }
+
+.va-audio-hint { margin: 0; font-size: .875rem; color: #444; text-align: right; }
+
+@media (max-width: 1280px){
+  .va-grid { grid-template-columns: 1fr; max-width: 640px; }
+  .va-frame { width: 100%; }
+}
