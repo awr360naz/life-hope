@@ -13,6 +13,13 @@ import Askforpray from './pages/Askforpray';
 import AudioLive from './pages/AudioLive';
 import VedioAudioLive from "./pages/VedioAudioLive";
 import ArticleDetail from "./pages/ArticleDetail";
+import ProgramDetailspage from "./pages/ProgramDetailsPage";
+
+
+
+
+
+
  
 
 
@@ -35,7 +42,9 @@ export default function App() {
   <Route path="/AudioLive" element={<AudioLive />} />
  <Route path="/vedio-audio-live" element={<VedioAudioLive />} />
 <Route path="/articles/:slug" element={<ArticleDetail />} />
-  
+<Route path="/program/:id" element={<ProgramsPage />} />
+<Route path="/programs/:slug" element={<ProgramDetailspage />} />
+ 
 </Routes>
         </main>
         <Footer />

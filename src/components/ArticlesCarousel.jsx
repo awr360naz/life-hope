@@ -12,7 +12,7 @@ export default function ArticlesCarousel({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [index, setIndex] = useState(0);        // أول كرت ظاهر
-  const scrollRef = useRef(null);               // العنصر القابل للتمرير (المسار)
+  const scrollRef = useRef(null);               // المسار القابل للتمرير
 
   const visible = useResponsivePerView(perView);
 
@@ -39,7 +39,7 @@ export default function ArticlesCarousel({
     })();
   }, [apiUrl]);
 
-  // لما يتغيّر عدد العناصر/الظاهر، ثبّتي الإندكس ضمن الحدود
+  // ضبط الإندكس ضمن الحدود عند تغيّر عدد العناصر/الظاهر
   useEffect(() => {
     const max = Math.max(0, items.length - visible);
     if (index > max) setIndex(max);
@@ -49,28 +49,39 @@ export default function ArticlesCarousel({
   const canPrev = items.length > visible && index > 0;
   const canNext = items.length > visible && index < maxIndex;
 
+  // نفس طريقة برامجنا: نحسب عرض الكرت ونسكرول المسار نفسه (RTL)
   const goToIndex = (nextIdx) => {
-    setIndex(nextIdx);
-    requestAnimationFrame(() => {
-      const track = scrollRef.current;
-      if (!track) return;
-      const cards = track.querySelectorAll(".article-card");
-      if (!cards.length) return;
-      const target = cards[nextIdx];
-      if (target) {
-        target.scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
-      }
-    });
+    const track = scrollRef.current;
+    if (!track) return;
+
+    const card = track.querySelector(".article-card");
+    if (!card) return;
+
+    const cardStyle = getComputedStyle(card);
+    // نقرأ الـ gap الحقيقي (نستعمل margin-inline-end fallback لو لزم)
+    const gapVar = getComputedStyle(track).getPropertyValue("--gap")?.trim();
+    const gapFromVar = gapVar ? parseInt(gapVar) : NaN;
+    const marginEnd = parseInt(cardStyle.marginInlineEnd || cardStyle.marginRight) || 0;
+    const gap = Number.isNaN(gapFromVar) ? (marginEnd || 12) : gapFromVar;
+
+    const cardWidth = card.offsetWidth + gap;
+    const clamped = Math.max(0, Math.min(maxIndex, nextIdx));
+    const delta = (clamped - index) * cardWidth;
+
+    // لأن المسار RTL: نعكس الإشارة
+    track.scrollBy({ left: -delta, behavior: "smooth" });
+    setIndex(clamped);
   };
 
-  const handlePrev = () => goToIndex(Math.max(0, index - step));
-  const handleNext = () => goToIndex(Math.min(maxIndex, index + step));
+  const handlePrev = () => goToIndex(index - step);
+  const handleNext = () => goToIndex(index + step);
 
   return (
     <section className="articles-section" dir="rtl" aria-labelledby="articles-title">
+      {/* العنوان بنفس مكان/ستايل برامجنا */}
       <header className="articles-header">
         <h2 id="articles-title" className="articles-title">
-          <Link to="/articles" className="articles-link"> {title} </Link>
+          <Link to="/articles" className="articles-link">{title}</Link>
         </h2>
       </header>
 
@@ -87,11 +98,11 @@ export default function ArticlesCarousel({
 
         {!loading && !error && items.length > 0 && (
           <div className="carousel-viewport">
-            {/* نخلي المسار نفسه هو اللي يِسكرول. dir="ltr" لتثبيت القياسات. */}
+            {/* مهم: خلي المسار RTL زي برامجنا */}
             <div
               ref={scrollRef}
               className="carousel-track"
-              dir="ltr"
+              dir="rtl"
               style={{ "--perView": visible }}
             >
               {items.map((it) => {
@@ -99,7 +110,6 @@ export default function ArticlesCarousel({
                 const img = it.cover_url || it.image_url || "";
                 return (
                   <article key={it.id || it.slug} className="article-card">
-                    {/* الكرت = رابط لتفاصيل المقال */}
                     <Link to={`/articles/${slugOrId}`} className="card-link" aria-label={it.title}>
                       <div className="article-inner">
                         <div className="article-image-wrap">
@@ -120,6 +130,7 @@ export default function ArticlesCarousel({
               })}
             </div>
 
+            {/* أزرار التنقل – نفس الشكل والمكان تبع برامجنا */}
             <button
               type="button"
               className="nav-btn nav-prev"
@@ -169,7 +180,6 @@ function normalizeArticle(a) {
   if (!a) return null;
   const id = a.id ?? a.article_id ?? a.uuid ?? a._id ?? null;
   const title = a.title ?? a.name ?? a.headline ?? "";
-  // ندعم cover_url (عندك بالداتابيس) + بدائل محتملة
   const cover_url =
     a.cover_url ?? a["cover url"] ?? a.coverUrl ?? a.cover_image ?? a.coverImage ?? "";
   const image_url =

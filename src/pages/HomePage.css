@@ -231,3 +231,41 @@ html, body { height: 100%; }
   margin: 24px auto 0;     /* يجي تحت الإطارات مباشرة */
   padding: 0 1rem;
 }
+/* === محاذاة "برامجنا" 1:1 مع الإطارات (frames-center = 1412px) === */
+/* لازم تكون هالكتلة في آخر HomePage.css لتربح الكاسكيد */
+main.homepage-rtl > section.programs-section {
+  width: 1412px !important;     /* نفس عرض .frames-center */
+  max-width: none !important;
+  margin-inline: auto !important;
+  padding-inline: 0 !important; /* لا padding داخلي */
+  --edge: 0px !important;       /* أول/آخر كرت على نفس خط الإطار */
+  box-sizing: content-box !important;
+}
+
+/* نتأكد ما في حواف خفية من العناصر الداخلية */
+main.homepage-rtl > section.programs-section .programs-header,
+main.homepage-rtl > section.programs-section .programs-title {
+  padding-inline: 0 !important;
+  margin-inline: 0 !important;
+}
+
+/* viewport و track بدون أي padding إضافي غير --edge */
+main.homepage-rtl > section.programs-section .carousel-viewport {
+  padding-inline: 0 !important;
+  overflow: hidden; /* زي ما هو */
+}
+
+main.homepage-rtl > section.programs-section .carousel-track {
+  padding-inline: var(--edge) !important;
+  scroll-padding-inline: var(--edge) !important;
+  box-sizing: content-box !important;
+}
+
+/* الأسهم تبقى على حافة المحتوى نفسه (مو حافة الشاشة) */
+main.homepage-rtl > section.programs-section .nav-prev { right: 6px !important; }
+main.homepage-rtl > section.programs-section .nav-next { left:  6px !important; }
+
+/* (اختياري) إذا بتحسي فرق بصري بسيط بسبب حدود الإطارات 1px: فعّلي التالي بدل 0px */
+/*
+main.homepage-rtl > section.programs-section { --edge: 1px !important; }
+*/

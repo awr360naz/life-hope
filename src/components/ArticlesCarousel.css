@@ -1,21 +1,29 @@
-.carousel-viewport {
-  position: relative;
+/* ===== الحاوية والعنوان بنفس برامجنا ===== */
+.articles-section {
+  max-width: 1100px;        /* طابقي قيمة برامجنا */
+  margin-inline: auto;      /* تمركز بالقسم */
+}
+
+.articles-section .articles-header { margin: 0 0 10px; }
+.articles-section .articles-title { text-align: right; margin: 0; }
+
+.articles-section .articles-link,
+.articles-section .card-link {
+  color: inherit;
+  text-decoration: none;
+}
+.articles-section .articles-link:hover,
+.articles-section .card-link:hover {
+  text-decoration: none;
+}
+
+/* ===== المشهد العام للكاروusel ===== */
+.articles-section .carousel-viewport {
+  position: relative;   /* للأسهم المطلقة */
   overflow: hidden;
-
-}
-.articles-link {
-  color: inherit;            /* يخلي اللون زي الأب (العنوان الأصلي) */
-  text-decoration: none;     /* يشيل الخط */
 }
 
-.articles-link:hover {
-  color: inherit;            /* يضل نفس اللون عند المرور */
-  text-decoration: none;     /* ما يظهرش خط */
-}
-
-
-/* استخدمي متغيّرات للتحكم السهل */
-.carousel-track {
+.articles-section .carousel-track {
   --gap: 12px;     /* المسافة بين الكروت */
   --edge: 12px;    /* حافة يمين/يسار المسار */
 
@@ -33,12 +41,10 @@
   padding-inline: var(--edge);         /* حافة تمنع قصّ أول/آخر كرت */
   scroll-padding-inline: var(--edge);  /* السناب يحتسب الحافة */
 }
-.carousel-track::-webkit-scrollbar { display: none; }
+.articles-section .carousel-track::-webkit-scrollbar { display: none; }
 
-
-/* عرض الكرت = (100% - مجموع الفراغات بين الكروت الظاهرة) / عدد الظاهر */
-.article-card {
-  /* إذا ظاهر 4 كروت، في 3 فراغات بينهم داخل العرض */
+/* نفس قسمة “برامجنا”: عرض الكرت = (100% - الفراغات) / perView */
+.articles-section .article-card {
   flex: 0 0 calc(
     (100% - ( (var(--perView, 4) - 1) * var(--gap, 12px) ))
     / var(--perView, 4)
@@ -48,61 +54,90 @@
   cursor: pointer;
 }
 
-
-/* الإطار الأبيض */
-.article-inner {
+/* الكرت من الداخل (ستايل إطار أبيض صغير) */
+.articles-section .article-inner {
   height: 100%;
   border-radius: 8px;
   background: #fff;
   box-shadow: 0 1px 4px rgba(0,0,0,.08);
   overflow: hidden;
-  padding: 6px;        /* <<< أصغر من قبل */
+  padding: 6px;
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
 /* صورة */
-.article-image-wrap {
+.articles-section .article-image-wrap {
   aspect-ratio: 16 / 9;
   overflow: hidden;
   border-radius: 6px;
 }
-.article-image {
+.articles-section .article-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
-/* عنوان المقال RTL */
-.article-card-title {
+/* عنوان RTL */
+.articles-section .article-card-title {
   font-size: 14px;
   font-weight: 600;
   line-height: 1.4;
   margin: 0;
-  text-align: right;   /* <<< من اليمين لليسار */
+  text-align: right;
   direction: rtl;
 }
 
-/* الأزرار تبقى مثل قبل */
-.nav-btn {
-  position: absolute; top: 50%; transform: translateY(-50%);
-  inline-size: 38px; block-size: 38px; border-radius: 999px;
-  border: none; background: rgba(0,0,0,.6); color: #fff;
-  font-size: 22px; display: grid; place-items: center;
-  cursor: pointer; z-index: 1;
+/* ===== الأسهم – نفس ستايل/الموضع تبع برامجنا بالضبط ===== */
+.articles-section .nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  inline-size: 38px;
+  block-size: 38px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(0,0,0,.6);
+  color: #fff;
+  font-size: 22px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
 }
-.nav-prev { inset-inline-start: 6px; }
-.nav-next { inset-inline-end: 6px; }
-.nav-btn:disabled { opacity: .35; cursor: default; }
-.articles-link,
-.card-link {
-  color: inherit;
-  text-decoration: none;
+
+.articles-section .nav-prev { inset-inline-start: calc(var(--edge, 12px) + 2px); }
+.articles-section .nav-next { inset-inline-end: calc(var(--edge, 12px) + 2px); }
+.articles-section .nav-btn:disabled { opacity: .35; cursor: default; }
+
+/* ===== هيكل التحميل (اختياري) ===== */
+.articles-section .carousel-skeleton {
+  display: grid;
+  grid-auto-flow: column;
+  gap: 12px;
+  padding-inline: 12px;
 }
-.articles-link:hover,
-.card-link:hover {
-  text-decoration: none;
+.articles-section .skeleton-card {
+  height: 140px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #eee, #f6f6f6, #eee);
+  background-size: 200% 100%;
+  animation: articShimmer 1.2s linear infinite;
 }
-.article-card { cursor: pointer; }
+
+@keyframes articShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* موبايل – نفس تصغير الكرت */
+@media (max-width: 600px) {
+  .articles-section .article-card,
+  .articles-section .skeleton-card {
+    flex-basis: 180px;
+    max-width: 180px;
+    min-height: 130px;
+  }
+}

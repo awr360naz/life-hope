@@ -3,6 +3,7 @@ import "./HomePage.css";
 import hopeImage from "./hopeimage.jpg";
 import api from "../lib/api"; 
 import ArticlesCarousel from "../components/ArticlesCarousel";
+import ProgramsCarousel from "../components/ProgramsCarousel";
 import { Link } from "react-router-dom";
 
 function ThirdFrame() {
@@ -228,11 +229,13 @@ export default function HomePage() {
           <ThirdFrame />
         </section>
       </div>
+<br></br>
+   <ProgramsCarousel title="برامجنا" />
+   <br></br>
+ 
+      
 
-      {/* ===== مقالات (كاروسول) ===== */}
-      <div className="articles-wrap">
-        <ArticlesCarousel title="مقالات" />
-      </div>
+
     </main>
   );
 }
