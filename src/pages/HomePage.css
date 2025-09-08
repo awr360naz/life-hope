@@ -269,3 +269,40 @@ main.homepage-rtl > section.programs-section .nav-next { left:  6px !important; 
 /*
 main.homepage-rtl > section.programs-section { --edge: 1px !important; }
 */
+/* === محاذاة "فقرات قصيرة" 1:1 مع الإطارات (frames-center = 1412px) === */
+/* لازم تكون هالكتلة في آخر HomePage.css لتربح الكاسكيد */
+main.homepage-rtl > section.shortsegs-section {
+  width: 1412px !important;     /* نفس عرض .frames-center */
+  max-width: none !important;
+  margin-inline: auto !important;
+  padding-inline: 0 !important;  /* لا padding داخلي */
+  --edge: 0px !important;        /* أول/آخر كرت على نفس خط الإطار */
+  box-sizing: content-box !important;
+}
+
+/* لا تضيف حواف داخلية للرأس */
+main.homepage-rtl > section.shortsegs-section .shortsegs-header,
+main.homepage-rtl > section.shortsegs-section .shortsegs-title {
+  padding-inline: 0 !important;
+  margin-inline: 0 !important;
+}
+
+/* الـ viewport والـ track بدون أي padding إضافي غير --edge */
+main.homepage-rtl > section.shortsegs-section .shortsegs-viewport {
+  padding-inline: 0 !important;
+  overflow: hidden; /* زي ما هو */
+}
+
+/* نستخدم --edge لضبط بداية/نهاية المسار عند حدود الإطارين */
+main.homepage-rtl > section.shortsegs-section .shortsegs-track {
+  padding-inline: var(--edge) !important;
+  scroll-padding-inline: var(--edge) !important;
+  box-sizing: content-box !important;
+}
+
+/* الأسهم على حافة المحتوى (مش حافة الشاشة) وبنفس سلوك برامجنا */
+main.homepage-rtl > section.shortsegs-section .shortsegs-arrow.prev { right: 6px !important; }
+main.homepage-rtl > section.shortsegs-section .shortsegs-arrow.next { left:  6px !important; }
+
+/* (اختياري) لو بدك تحسبي سماكة حدود الإطارات 1px */
+ /* main.homepage-rtl > section.shortsegs-section { --edge: 1px !important; } */

@@ -14,6 +14,9 @@ import AudioLive from './pages/AudioLive';
 import VedioAudioLive from "./pages/VedioAudioLive";
 import ArticleDetail from "./pages/ArticleDetail";
 import ProgramDetailspage from "./pages/ProgramDetailsPage";
+import ShortSegmentsPage from "./pages/ShortSegmentsPage";
+
+
 
 
 
@@ -44,6 +47,7 @@ export default function App() {
 <Route path="/articles/:slug" element={<ArticleDetail />} />
 <Route path="/program/:id" element={<ProgramsPage />} />
 <Route path="/programs/:slug" element={<ProgramDetailspage />} />
+<Route path="/shorts" element={<ShortSegmentsPage />} />
  
 </Routes>
         </main>

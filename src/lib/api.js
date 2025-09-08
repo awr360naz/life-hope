@@ -24,10 +24,9 @@ export const api = {
   live:     () => http('GET',  '/content/live'),
   articles: () => http('GET',  '/content/articles'),
 
-  // ✅ استخدمي المسارات الفعلية الموجودة في الباكند
   getProgramToday: () => http('GET',  '/content/programs/today'),
   getProgramsWeek: () => http('GET',  '/content/programs'),
-  // ملاحظة: الباكند يدعم PUT على /:day وليس PATCH
+
   patchProgramsDay: (dayKey, patch) => http('PUT', `/content/programs/${dayKey}`, patch),
 
   sendPrayer:  (payload) => http('POST', '/contact/prayer', payload),

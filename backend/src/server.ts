@@ -6,6 +6,9 @@ import morgan from "morgan";
 import articlesRouter from "./routes/articles.js";
 // import contentRoutes from "./routes/content.routes.js"; // اتركيه معلّق إذا بعمل تداخل
 import { getSupabase } from "./supabaseClient.js";
+import type { Request, Response } from "express";
+import crypto from "node:crypto";
+
 
 const app = express();
 app.set("trust proxy", true);
@@ -237,6 +240,134 @@ app.get("/api/content/programs/:id", async (req, res) => {
     res.status(500).json({ error: e?.message || String(e) });
   }
 });
+// ===== فقرات قصيرة =====
+app.get("/api/content/short-segments", async (req, res) => {
+  try {
+    const limit = Math.min(parseInt(String(req.query.limit || "20")), 100);
+    const from = parseInt(String(req.query.offset || "0"));
+    const to = from + limit - 1;
+
+    const supa = getSupabase(); // نفس الدالة عندك
+    if (!supa) return res.status(500).json({ error: "Supabase not configured (env missing)" });
+
+    const q = supa
+      .from("short_segments")
+      .select("id,title,thumb_url,video_url,duration_sec,created_at", { count: "exact" })
+      .eq("is_published", true)
+      .order("created_at", { ascending: false })
+      .range(from, to);
+
+    const { data, error, count } = await q;
+    if (error) throw error;
+
+    res.json({
+      ok: true,
+      total: count ?? data?.length ?? 0,
+      items: data ?? [],
+    });
+  } catch (e:any) {
+    res.status(500).json({ error: e.message || String(e) });
+  }
+});
+type ShortSeg = {
+  id: string;
+  title: string | null;
+  video_url: string;
+  duration_sec?: number | null;
+  published?: boolean | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+};
+
+// كاش ذاكرة بسيط
+const memCache = new Map<string, { ts: number; data: ShortSeg[] }>();
+const TTL_MS = 5 * 60 * 1000; // 5 دقائق
+
+function setCache(key: string, data: ShortSeg[]) {
+  memCache.set(key, { ts: Date.now(), data });
+}
+function getCache(key: string): ShortSeg[] | null {
+  const v = memCache.get(key);
+  if (!v) return null;
+  if (Date.now() - v.ts > TTL_MS) {
+    memCache.delete(key);
+    return null;
+  }
+  return v.data;
+}
+
+// helper موحّد لجلب آخر العناصر
+async function fetchShortSegs(limit = 30): Promise<ShortSeg[]> {
+  const supabase = getSupabase();
+  // 1) المنشور فقط
+  const q1 = await supabase
+    .from("short_segments")
+    .select("id, title, video_url, duration_sec, published, created_at, updated_at")
+    .eq("published", true)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (q1.error) throw q1.error;
+  const publishedRows = q1.data ?? [];
+
+  if (publishedRows.length > 0) return publishedRows;
+
+  // 2) fallback: بغض النظر عن published
+  const q2 = await supabase
+    .from("short_segments")
+    .select("id, title, video_url, duration_sec, published, created_at, updated_at")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (q2.error) throw q2.error;
+  return q2.data ?? [];
+}
+
+// راوتر المحتوى
+app.get("/api/content/short-segments", async (req: Request, res: Response) => {
+  try {
+    const limit = Math.max(1, Math.min(100, Number(req.query.limit) || 30));
+    const cacheKey = `shortsegs:${limit}`;
+
+    // جرّب الكاش أولًا
+    const cached = getCache(cacheKey);
+    if (cached && cached.length > 0) {
+      const etag = crypto.createHash("sha1").update(cached.map(x => x.id).join("|")).digest("hex");
+      res.setHeader("ETag", etag);
+      res.setHeader("Cache-Control", "public, max-age=30");
+      return res.json({ items: cached });
+    }
+
+    const rows = await fetchShortSegs(limit);
+
+    // حتى لو DB رجّع فاضي = بنظل نبعث “آخر نسخة كاش” إن وُجدت؛
+    // لكن بما إن الكاش مش موجود/منتهي، خلّينا على الأقل نبعث [] مع كود 200.
+    if (rows.length > 0) setCache(cacheKey, rows);
+
+    const etag = crypto.createHash("sha1").update(rows.map(x => x.id).join("|")).digest("hex");
+    res.setHeader("ETag", etag);
+    res.setHeader("Cache-Control", "public, max-age=30");
+
+    return res.json({ items: rows });
+  } catch (err: any) {
+    // في حال الخطأ: رجّع آخر كاش إن وُجد
+    const cacheKey = `shortsegs:${Number(req.query.limit) || 30}`;
+    const cached = getCache(cacheKey);
+    if (cached && cached.length > 0) {
+      res.setHeader("Cache-Control", "no-store");
+      return res.json({ items: cached, fallback: true, error: String(err?.message || err) });
+    }
+    return res.status(500).json({ error: String(err?.message || err) });
+  }
+});
+
+// جسر توافقية (اختياري)
+app.get("/api/short-segments", (req, res) => {
+  req.url = "/api/content/short-segments" + (req.url.includes("?") ? req.url.slice(req.url.indexOf("?")) : "");
+  app._router.handle(req, res);
+});
+
+
 
 
 // جسر توافق مختصر

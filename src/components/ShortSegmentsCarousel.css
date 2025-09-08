@@ -1,0 +1,120 @@
+/* ===== القسم العام ===== */
+.shortsegs-section {
+  direction: rtl;
+  margin-block: 24px;
+}
+.shortsegs-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.shortsegs-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+.shortsegs-title-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+
+/* ===== المشهد ===== */
+.shortsegs-viewport {
+  position: relative;
+  overflow: visible; /* حتى ما يقصّ الأسهم */
+}
+
+/* ===== المسار ===== */
+.shortsegs-track {
+  --gap: 12px;
+  --edge: 12px;
+
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+
+  gap: var(--gap);
+  padding-inline: var(--edge);
+  scroll-padding-inline: var(--edge);
+}
+.shortsegs-track::-webkit-scrollbar { display: none; }
+
+/* ===== الكرت ===== */
+.shortsegs-card {
+  scroll-snap-align: start;
+  flex: 0 0 auto;
+  width: min(20%, 260px);   /* نفس عرض برامجنا الكبير: 5 بالكبير */
+  border-radius: 20px;      /* حفف مطعوجة */
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* استجابة مثل الـ CSS اللي عندك */
+@media (max-width: 1280px) { .shortsegs-card { width: calc((100% - 4 * var(--gap)) / 4); } }
+@media (max-width: 1024px) { .shortsegs-card { width: calc((100% - 3 * var(--gap)) / 3); } }
+@media (max-width: 768px)  { .shortsegs-card { width: calc((100% - 2 * var(--gap)) / 2); } }
+@media (max-width: 480px)  { .shortsegs-card { width: 100%; } }
+
+/* الطول أكبر (فيديو طولي نسبيًا) */
+.shortsegs-thumb {
+  position: relative;
+  aspect-ratio: 9 / 12;      /* أطول من العادي؛ بدك أطول؟ استعملي 9/16 */
+  width: 100%;
+  overflow: hidden;
+}
+.shortsegs-thumb iframe {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border: 0;
+}
+
+.shortsegs-meta {
+  padding: 6px 10px 10px;
+}
+.shortsegs-meta .title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.3;
+}
+.shortsegs-meta .duration {
+  font-size: 0.8rem;
+  opacity: 0.75;
+}
+
+/* ===== أسهم مثل برامجنا: يمين/يسار منتصف المسار، واضحة ومش مقصوصة ===== */
+.shortsegs-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  inline-size: 38px;
+  block-size: 38px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(0,0,0,.6);
+  color: #fff;
+  font-size: 22px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  z-index: 2;               /* فوق المسار */
+}
+.shortsegs-arrow:hover { background: rgba(0,0,0,0.7); }
+.shortsegs-arrow:disabled {
+  background: rgba(0,0,0,0.2);
+  color: #999;
+  cursor: default;
+}
+.shortsegs-arrow.prev { right: 8px; }  /* RTL: أول كرت يمين */
+.shortsegs-arrow.next { left:  8px; }  /* آخر كرت شمال */

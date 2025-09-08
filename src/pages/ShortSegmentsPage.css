@@ -1,0 +1,140 @@
+.shortseg-page {
+  direction: rtl;
+  font-family: Cairo, sans-serif;
+}
+
+.wrap {
+  max-width: 1420px;
+  margin-inline: auto;
+  padding: 16px 12px 32px;
+}
+
+.shortseg-heading {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 8px 0 16px;
+}
+
+/* شبكة الكروت */
+.shortseg-grid {
+  --gap: 12px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--gap);
+  align-items: stretch;
+}
+
+/* الكرت كبَتن (مش Link) عشان النقر يشغّل الفيديو */
+.shortseg-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(0,0,0,.06);
+  text-decoration: none;
+  color: inherit;
+  min-height: 420px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  border: none;
+  text-align: start;
+}
+.shortseg-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0,0,0,.1);
+}
+
+/* الصورة */
+.shortseg-thumb {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  background: #f2f2f2;
+}
+.shortseg-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.shortseg-fallback { width: 100%; height: 100%; background: #e9e9e9; }
+
+/* أيقونة تشغيل */
+.shortseg-play {
+  position: absolute;
+  inset-inline-start: 10px;
+  inset-block-end: 10px;
+  background: rgba(0,0,0,.6);
+  color: #fff;
+  border-radius: 999px;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+}
+
+/* جسم الكرت */
+.shortseg-body { padding: 10px 12px 14px; }
+.shortseg-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* رسالة خطأ */
+.shortseg-error { color: #b30000; }
+
+/* ====== المودال ====== */
+.shortseg-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+}
+.shortseg-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+}
+.shortseg-modal-content {
+  position: absolute;
+  inset: 5% 8%;
+  background: #000;
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.shortseg-close {
+  position: absolute;
+  inset-inline-end: 12px;
+  inset-block-start: 10px;
+  z-index: 2;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(255,255,255,.12);
+  color: #fff;
+  cursor: pointer;
+  font-size: 18px;
+}
+.shortseg-iframe-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.shortseg-iframe-wrap iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+@media (max-width: 768px) {
+  .shortseg-modal-content { inset: 8% 4%; }
+}

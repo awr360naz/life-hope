@@ -4,6 +4,7 @@ import hopeImage from "./hopeimage.jpg";
 import api from "../lib/api"; 
 import ArticlesCarousel from "../components/ArticlesCarousel";
 import ProgramsCarousel from "../components/ProgramsCarousel";
+import ShortSegmentsCarousel from "../components/ShortSegmentsCarousel";
 import { Link } from "react-router-dom";
 
 function ThirdFrame() {
@@ -233,7 +234,14 @@ export default function HomePage() {
    <ProgramsCarousel title="برامجنا" />
    <br></br>
  
-      
+      <ShortSegmentsCarousel
+  title="فقرات قصيرة"
+  perView={5}
+  step={1}
+  apiUrl="/api/content/short-segments"
+  toAllHref="/shorts"
+  limit={30}
+/>
 
 
     </main>
