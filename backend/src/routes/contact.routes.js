@@ -1,11 +1,13 @@
-// src/routes/contact.routes.js
 import { Router } from "express";
-import { sendPrayer, sendContact } from "../controllers/contact.controller.js";
-import { validate } from "../lib/validate.js";
 
-const r = Router();
+const router = Router();
 
-r.post("/prayer", validate("prayer"), sendPrayer);
-r.post("/message", validate("contact"), sendContact);
+router.get("/__ping", (_req, res) => {
+  res.json({ ok: true });
+});
 
-export default r;
+router.post("/prayer", (req, res) => {
+  res.json({ ok: true, echo: req.body });
+});
+
+export default router;

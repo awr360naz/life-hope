@@ -4,10 +4,16 @@ import express from "express";
 import cors from "cors";
 import morgan from "morgan";
 import articlesRouter from "./routes/articles.js";
-// import contentRoutes from "./routes/content.routes.js"; // اتركيه معلّق إذا بعمل تداخل
 import { getSupabase } from "./supabaseClient.js";
 import type { Request, Response } from "express";
 import crypto from "node:crypto";
+import shortSegmentsRouter from "./routes/shortSegments.routes.js";
+
+
+
+
+
+
 
 
 const app = express();
@@ -20,15 +26,147 @@ app.use(
 );
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true }));
-app.use(morgan("dev"));
+// بعد الميدلويرات مباشرة:
 
-// راوتر المقالات (جاهز عندك)
+/* فحص سريع: لازم يرجّع {ok:true} على :4000/api/_ping */
+app.get("/api/_ping", (_req, res) => res.json({ ok: true, at: new Date().toISOString() }));
+
+
+/* اترك راوتر المقالات بعدهم */
 app.use(articlesRouter);
+app.use(shortSegmentsRouter);
+
+
+
+
+
+
+
 
 // صحة
 app.get("/api/health", (_req, res) => {
   res.json({ ok: true, service: "life-hope-backend", time: new Date().toISOString() });
 });
+
+// ـــــ داخل server.ts بعد /api/health مثلاً ـــــ
+
+/**
+ * Simple Search endpoint
+ * GET /api/content/search?q=كلمة&limit=20&offset=0
+ * بيرجّع من جدولين: articles + programs_catalog
+ * الحقول موحّدة وبكون معها type = "article" أو "program"
+ */
+app.get("/api/content/search", async (req: Request, res: Response) => {
+  const supabase = getSupabase?.();
+  const rawQ = (req.query.q ?? "").toString().trim();
+  const limit = Math.min(parseInt((req.query.limit ?? "20") as string, 10) || 20, 50);
+  const debug = String(req.query.debug || "") === "1";
+
+  // تطبيع عربي خفيف
+  const AR_TATWEEL = /\u0640/g;
+  const AR_DIACRITICS = /[\u064B-\u065F\u0670\u0674]/g;
+  const norm = (s: string) =>
+    (s || "")
+      .replace(AR_TATWEEL, "")
+      .replace(AR_DIACRITICS, "")
+      .replace(/[أإآ]/g, "ا")
+      .replace(/ؤ|ئ/g, "ء")
+      .replace(/ة/g, "ه")
+      .replace(/ى/g, "ي")
+      .trim();
+
+  const qNorm = norm(rawQ);
+  const pats = Array.from(new Set([`%${rawQ}%`, `%${qNorm}%`]));
+
+  const dbg: any = { q: rawQ, pats, steps: [], errors: [] };
+  if (!rawQ || !supabase) {
+    if (debug) return res.json({ ...dbg, note: "no query or no supabase", results: [] });
+    return res.json([]);
+  }
+
+  // Helpers
+  const mapRecord = (r: any, type: "article" | "program") => ({
+    id: r?.id ?? null,
+    type,
+    slug: r?.slug ?? null,
+    title: r?.title ?? "",
+    excerpt:
+      (typeof r?.excerpt === "string" && r.excerpt) ||
+      (typeof r?.content === "string" && String(r.content).slice(0, 140)) ||
+      "",
+    cover_url: r?.cover_url ?? null,
+    created_at: r?.created_at ?? null,
+    url: r?.slug ? (type === "article" ? `/articles/${r.slug}` : `/programs/${r.slug}`) : null,
+  });
+
+  async function tryIlike(table: string, field: string, sel: string, type: "article" | "program") {
+    try {
+      let acc: any[] = [];
+      for (const p of pats) {
+        const r = await supabase.from(table).select(sel).ilike(field, p).order("created_at", { ascending: false });
+        if (r.error) throw r.error;
+        acc = acc.concat(r.data || []);
+      }
+      dbg.steps.push({ table, field, count: acc.length });
+      return acc.map((x) => mapRecord(x, type));
+    } catch (e: any) {
+      dbg.errors.push({ table, field, message: String(e?.message || e) });
+      return [];
+    }
+  }
+
+  // 1) محاولات آمنة على حقول متوقعة
+  let articles: any[] = [];
+  let programs: any[] = [];
+
+  // أقل اختيار حساسية للأعمدة (select("*")) حتى ما نطيّر لو عمود مش موجود
+  articles = articles.concat(await tryIlike("articles", "title", "*", "article"));
+  programs = programs.concat(await tryIlike("programs_catalog", "title", "*", "program"));
+
+  if (articles.length === 0) {
+    articles = articles.concat(await tryIlike("articles", "excerpt", "*", "article"));
+  }
+  if (articles.length === 0) {
+    articles = articles.concat(await tryIlike("articles", "content", "*", "article"));
+  }
+  if (programs.length === 0) {
+    programs = programs.concat(await tryIlike("programs_catalog", "content", "*", "program"));
+  }
+
+  let merged = [...articles, ...programs].sort((a, b) => (b.created_at ?? "").localeCompare(a.created_at ?? ""));
+  merged = merged.slice(0, limit);
+
+  // 2) خطة-ب: فلترة محلية إذا لسه صفر
+  if (merged.length === 0) {
+    try {
+      const [a2, p2] = await Promise.all([
+        supabase.from("articles").select("*").order("created_at", { ascending: false }).limit(200),
+        supabase.from("programs_catalog").select("*").order("created_at", { ascending: false }).limit(200),
+      ]);
+
+      const pickText = (obj: any) =>
+        Object.values(obj || {})
+          .filter((v) => typeof v === "string")
+          .join(" ");
+
+      const ok = (obj: any) => norm(pickText(obj)).includes(qNorm);
+
+      const aLoc = (a2.data || []).filter(ok).map((x) => mapRecord(x, "article"));
+      const pLoc = (p2.data || []).filter(ok).map((x) => mapRecord(x, "program"));
+
+      merged = [...aLoc, ...pLoc].sort((a, b) => (b.created_at ?? "").localeCompare(a.created_at ?? "")).slice(0, limit);
+      dbg.steps.push({ fallback_local: true, aLoc: aLoc.length, pLoc: pLoc.length });
+    } catch (e: any) {
+      dbg.errors.push({ fallback_local_error: String(e?.message || e) });
+      // حتى لو فشل fallback المحلي، بنرجّع اللي معنا (قد يكون صفر) بدون ما نرمي خطأ
+    }
+  }
+
+  if (debug) return res.json({ ...dbg, counts: { merged: merged.length }, results: merged });
+  return res.json(merged);
+});
+
+
 
 /* =========================
    إعدادات عامة من البيئة
@@ -190,57 +328,100 @@ app.get("/api/articles", (req, res) => {
    برامج عامة (كاروسول "برامجنا")
    جدول: programs_catalog (قابل للتبديل عبر PROGRAMS_CATALOG_TABLE)
    ========================= */
-app.get("/api/content/programs", async (_req, res) => {
-  const sb = getSupabase();
-  if (!sb) return res.status(500).json({ error: "Supabase not configured (env missing)" });
-
+// GET /api/content/programs
+app.get("/api/content/programs", async (req, res) => {
   try {
-    const { data, error } = await sb
-      .from(PROGRAMS_CATALOG_TABLE)
-      .select("id,title,subtitle,items,cover_url,is_active,sort_order,updated_at")
-      .eq("is_active", true)
-      .order("sort_order", { ascending: true })
-      .limit(100);
+    const limit = Math.min(parseInt(String(req.query.limit || "24"), 10) || 24, 50);
+    const supabase = getSupabase();
 
-    if (error) return res.status(500).json({ error: error.message });
+    const { data, error } = await supabase
+      .from("programs_catalog")
+      .select("id, title, content, cover_url, updated_at")
+      .eq("published", true)
+      .order("updated_at", { ascending: false })
+      .limit(limit);
 
-    const programs = (data || []).map((p: any) => ({
-      id: p.id,
-      title: p.title,
-      subtitle: p.subtitle || null,
-      items: Array.isArray(p.items) ? p.items : [],
-      cover_url: p.cover_url || null,
-      updated_at: p.updated_at,
-    }));
+    if (error) throw error;
 
-    res.json({ ok: true, programs });
+    res.json(data || []);
   } catch (e: any) {
-    res.status(500).json({ error: String(e?.message || e) });
+    res.status(500).json({ error: e?.message || "Failed to fetch programs" });
   }
 });
-// GET /api/content/programs/:id  → تفاصيل برنامج واحد
-app.get("/api/content/programs/:id", async (req, res) => {
-  const sb = getSupabase();
-  if (!sb) return res.status(500).json({ error: "Supabase not configured (env missing)" });
 
-  const PROGRAMS_CATALOG_TABLE = process.env.PROGRAMS_CATALOG_TABLE || "programs_catalog";
+// GET /api/content/programs/:id
+app.get("/api/content/programs/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { data, error } = await sb
-      .from(PROGRAMS_CATALOG_TABLE)
-      .select("id,title,subtitle,items,cover_url,updated_at,is_active")
+    const supabase = getSupabase();
+
+    // هات *كل* الحقول لهذا الصف (عشان نعرف شو موجود فعلياً)
+    const { data, error } = await supabase
+      .from("programs_catalog")
+      .select("*")
       .eq("id", id)
-      .maybeSingle();
+      .single();
 
-    if (error) return res.status(500).json({ error: error.message });
-    if (!data || data.is_active === false) return res.status(404).json({ error: "Not found" });
+    if (error) throw error;
+    if (!data) return res.status(404).json({ error: "Not found" });
 
-    res.json({ ok: true, program: data });
-  } catch (e:any) {
-    res.status(500).json({ error: e?.message || String(e) });
+    // التقط العنوان من أي اسم محتمل
+    const title =
+      data.title ||
+      data.name ||
+      data.heading ||
+      data.ar_title ||
+      data.he_title ||
+      "بدون عنوان";
+
+    // التقط المحتوى من أي اسم/بنية محتملة
+    let content =
+      data.content ||
+      data.description ||
+      data.subtitle ||
+      data.body ||
+      data.text ||
+      data.html ||
+      (data.content_html ?? null) ||
+      (data.content_json?.html ?? null) ||
+      (data.content_json?.markdown ?? null) ||
+      (data.content_json?.text ?? null) ||
+      "";
+
+    // لو طلع المحتوى كائن/مصفوفة (Rich JSON) حوّله لنص بدل ما يطلع فاضي
+    if (content && typeof content !== "string") {
+      try {
+        // لو فيه html داخلي، استخدمه
+        if (content.html && typeof content.html === "string") {
+          content = content.html;
+        } else if (content.markdown && typeof content.markdown === "string") {
+          content = content.markdown;
+        } else if (content.text && typeof content.text === "string") {
+          content = content.text;
+        } else {
+          content = JSON.stringify(content, null, 2);
+        }
+      } catch {
+        content = String(content);
+      }
+    }
+
+    // رجّع حقول موحّدة تستهلكها الواجهة
+    res.json({
+      id: data.id,
+      cover_url:
+        data.cover_url || data.image_url || data.cover || data.thumbnail_url || null,
+      updated_at: data.updated_at || data.updatedAt || null,
+      title,
+      content, // مضمون!
+      // _raw: data, // تركتها معلّقة
+    });
+  } catch (e: any) {
+    res.status(500).json({ error: e?.message || "Failed to fetch program" });
   }
 });
-// ===== فقرات قصيرة =====
+
+// ===== فقرات قصيرة ===== (الإصدار الأول)
 app.get("/api/content/short-segments", async (req, res) => {
   try {
     const limit = Math.min(parseInt(String(req.query.limit || "20")), 100);
@@ -269,6 +450,10 @@ app.get("/api/content/short-segments", async (req, res) => {
     res.status(500).json({ error: e.message || String(e) });
   }
 });
+
+
+
+
 type ShortSeg = {
   id: string;
   title: string | null;
@@ -323,7 +508,7 @@ async function fetchShortSegs(limit = 30): Promise<ShortSeg[]> {
   return q2.data ?? [];
 }
 
-// راوتر المحتوى
+// راوتر المحتوى (الإصدار الثاني مع كاش)
 app.get("/api/content/short-segments", async (req: Request, res: Response) => {
   try {
     const limit = Math.max(1, Math.min(100, Number(req.query.limit) || 30));
@@ -340,8 +525,6 @@ app.get("/api/content/short-segments", async (req: Request, res: Response) => {
 
     const rows = await fetchShortSegs(limit);
 
-    // حتى لو DB رجّع فاضي = بنظل نبعث “آخر نسخة كاش” إن وُجدت؛
-    // لكن بما إن الكاش مش موجود/منتهي، خلّينا على الأقل نبعث [] مع كود 200.
     if (rows.length > 0) setCache(cacheKey, rows);
 
     const etag = crypto.createHash("sha1").update(rows.map(x => x.id).join("|")).digest("hex");
@@ -367,9 +550,6 @@ app.get("/api/short-segments", (req, res) => {
   app._router.handle(req, res);
 });
 
-
-
-
 // جسر توافق مختصر
 app.get("/api/programs", (_req, res, next) => {
   ( _req as any ).url = "/api/content/programs";
@@ -393,12 +573,48 @@ app.use((err: any, _req: any, res: any, _next: any) => {
 });
 
 /* =========================
-   تشغيل السيرفر
+   تشغيل السيرفر + معالجة EADDRINUSE
    ========================= */
 const PORT = Number(process.env.PORT || 4000);
-app.listen(PORT, "127.0.0.1", () => {
-  console.log(`✅ Backend up at http://127.0.0.1:${PORT}`);
-  console.log(
-    `   PROGRAMS_TABLE=${PROGRAMS_TABLE} | THIRD_TABLE=${THIRD_TABLE} | PROGRAMS_CATALOG_TABLE=${PROGRAMS_CATALOG_TABLE}`
-  );
+
+const server = app
+  .listen(PORT, "127.0.0.1", () => {
+    console.log(`✅ Backend up at http://127.0.0.1:${PORT}`);
+    console.log(
+      `   PROGRAMS_TABLE=${PROGRAMS_TABLE} | THIRD_TABLE=${THIRD_TABLE} | PROGRAMS_CATALOG_TABLE=${PROGRAMS_CATALOG_TABLE}`
+    );
+  })
+  .on("error", (err: any) => {
+    if (err?.code === "EADDRINUSE") {
+      console.error(
+        `❌ البورت ${PORT} محجوز (EADDRINUSE).\n` +
+          `   إمّا تسكّر العملية الماسكة للبورت أو تشغّل الباكند مؤقتًا على بورت آخر:\n` +
+          (process.platform === "win32"
+            ? `   PowerShell:\n   $env:PORT=4001; npm run dev\n`
+            : `   Bash:\n   PORT=4001 npm run dev\n`)
+      );
+      // لا نرمي throw حتى ما ينهار nodemon؛ مجرّد لوج واضح.
+      return;
+    }
+    console.error("Server failed to start:", err);
+  });
+
+/* =========================
+   إشعارات نظام/إغلاقات نظيفة
+   ========================= */
+process.on("unhandledRejection", (e) => {
+  console.error("UNHANDLED REJECTION:", e);
 });
+process.on("uncaughtException", (e) => {
+  console.error("UNCAUGHT EXCEPTION:", e);
+});
+for (const sig of ["SIGINT", "SIGTERM"] as const) {
+  process.on(sig, () => {
+    console.log(`Received ${sig}, closing server...`);
+    server.close(() => {
+      console.log("Server closed gracefully.");
+      process.exit(0);
+    });
+    setTimeout(() => process.exit(0), 2000).unref();
+  });
+}

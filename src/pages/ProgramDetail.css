@@ -1,0 +1,35 @@
+/* حاوية خفيفة بلا ألوان */
+.pd {
+  max-width: 860px;
+  margin: 16px auto;
+  padding: 0 12px;
+  background: transparent !important;  /* يطفي أي خلفيات عامة */
+}
+
+/* عنوان بسيط غير مركّز وبحجم معقول */
+.pd-title {
+  font-family: "AraHamah1964";
+  margin: 0 0 10px;
+ font-size: 3rem; 
+  font-weight: 700;
+  text-align: start !important; /* يمنع التوسيط */
+  line-height: 1.25;
+  color: inherit !important;     /* بدون ألوان خاصة */
+}
+
+/* نص المحتوى بسيط */
+.pd-content {
+  font-family:"The Year of Handicrafts";
+  font-size: 1.5rem;
+  line-height: 1.85;
+  color: inherit;                /* وراثة اللون بدون ثيم */
+}
+
+/* لو المحتوى HTML */
+.pd-html h2, .pd-html h3 { margin: 1.1em 0 .55em; }
+.pd-html p               { margin: .6em 0; }
+.pd-html img             { max-width: 100%; height: auto; display: block; }
+
+/* رسائل بسيطة */
+.pd-err   { color: #b00020; }
+.pd-empty { opacity: .7; }

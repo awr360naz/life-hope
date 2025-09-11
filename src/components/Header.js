@@ -1,11 +1,23 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./Header.css";
 import { FiSearch } from "react-icons/fi";
-import LiveButtonImg from "../components/livebutton.png"; 
+import LiveButtonImg from "../components/livebutton.png";
 
 export default function Header() {
   const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const navigate = useNavigate();
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    const q = query.trim();
+    if (!q) return;
+    // روح على صفحة النتائج
+    navigate(`/search?q=${encodeURIComponent(q)}`);
+    // (اختياري) فضّي الحقل بعد الانتقال
+    // setQuery("");
+  };
 
   return (
     <header className="header" dir="rtl">
@@ -27,7 +39,7 @@ export default function Header() {
           <span className="logo-mark">الحَياة والأمْل</span>
         </Link>
 
-        {/* الروابط (ديسكتوب/تابلت) */}
+        {/* الروابط */}
         <nav className="main-nav" aria-label="روابط الموقع">
           <Link to="/articles" className="nav-link">مقالات</Link>
           <Link to="/programs" className="nav-link">برامجنا</Link>
@@ -42,25 +54,61 @@ export default function Header() {
         {/* يدفع البحث للطرف الشمالي */}
         <div className="spacer" />
 
-      
-       <form className="search" role="search" onSubmit={(e)=>e.preventDefault()}dir="ltr">
-        <FiSearch className="search-icon" />
-        <input type="search" placeholder="Search" className="search-input" />
-          </form>
+        {/* البحث */}
+        <form className="search" role="search" onSubmit={handleSearchSubmit} dir="ltr">
+          <FiSearch className="search-icon" />
+          <input
+            type="search"
+            placeholder="Search"
+            className="search-input"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            aria-label="ابحث في الموقع"
+          />
+         <button
+  type="submit"
+  style={{
+    border: "none",
+    background: "transparent",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 0
+  }}
+  aria-label="ابحث"
+>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="black"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <circle cx="11" cy="11" r="8" />
+    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+  </svg>
+</button>
 
+
+        </form>
       </div>
 
       {/* أوف-كانفاس (موبايل) */}
       <div className={`drawer ${open ? "drawer--open" : ""}`} onClick={() => setOpen(false)}>
         <nav className="drawer-panel" onClick={(e)=>e.stopPropagation()}>
+          <Link to="/" className="drawer-link" onClick={()=>setOpen(false)}>الصفحه الرئيسية</Link>
           <Link to="/articles" className="drawer-link" onClick={()=>setOpen(false)}>مقالات</Link>
           <Link to="/programs" className="drawer-link" onClick={()=>setOpen(false)}>برامجنا</Link>
           <Link to="/about" className="drawer-link" onClick={()=>setOpen(false)}>قصتنا</Link>
+          <Link to="/contact" className="drawer-link" onClick={()=>setOpen(false)}>تواصل معنا</Link>
+          <Link to="/prayer-request" className="drawer-link" onClick={()=>setOpen(false)}>اطلب صلاة</Link>
           <Link to="/live" className="drawer-live" onClick={()=>setOpen(false)}>البث المباشر</Link>
-        <Link to="/AudioLive" className="drawer-live" onClick={()=>setOpen(false)}>
-  البث المباشر الصوتي
-</Link>
-
+          <Link to="/AudioLive" className="drawer-live" onClick={()=>setOpen(false)}>البث المباشر الصوتي</Link>
         </nav>
       </div>
     </header>

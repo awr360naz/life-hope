@@ -44,7 +44,6 @@ function ThirdFrame() {
           image_url: it.image_url ?? it.imageUrl ?? it.image ?? null,
         }));
 
-        // حساب العنصر حسب الخميس
         const now = new Date();
         const startOfYear = new Date(now.getFullYear(), 0, 1);
         const days = Math.floor((now - startOfYear) / (24 * 60 * 60 * 1000));
@@ -55,9 +54,7 @@ function ThirdFrame() {
           idx = weekNumber % normalized.length;
         } else {
           const saved = localStorage.getItem("thirdFrameIndex");
-          if (saved !== null) {
-            idx = parseInt(saved, 10);
-          }
+          if (saved !== null) idx = parseInt(saved, 10);
         }
 
         setItems(normalized);
@@ -78,16 +75,19 @@ function ThirdFrame() {
     <div className="third-frame" dir="rtl">
       <div className="text-body">
         <div className="text-col text-col--right">
-         <h2 className="text-title">تأمل هذا الأسبوع</h2>
-  <p className="text-paragraph">{item.body}</p>
+          <h2 className="text-title">تأمل هذا الأسبوع</h2>
+          <p className="text-paragraph">{item.body}</p>
         </div>
         <div className="text-col text-col--left">
-          {item.image_url && <img className="text-image" src={item.image_url} alt={item.title} />}
+          {item.image_url && (
+            <img className="text-image" src={item.image_url} alt={item.title} />
+          )}
         </div>
       </div>
     </div>
   );
 }
+
 
 export default function HomePage() { 
   // تاريخ اليوم بأرقام إنجليزية (Asia/Jerusalem)
@@ -232,7 +232,7 @@ export default function HomePage() {
       </div>
 <br></br>
    <ProgramsCarousel title="برامجنا" />
-   <br></br>
+   <br></br><br></br>
  
       <ShortSegmentsCarousel
   title="فقرات قصيرة"

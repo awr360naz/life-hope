@@ -2,11 +2,13 @@ import React, { useEffect, useRef, useState } from "react";
 import "./ProgramsCarousel.css";
 import { Link } from "react-router-dom";
 
+
 export default function ProgramsCarousel({
   title = "برامجنا",
   perView = 4,
   step = 1,
   apiUrl = "/api/content/programs",
+   linkTo = "/programs",
 }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -68,11 +70,12 @@ const goToIndex = (nextIdx) => {
 
   return (
     <section className="programs-section" dir="rtl" aria-labelledby="programs-title">
-      <header className="programs-header">
-        <h2 id="programs-title" className="programs-title">
-          <Link to="/programs" className="programs-link">{title}</Link>
-        </h2>
-      </header>
+        <div className="programs-header">
+              <h2 id="pr-title" className="programs-title">{title}</h2>
+           
+              {linkTo && <Link to={linkTo} className="programs-viewall">عرض الكل </Link>}
+            </div>
+    
 
       <div className={`carousel ${loading ? "is-loading" : ""}`}>
         {error && <div className="carousel-error">خطأ: {error}</div>}

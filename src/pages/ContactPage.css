@@ -1,0 +1,131 @@
+:root {
+  --bg: linear-gradient(180deg, #FFFFFF 0%, #F6F3EE 20%);
+  --card: #FDFBF9;            /* كرت بيج فاتح ناعم */
+  --text: black;            /* نص أسود مائل للبني */
+  --muted: #6B635C;           /* نص ثانوي بني رمادي */
+  --ring: #C49A6C;            /* ذهبي/برونزي ناعم للإطار */
+  --shadow: 0 6px 14px rgba(0,0,0,0.06); 
+}
+
+
+.contact-page {
+  min-height: 100dvh;
+  background: transparent;
+  color: var(--text);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 24px;
+  padding: clamp(16px, 3vw, 32px);
+  font-family: "Cairo", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+.contact-hero {
+  text-align: center;
+  margin-top: 8px;
+}
+
+.contact-title {
+  margin: 0 0 8px;
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 800;
+  letter-spacing: 0.2px;
+   font-family: "The Year of Handicrafts";
+}
+
+.contact-subtitle {
+  margin: 0 auto;
+  max-width: 48ch;
+  line-height: 1.7;
+  color: var(--muted);
+  font-size: clamp(14px, 2.2vw, 16px);
+   font-family: "The Year of Handicrafts";
+}
+
+/* شبكة البطاقات */
+.contact-grid {
+  --size: 130px;
+  margin: 8px auto 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(var(--size), 1fr));
+  gap: clamp(12px, 2vw, 18px);
+  width: min(1100px, 100%);
+  align-content: start;
+}
+
+@media (max-width: 1100px) {
+  .contact-grid { grid-template-columns: repeat(3, minmax(var(--size), 1fr)); }
+}
+@media (max-width: 640px) {
+  .contact-grid { grid-template-columns: repeat(2, minmax(var(--size), 1fr)); }
+}
+
+/* البطاقة */
+.contact-card {
+  background: linear-gradient(180deg, var(--card), #feffff);
+  border: 1px solid rgba(148,163,184,0.12);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  padding: 18px 16px;
+  display: grid;
+  place-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--text);
+  transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease, background .25s ease;
+  position: relative;
+  isolation: isolate;
+}
+
+.contact-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(59,130,246,.5);
+  box-shadow: 0 14px 28px rgba(0,0,0,.35), 0 0 0 4px rgba(59,130,246,.12) inset;
+}
+
+/* أيقونة */
+.icon-wrap {
+  width: 60px;
+  height: 60px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: rgba(59,130,246,0.08);
+  outline: 1px dashed rgba(148,163,184,0.2);
+  outline-offset: 6px;
+}
+
+.icon-wrap svg {
+  width: 34px;
+  height: 34px;
+  fill: currentColor;
+}
+
+/* عنوان القناة */
+.contact-label {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: .2px;
+}
+
+/* ألوان خفيفة مخصصة لكل خدمة */
+.contact-facebook { color: #3b82f6; }
+.contact-instagram { color: #e879f9; }
+.contact-tiktok { color: black; }
+.contact-youtube { color: #f87171; }
+.contact-email { color: #22d3ee; }
+.contact-whatsapp { color: #34d399; }
+
+/* تذييل */
+.contact-footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+  margin-top: 8px;
+   font-family: "The Year of Handicrafts";
+}
+
+/* تحسينات إمكانية الوصول عند التركيز */
+.contact-card:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 3px;
+}

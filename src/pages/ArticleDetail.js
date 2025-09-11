@@ -54,13 +54,7 @@ export default function ArticleDetail() {
     <main dir="rtl" style={{maxWidth:900, margin:"2rem auto", padding:"0 1rem", color:"#111"}}>
       <Link to="/articles" style={{textDecoration:"none"}}>← العودة للمقالات</Link>
       <h1 style={{margin:"1rem 0"}}>{article.title}</h1>
-      {cover && (
-        <img
-          src={cover}
-          alt=""
-          style={{width:"100%", height:"auto", borderRadius:12, marginBottom:"1rem"}}
-        />
-      )}
+  
       {looksHtml
         ? <div dangerouslySetInnerHTML={{ __html: html }} style={{lineHeight:1.9}} />
         : <div style={{whiteSpace:"pre-wrap", lineHeight:1.9}}>{html || "(لا يوجد محتوى)"}</div>
