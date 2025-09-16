@@ -7,84 +7,57 @@ import ProgramsCarousel from "../components/ProgramsCarousel";
 import ShortSegmentsCarousel from "../components/ShortSegmentsCarousel";
 import { Link } from "react-router-dom";
 
-function ThirdFrame() {
-  const [items, setItems] = useState([]);
-  const [err, setErr] = useState("");
-  const [index, setIndex] = useState(0);
 
-  useEffect(() => {
+function ThirdFrame() {
+  const [item, setItem] = React.useState(null);
+  const [err, setErr] = React.useState("");
+
+  React.useEffect(() => {
     (async () => {
       try {
         const res = await fetch("/api/content/home-third-frame", {
           headers: { Accept: "application/json" },
+          cache: "no-store",
         });
-        const text = await res.text();
-        let data = null;
-        try { data = text ? JSON.parse(text) : null; } catch {}
+        const data = await res.json();
+        if (!res.ok) throw new Error(data?.error || "HTTP " + res.status);
+        const it = data?.content;
+        if (!it) throw new Error("لا توجد بيانات.");
 
-        if (!res.ok) {
-          const serverMsg = data?.error || data?.message || text;
-          throw new Error(serverMsg ? `${res.status}: ${serverMsg}` : `HTTP ${res.status}`);
-        }
-
-        let list = [];
-        if (Array.isArray(data)) list = data;
-        else if (Array.isArray(data?.items)) list = data.items;
-        else if (Array.isArray(data?.rows)) list = data.rows;
-        else if (Array.isArray(data?.data)) list = data.data;
-        else if (data?.content) list = [data.content];
-
-        if (!Array.isArray(list) || list.length === 0) {
-          throw new Error("لا توجد عناصر لعرضها في الإطار الثالث.");
-        }
-
-        const normalized = list.map((it) => ({
-          title: it.title ?? "—",
-          body: it.body ?? it.text ?? "",
-          image_url: it.image_url ?? it.imageUrl ?? it.image ?? null,
-        }));
-
-        const now = new Date();
-        const startOfYear = new Date(now.getFullYear(), 0, 1);
-        const days = Math.floor((now - startOfYear) / (24 * 60 * 60 * 1000));
-        const weekNumber = Math.floor(days / 7);
-
-        let idx = 0;
-        if (now.getDay() === 4) { // الخميس
-          idx = weekNumber % normalized.length;
-        } else {
-          const saved = localStorage.getItem("thirdFrameIndex");
-          if (saved !== null) idx = parseInt(saved, 10);
-        }
-
-        setItems(normalized);
-        setIndex(idx);
-        localStorage.setItem("thirdFrameIndex", idx.toString());
+        setItem({
+          title: it.title?.trim() || "",          // ممكن يكون فاضي — نخبّيه
+          body: it.body || "",
+          image_url: it.image_url || null,
+        });
       } catch (e) {
-        console.error("ThirdFrame fetch error:", e);
-        setErr(`خطأ في الجلب: ${e.message}`);
+        setErr("تعذّر تحميل معلومات الإطار الثالث: " + e.message);
       }
     })();
   }, []);
 
-  if (err) return <p>{err}</p>;
-  if (items.length === 0) return null;
+  if (err) return <p className="third-frame-error">{err}</p>;
+  if (!item) return null;
 
-  const item = items[index];
   return (
-    <div className="third-frame" dir="rtl">
-      <div className="text-body">
-        <div className="text-col text-col--right">
-          <h2 className="text-title">تأمل هذا الأسبوع</h2>
-          <p className="text-paragraph">{item.body}</p>
-        </div>
-        <div className="text-col text-col--left">
-          {item.image_url && (
-            <img className="text-image" src={item.image_url} alt={item.title} />
+    <section className="third-frame" dir="rtl" aria-label="تأمل هذا الأسبوع">
+      {/* النص يمين */}
+      <div className="tf-col tf-col--right">
+        <h2 className="tf-title">تأمل هذا الأسبوع</h2>
+        {item.title && <h3 className="tf-subtitle">{item.title}</h3>}
+        <p className="tf-paragraph">{item.body}</p>
+      </div>
+
+      {/* الصورة شمال */}
+      <div className="tf-col tf-col--left">
+        <div className="image-4x5">
+          {item.image_url ? (
+            <img src={item.image_url} alt={item.title || "صورة التأمل"} />
+          ) : (
+            <div className="image-placeholder">لا توجد صورة</div>
           )}
         </div>
       </div>
-    </div>
+    </section>
   );
 }
 
@@ -183,10 +156,15 @@ export default function HomePage() {
 
         {/* ===== الإطار 2: برنامج اليوم ===== */}
         <section
-          className="schedule-frame"
-          onMouseEnter={() => setPaused(true)}
-          onMouseLeave={() => setPaused(false)}
-        >
+  className="schedule-frame"
+  onMouseEnter={() => setPaused(true)}
+  onMouseLeave={() => setPaused(false)}
+  onTouchStart={() => setPaused(true)}
+  onTouchEnd={() => setPaused(false)}
+  onMouseDown={() => setPaused(true)}
+  onMouseUp={() => setPaused(false)}
+>
+
           <div className="frame-header center">
             <span className="schedule-title">برنامج اليوم</span>
           </div>

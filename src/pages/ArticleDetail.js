@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
+import "./ArticleDetail.css";
+
 
 export default function ArticleDetail() {
   const { slug } = useParams();
@@ -52,7 +54,7 @@ export default function ArticleDetail() {
 
   return (
     <main dir="rtl" style={{maxWidth:900, margin:"2rem auto", padding:"0 1rem", color:"#111"}}>
-      <Link to="/articles" style={{textDecoration:"none"}}>← العودة للمقالات</Link>
+
       <h1 style={{margin:"1rem 0"}}>{article.title}</h1>
   
       {looksHtml

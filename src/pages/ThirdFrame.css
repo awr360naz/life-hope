@@ -1,0 +1,139 @@
+.third-frame {
+  margin: 32px 0;
+}
+
+/* صف الأعمدة */
+.third-frame .text-body {
+  display: flex;
+  gap: 24px;
+  align-items: stretch;          /* يساوي ارتفاع العمودين */
+  min-height: 220px;             /* يمنع الانطواء لو النص قصير */
+}
+
+/* أعمدة */
+.third-frame .text-col {
+  flex: 1;
+  min-width: 0;                  /* مهم داخل flex لمنع overflow */
+}
+
+/* عمود النص */
+.third-frame .text-col--right {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* عمود الصورة */
+.third-frame .text-col--left {
+  display: flex;
+  align-items: stretch;
+  min-height: 1px;
+}
+
+/* الصورة — نصف العرض، نفس ارتفاع النص، حواف مطعوجة */
+.third-frame .text-image {
+  display: block;
+  width: 100%;
+  height: 100%;                  /* يخليها بطول عمود النص */
+  object-fit: cover;
+  border-radius: 28px;           /* الحفف المطعوجة */
+}
+
+/* بديل مرئي عند غياب الصورة */
+.third-frame .text-image--fallback {
+  flex: 1;
+  border-radius: 28px;
+  background: #eee;
+}
+
+/* عناوين ونص */
+.third-frame .text-title {
+  margin: 0 0 12px;
+  font-size: 24px;
+  line-height: 1.3;
+}
+.third-frame .text-paragraph {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+/* Responsive: على الشاشات الصغيرة خليهم تحت بعض */
+@media (max-width: 768px) {
+  .third-frame .text-body {
+    flex-direction: column;
+  }
+  .third-frame .text-image {
+    height: 320px;               /* ارتفاع مناسب للموبايل */
+  }
+}
+/* صف الأعمدة: نفس ارتفاع، بدون سكرول داخلي */
+.third-frame .text-body {
+  display: flex;
+  gap: 24px;
+  align-items: stretch;      /* يساوي ارتفاع العمودين */
+  min-height: 280px;         /* اضمن ارتفاع أدنى واضح */
+}
+
+/* الأعمدة */
+.third-frame .text-col {
+  flex: 1;
+  min-width: 0;              /* مهم داخل flex لمنع overflow */
+  overflow: hidden;          /* يمنع أي سكرول داخلي */
+}
+
+/* عمود النص */
+.third-frame .text-col--right {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;   /* وسّط المحتوى عاموديًا */
+}
+
+/* النص: قصّ سطور بدل سكرول */
+.third-frame .text-paragraph {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.8;
+  display: -webkit-box;
+  -webkit-line-clamp: 9;     /* عدّل عدد السطور حسب اللي بدك */
+  -webkit-box-orient: vertical;
+  overflow: hidden;          /* يخفي الزيادة بدون سكرول */
+  text-overflow: ellipsis;
+}
+
+/* عمود الصورة */
+.third-frame .text-col--left {
+  display: flex;
+  align-items: stretch;
+  min-height: 1px;           /* مهم داخل flex */
+}
+
+/* الصورة: لازم تاخذ ارتفاع العمود كله وتظهر */
+.third-frame .text-image {
+  display: block;
+  width: 100%;
+  height: 100%;              /* يساوي ارتفاع عمود النص */
+  object-fit: cover;         /* تغطّي المساحة */
+  border-radius: 28px;       /* الحفف المطعوجة */
+}
+
+/* بديل مرئي لو ما في صورة */
+.third-frame .text-image--fallback {
+  flex: 1;
+  border-radius: 28px;
+  background: #eee;
+}
+
+/* Responsive: على الشاشات الصغيرة خليهم تحت بعض */
+@media (max-width: 768px) {
+  .third-frame .text-body {
+    flex-direction: column;
+    min-height: 0;           /* خلّي الارتفاع يتكيّف على الموبايل */
+  }
+  .third-frame .text-image {
+    height: 320px;           /* ارتفاع مناسب للصورة على الموبايل */
+  }
+  .third-frame .text-paragraph {
+    -webkit-line-clamp: 6;   /* قلّل السطور بالموبايل */
+  }
+}

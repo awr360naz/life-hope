@@ -1,0 +1,12 @@
+main[dir="rtl"],
+.article-detail {
+  font-family: "Cairo", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 1.2rem; /* كبّر النص */
+  line-height: 1.9;
+}
+
+main[dir="rtl"] h1,
+.article-detail h1 {
+  font-size: 2rem; /* العنوان */
+  font-weight: bold;
+}

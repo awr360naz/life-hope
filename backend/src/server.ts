@@ -8,16 +8,13 @@ import { getSupabase } from "./supabaseClient.js";
 import type { Request, Response } from "express";
 import crypto from "node:crypto";
 import shortSegmentsRouter from "./routes/shortSegments.routes.js";
-
-
-
-
-
+import categoriesRouter from "./routes/categories.js";
 
 
 
 const app = express();
 app.set("trust proxy", true);
+
 app.use(
   cors({
     origin: (_origin, cb) => cb(null, true), // مرن للتطوير
@@ -26,29 +23,65 @@ app.use(
 );
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true }));
-// بعد الميدلويرات مباشرة:
+app.use(morgan("dev"));
 
 /* فحص سريع: لازم يرجّع {ok:true} على :4000/api/_ping */
 app.get("/api/_ping", (_req, res) => res.json({ ok: true, at: new Date().toISOString() }));
 
-
-/* اترك راوتر المقالات بعدهم */
-app.use(articlesRouter);
-app.use(shortSegmentsRouter);
-
-
-
-
-
-
-
-
-// صحة
+/* صحة */
 app.get("/api/health", (_req, res) => {
   res.json({ ok: true, service: "life-hope-backend", time: new Date().toISOString() });
 });
 
-// ـــــ داخل server.ts بعد /api/health مثلاً ـــــ
+/* =========================
+   قصتنا — لازم يسبق أي app.use(...)
+   ========================= */
+// بعد الميدلويرات و/_ping و/health مباشرة
+app.get("/api/content/about", async (_req, res) => {
+  try {
+    const supabase = getSupabase();
+    const { data, error } = await supabase
+      .from("about_page")
+      .select("id, title, body, hero_url, images, updated_at, published")
+      .eq("published", true)
+      .order("updated_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error) return res.status(500).json({ ok: false, error: "DB_ERROR" });
+
+    if (!data) {
+      // إن بدك يختفي خطأ الفرونت مؤقتًا، رجّع 200 بفولباك جاهز:
+      return res.json({
+        ok: true,
+        data: {
+          title: "قصتنا",
+          body: "محتوى مؤقت — أضف/انشر صفًا في about_page ليظهر الحقيقي.",
+          hero_url: "https://picsum.photos/1200/540",
+          images: [],
+          updated_at: new Date().toISOString(),
+          published: true,
+        },
+        fallback: true,
+      });
+      // ولو بدّك 404 تقليدي بدل الفولباك:
+      // return res.status(404).json({ ok: false, error: "NOT_FOUND" });
+    }
+
+    return res.json({ ok: true, data });
+  } catch {
+    return res.status(500).json({ ok: false, error: "SERVER_ERROR" });
+  }
+});
+
+
+/* =========================
+   راوترات موجودة — بعد /api/content/about
+   (لا تكرّر تركيب نفس الراوتر)
+   ========================= */
+app.use(articlesRouter);
+app.use(categoriesRouter);
+app.use(shortSegmentsRouter);
 
 /**
  * Simple Search endpoint
@@ -57,7 +90,7 @@ app.get("/api/health", (_req, res) => {
  * الحقول موحّدة وبكون معها type = "article" أو "program"
  */
 app.get("/api/content/search", async (req: Request, res: Response) => {
-  const supabase = getSupabase?.();
+  const supabase = getSupabase();
   const rawQ = (req.query.q ?? "").toString().trim();
   const limit = Math.min(parseInt((req.query.limit ?? "20") as string, 10) || 20, 50);
   const debug = String(req.query.debug || "") === "1";
@@ -115,11 +148,9 @@ app.get("/api/content/search", async (req: Request, res: Response) => {
     }
   }
 
-  // 1) محاولات آمنة على حقول متوقعة
   let articles: any[] = [];
   let programs: any[] = [];
 
-  // أقل اختيار حساسية للأعمدة (select("*")) حتى ما نطيّر لو عمود مش موجود
   articles = articles.concat(await tryIlike("articles", "title", "*", "article"));
   programs = programs.concat(await tryIlike("programs_catalog", "title", "*", "program"));
 
@@ -136,7 +167,6 @@ app.get("/api/content/search", async (req: Request, res: Response) => {
   let merged = [...articles, ...programs].sort((a, b) => (b.created_at ?? "").localeCompare(a.created_at ?? ""));
   merged = merged.slice(0, limit);
 
-  // 2) خطة-ب: فلترة محلية إذا لسه صفر
   if (merged.length === 0) {
     try {
       const [a2, p2] = await Promise.all([
@@ -154,19 +184,17 @@ app.get("/api/content/search", async (req: Request, res: Response) => {
       const aLoc = (a2.data || []).filter(ok).map((x) => mapRecord(x, "article"));
       const pLoc = (p2.data || []).filter(ok).map((x) => mapRecord(x, "program"));
 
-      merged = [...aLoc, ...pLoc].sort((a, b) => (b.created_at ?? "").localeCompare(a.created_at ?? "")).slice(0, limit);
+      merged = [...aLoc, ...pLoc]
+        .sort((a, b) => (b.created_at ?? "").localeCompare(a.created_at ?? ""))
+        .slice(0, limit);
       dbg.steps.push({ fallback_local: true, aLoc: aLoc.length, pLoc: pLoc.length });
     } catch (e: any) {
       dbg.errors.push({ fallback_local_error: String(e?.message || e) });
-      // حتى لو فشل fallback المحلي، بنرجّع اللي معنا (قد يكون صفر) بدون ما نرمي خطأ
     }
   }
 
-  if (debug) return res.json({ ...dbg, counts: { merged: merged.length }, results: merged });
-  return res.json(merged);
+  return debug ? res.json({ ...dbg, counts: { merged: merged.length }, results: merged }) : res.json(merged);
 });
-
-
 
 /* =========================
    إعدادات عامة من البيئة
@@ -201,7 +229,6 @@ async function handleGetProgramToday(req: express.Request, res: express.Response
     return res.status(500).json({ error: String(e?.message || e) });
   }
 }
-
 app.get("/api/content/programs/today", handleGetProgramToday);
 app.get("/api/programs/today", handleGetProgramToday); // جسر توافق
 
@@ -210,123 +237,68 @@ app.get("/api/programs/today", handleGetProgramToday); // جسر توافق
    ========================= */
 async function handleGetHomeThird(req: express.Request, res: express.Response) {
   const sb = getSupabase();
-  if (!sb) return res.status(500).json({ error: "Supabase not configured (env missing)" });
+  if (!sb) return res.status(500).json({ ok: false, error: "Supabase not configured (env missing)" });
+
+  // نقرأ sort من الـ path أو الـ query (الافتراضي 0)
+  const rawSort = String((req.params as any)?.sort ?? req.query?.sort ?? "0").trim();
+  const sortNum = /^\d+$/.test(rawSort) ? Number(rawSort) : 0;
+
+  // DEBUG: لازم تشوف هذا السطر عند كل طلب
+  console.log("[home-third-frame]", { url: req.originalUrl, rawSort, sortNum });
 
   try {
-    const { data, error } = await sb.from(THIRD_TABLE).select("*").limit(1);
-    if (error) return res.status(500).json({ error: error.message });
-    if (!data || data.length === 0) return res.status(404).json({ error: "Not found" });
+    const { data, error } = await sb
+      .from(THIRD_TABLE) // ← استخدم الثابت اللي عرّفتَه فوق
+      .select("id, title, body, text, image_url, img, sort_num, updated_at, created_at")
+      // ندعم كون العمود مخزَّن رقم أو نص
+      .or(`sort_num.eq.${sortNum},sort_num.eq.${rawSort}`)
+      .order("updated_at", { ascending: false, nullsFirst: false })
+      .order("created_at", { ascending: false, nullsFirst: false })
+      .limit(1)
+      .maybeSingle();
 
-    const row: any = data[0];
+    if (error) {
+      console.error("[home-third-frame] DB_ERROR:", error);
+      return res.status(500).json({ ok: false, error: "DB_ERROR" });
+    }
+    if (!data) {
+      return res.status(404).json({ ok: false, error: "NOT_FOUND", sort: sortNum });
+    }
+
     return res.json({
       ok: true,
+      sort: sortNum,
       content: {
-        title: row.title ?? "—",
-        body: row.body ?? row.text ?? "",
-        image_url: row.image_url ?? row.img ?? null,
-        updated_at: row.updated_at ?? null,
+        title: data.title ?? "—",
+        body: (data.body ?? data.text ?? "").trim(),
+        image_url: data.image_url ?? data.img ?? null,
+        updated_at: data.updated_at ?? data.created_at ?? null,
       },
     });
   } catch (e: any) {
-    return res.status(500).json({ error: String(e?.message || e) });
+    console.error("[home-third-frame] SERVER_ERROR:", e);
+    return res.status(500).json({ ok: false, error: "SERVER_ERROR" });
   }
 }
 
-app.get("/api/content/home-third-frame", handleGetHomeThird);
-app.get("/api/home-third-frame", handleGetHomeThird); // جسر توافق
+// ⚠️ ضَع هذه المسارات قبل أي راوتر ممكن يصطدم بـ /api/content/*
+app.get("/api/content/home-third-frame", handleGetHomeThird);       // ?sort=0
+app.get("/api/content/home-third-frame/:sort", handleGetHomeThird); // /.../0
+app.get("/api/home-third-frame", handleGetHomeThird);
+app.get("/api/home-third-frame/:sort", handleGetHomeThird);
+
 
 /* =========================
    المقالات (قائمة + تفاصيل)
    ========================= */
 const ARTICLES_TABLE = process.env.ARTICLES_TABLE || "articles";
 
-// GET /api/content/articles?limit=24
-app.get("/api/content/articles", async (req, res) => {
-  const sb = getSupabase();
-  if (!sb) return res.status(500).json({ error: "Supabase not configured (env missing)" });
 
-  try {
-    const limit = Math.min(parseInt(String(req.query.limit || "24"), 10) || 24, 100);
-    const { data, error } = await sb
-      .from(ARTICLES_TABLE)
-      .select("id, slug, title, cover_url, published, created_at")
-      .eq("published", true)
-      .order("created_at", { ascending: false })
-      .limit(limit);
 
-    if (error) return res.status(500).json({ error: error.message });
-
-    const articles = (data || []).map((a) => ({
-      id: a.id,
-      slug: a.slug,
-      title: a.title,
-      image_url: a.cover_url || "",
-    }));
-
-    res.json({ articles });
-  } catch (e: any) {
-    res.status(500).json({ error: e?.message || String(e) });
-  }
-});
-
-// GET /api/content/articles/:idOrSlug
-app.get("/api/content/articles/:idOrSlug", async (req, res) => {
-  const sb = getSupabase();
-  if (!sb) return res.status(500).json({ error: "Supabase not configured (env missing)" });
-
-  try {
-    const { idOrSlug } = req.params;
-
-    // جرّب slug أولًا
-    let { data, error } = await sb
-      .from(ARTICLES_TABLE)
-      .select("id, slug, title, cover_url, content, created_at, updated_at, published")
-      .eq("published", true)
-      .eq("slug", idOrSlug)
-      .limit(1);
-
-    if (error) return res.status(500).json({ error: error.message });
-
-    // لو مش لاقي، جرّب id (UUID)
-    if (!data || !data.length) {
-      const byId = await sb
-        .from(ARTICLES_TABLE)
-        .select("id, slug, title, cover_url, content, created_at, updated_at, published")
-        .eq("published", true)
-        .eq("id", idOrSlug)
-        .limit(1);
-      if (byId.error) return res.status(500).json({ error: byId.error.message });
-      data = byId.data;
-    }
-
-    if (!data || !data.length) return res.status(404).json({ error: "Not found" });
-
-    const a = data[0];
-    res.json({
-      id: a.id,
-      slug: a.slug,
-      title: a.title,
-      image_url: a.cover_url || "",
-      content: a.content || "",
-      created_at: a.created_at,
-      updated_at: a.updated_at,
-    });
-  } catch (e: any) {
-    res.status(500).json({ error: e?.message || String(e) });
-  }
-});
-
-// (اختياري) جسر توافق قصير للمقالات
-app.get("/api/articles", (req, res) => {
-  res.redirect(
-    307,
-    `/api/content/articles${req.url.includes("?") ? req.url.slice(req.url.indexOf("?")) : ""}`
-  );
-});
 
 /* =========================
    برامج عامة (كاروسول "برامجنا")
-   جدول: programs_catalog (قابل للتبديل عبر PROGRAMS_CATALOG_TABLE)
+   جدول: programs_catalog
    ========================= */
 // GET /api/content/programs
 app.get("/api/content/programs", async (req, res) => {
@@ -335,7 +307,7 @@ app.get("/api/content/programs", async (req, res) => {
     const supabase = getSupabase();
 
     const { data, error } = await supabase
-      .from("programs_catalog")
+      .from(PROGRAMS_CATALOG_TABLE)
       .select("id, title, content, cover_url, updated_at")
       .eq("published", true)
       .order("updated_at", { ascending: false })
@@ -356,25 +328,13 @@ app.get("/api/content/programs/:id", async (req, res) => {
     const supabase = getSupabase();
 
     // هات *كل* الحقول لهذا الصف (عشان نعرف شو موجود فعلياً)
-    const { data, error } = await supabase
-      .from("programs_catalog")
-      .select("*")
-      .eq("id", id)
-      .single();
+    const { data, error } = await supabase.from(PROGRAMS_CATALOG_TABLE).select("*").eq("id", id).single();
 
     if (error) throw error;
     if (!data) return res.status(404).json({ error: "Not found" });
 
-    // التقط العنوان من أي اسم محتمل
-    const title =
-      data.title ||
-      data.name ||
-      data.heading ||
-      data.ar_title ||
-      data.he_title ||
-      "بدون عنوان";
+    const title = data.title || data.name || data.heading || data.ar_title || data.he_title || "بدون عنوان";
 
-    // التقط المحتوى من أي اسم/بنية محتملة
     let content =
       data.content ||
       data.description ||
@@ -388,10 +348,8 @@ app.get("/api/content/programs/:id", async (req, res) => {
       (data.content_json?.text ?? null) ||
       "";
 
-    // لو طلع المحتوى كائن/مصفوفة (Rich JSON) حوّله لنص بدل ما يطلع فاضي
     if (content && typeof content !== "string") {
       try {
-        // لو فيه html داخلي، استخدمه
         if (content.html && typeof content.html === "string") {
           content = content.html;
         } else if (content.markdown && typeof content.markdown === "string") {
@@ -406,54 +364,21 @@ app.get("/api/content/programs/:id", async (req, res) => {
       }
     }
 
-    // رجّع حقول موحّدة تستهلكها الواجهة
     res.json({
       id: data.id,
-      cover_url:
-        data.cover_url || data.image_url || data.cover || data.thumbnail_url || null,
+      cover_url: data.cover_url || data.image_url || data.cover || data.thumbnail_url || null,
       updated_at: data.updated_at || data.updatedAt || null,
       title,
-      content, // مضمون!
-      // _raw: data, // تركتها معلّقة
+      content,
     });
   } catch (e: any) {
     res.status(500).json({ error: e?.message || "Failed to fetch program" });
   }
 });
 
-// ===== فقرات قصيرة ===== (الإصدار الأول)
-app.get("/api/content/short-segments", async (req, res) => {
-  try {
-    const limit = Math.min(parseInt(String(req.query.limit || "20")), 100);
-    const from = parseInt(String(req.query.offset || "0"));
-    const to = from + limit - 1;
-
-    const supa = getSupabase(); // نفس الدالة عندك
-    if (!supa) return res.status(500).json({ error: "Supabase not configured (env missing)" });
-
-    const q = supa
-      .from("short_segments")
-      .select("id,title,thumb_url,video_url,duration_sec,created_at", { count: "exact" })
-      .eq("is_published", true)
-      .order("created_at", { ascending: false })
-      .range(from, to);
-
-    const { data, error, count } = await q;
-    if (error) throw error;
-
-    res.json({
-      ok: true,
-      total: count ?? data?.length ?? 0,
-      items: data ?? [],
-    });
-  } catch (e:any) {
-    res.status(500).json({ error: e.message || String(e) });
-  }
-});
-
-
-
-
+/* =========================
+   فقرات قصيرة — نسخة مكيَّشة واحدة فقط
+   ========================= */
 type ShortSeg = {
   id: string;
   title: string | null;
@@ -467,7 +392,6 @@ type ShortSeg = {
 // كاش ذاكرة بسيط
 const memCache = new Map<string, { ts: number; data: ShortSeg[] }>();
 const TTL_MS = 5 * 60 * 1000; // 5 دقائق
-
 function setCache(key: string, data: ShortSeg[]) {
   memCache.set(key, { ts: Date.now(), data });
 }
@@ -484,7 +408,7 @@ function getCache(key: string): ShortSeg[] | null {
 // helper موحّد لجلب آخر العناصر
 async function fetchShortSegs(limit = 30): Promise<ShortSeg[]> {
   const supabase = getSupabase();
-  // 1) المنشور فقط
+  // 1) المنشور فقط (اسم العمود published)
   const q1 = await supabase
     .from("short_segments")
     .select("id, title, video_url, duration_sec, published, created_at, updated_at")
@@ -508,7 +432,6 @@ async function fetchShortSegs(limit = 30): Promise<ShortSeg[]> {
   return q2.data ?? [];
 }
 
-// راوتر المحتوى (الإصدار الثاني مع كاش)
 app.get("/api/content/short-segments", async (req: Request, res: Response) => {
   try {
     const limit = Math.max(1, Math.min(100, Number(req.query.limit) || 30));
@@ -517,7 +440,7 @@ app.get("/api/content/short-segments", async (req: Request, res: Response) => {
     // جرّب الكاش أولًا
     const cached = getCache(cacheKey);
     if (cached && cached.length > 0) {
-      const etag = crypto.createHash("sha1").update(cached.map(x => x.id).join("|")).digest("hex");
+      const etag = crypto.createHash("sha1").update(cached.map((x) => x.id).join("|")).digest("hex");
       res.setHeader("ETag", etag);
       res.setHeader("Cache-Control", "public, max-age=30");
       return res.json({ items: cached });
@@ -527,7 +450,7 @@ app.get("/api/content/short-segments", async (req: Request, res: Response) => {
 
     if (rows.length > 0) setCache(cacheKey, rows);
 
-    const etag = crypto.createHash("sha1").update(rows.map(x => x.id).join("|")).digest("hex");
+    const etag = crypto.createHash("sha1").update(rows.map((x) => x.id).join("|")).digest("hex");
     res.setHeader("ETag", etag);
     res.setHeader("Cache-Control", "public, max-age=30");
 
@@ -544,16 +467,15 @@ app.get("/api/content/short-segments", async (req: Request, res: Response) => {
   }
 });
 
-// جسر توافقية (اختياري)
+// جسور واضحة (Redirect 307) بدل الـhandle/next hacks
 app.get("/api/short-segments", (req, res) => {
-  req.url = "/api/content/short-segments" + (req.url.includes("?") ? req.url.slice(req.url.indexOf("?")) : "");
-  app._router.handle(req, res);
+  const qs = req.url.includes("?") ? req.url.slice(req.url.indexOf("?")) : "";
+  res.redirect(307, `/api/content/short-segments${qs}`);
 });
 
-// جسر توافق مختصر
-app.get("/api/programs", (_req, res, next) => {
-  ( _req as any ).url = "/api/content/programs";
-  next();
+app.get("/api/programs", (req, res) => {
+  const qs = req.url.includes("?") ? req.url.slice(req.url.indexOf("?")) : "";
+  res.redirect(307, `/api/content/programs${qs}`);
 });
 
 /* =========================
@@ -593,7 +515,6 @@ const server = app
             ? `   PowerShell:\n   $env:PORT=4001; npm run dev\n`
             : `   Bash:\n   PORT=4001 npm run dev\n`)
       );
-      // لا نرمي throw حتى ما ينهار nodemon؛ مجرّد لوج واضح.
       return;
     }
     console.error("Server failed to start:", err);

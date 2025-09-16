@@ -18,6 +18,9 @@ import ProgramDetail from "./pages/ProgramDetail";
 import ContactPage from './pages/ContactPage';
 import PrayerRequest from './pages/PrayerRequest';
 import SearchPage from './pages/SearchPage';
+import AboutPage from './pages/AboutPage';
+import CategoriesPage from "./pages/CategoriesPage";
+import CategoryArticlesPage from "./pages/CategoryArticlesPage";
 
 
 
@@ -53,6 +56,9 @@ export default function App() {
 <Route path="/programs/:id" element={<ProgramDetail />} />
 <Route path="/prayer-request" element={<PrayerRequest />} />
 <Route path="/search" element={<SearchPage />} />
+<Route path="/about" element={<AboutPage />} />
+  <Route path="/articles" element={<CategoriesPage />} />
+     
 
  
 </Routes>

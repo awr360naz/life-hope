@@ -1,4 +1,6 @@
-/* ===== الخطوط المطلوبة ===== */
+/* =========================
+   1) الخطوط
+   ========================= */
 @font-face {
   font-family: "AraHamah1964";
   src: url("../assets/fonts/AraHamah1964 Bold.ttf") format("truetype");
@@ -15,7 +17,10 @@
 }
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
 
-/* ===== صفحة RTL وخلفية فاتحة ===== */
+/* =========================
+   2) قواعد عامة
+   ========================= */
+html, body { height: 100%; }
 .homepage-rtl {
   direction: rtl;
   position: relative;
@@ -23,16 +28,17 @@
   background: transparent;
   font-family: Cairo, sans-serif;
 }
-html, body { height: 100%; }
 
 /* (اختياري) حاوية عامة لو موجودة عندك في JSX */
 .home-wrap{
-  max-width: 1420px;   /* يلفّ frames+carousel فقط بدون تغيير القياسات */
+  max-width: 1420px;
   margin: 0 auto;
   padding: 0 1rem;
 }
 
-/* ===== شريط تمركز الإطارات بالمنتصف ===== */
+/* =========================
+   3) شريط تمركز الإطارات
+   ========================= */
 /* عرض الشريط = (576 + 37 + 187 + 36 + 576) = 1412px */
 .frames-center{
   position: relative;
@@ -41,7 +47,9 @@ html, body { height: 100%; }
   margin: 100px auto 0;   /* بدل 215px */
 }
 
-/* ===== الهيدر الصغير العام داخل الإطارات ===== */
+/* =========================
+   4) هيدر صغير عام داخل الإطارات
+   ========================= */
 .frame-header{
   display: flex;
   justify-content: center;
@@ -52,7 +60,9 @@ html, body { height: 100%; }
 }
 .frame-header.center{ justify-content: center; }
 
-/* ===== عنوان وتاريخ البث فوق الإطار (خارج صندوق البث) ===== */
+/* =========================
+   5) عنوان وتاريخ البث فوق الإطار
+   ========================= */
 .live-topline{
   position: absolute;
   left: 836px;            /* يحاذي يسار إطار البث */
@@ -64,8 +74,8 @@ html, body { height: 100%; }
   gap: 12px;
   width: 576px;           /* يساوي عرض إطار البث */
   padding: 0 2px;
-
-  .live-date{
+}
+.live-topline .live-date{
   font-weight: 700;
   font-size: 12px;
   color: #000;
@@ -74,8 +84,6 @@ html, body { height: 100%; }
   font-variant-numeric: tabular-nums;
   font-family: "The Year of Handicrafts", Cairo, sans-serif;
 }
-
-}
 .live-title{
   font-weight: 700;
   font-size: 18px;
@@ -83,10 +91,12 @@ html, body { height: 100%; }
   font-family: "AraHamah1964", Cairo, sans-serif;
 }
 
-/* ===== الإطار 1: البث المباشر ===== */
+/* =========================
+   6) الإطار 1: البث المباشر
+   ========================= */
 .live-frame{
   position: absolute;
-  top: 0px; left: 836px;  /* 697×1.2 ≈ 836 */
+  top: 0; left: 836px;    /* 697×1.2 ≈ 836 */
   width: 576px;           /* 480×1.2 */
   height: 330px;          /* 275×1.2 */
   border: 1px solid #000;
@@ -107,10 +117,12 @@ html, body { height: 100%; }
   border: 0;
 }
 
-/* ===== الإطار 2: برنامج اليوم ===== */
+/* =========================
+   7) الإطار 2: برنامج اليوم
+   ========================= */
 .schedule-frame{
   position: absolute;
-  top: 0px; left: 613px;  /* 511×1.2 ≈ 613 */
+  top: 0; left: 613px;    /* 511×1.2 ≈ 613 */
   width: 187px;           /* 156×1.2 ≈ 187 */
   height: 330px;          /* 275×1.2 */
   border: 1px solid #000;
@@ -128,7 +140,7 @@ html, body { height: 100%; }
 }
 .schedule-viewport{
   flex: 1;
-  overflow: hidden;
+  overflow: hidden;       /* يُلغى بالموبايل ليصير عمودي */
   color: #000;
 }
 .schedule-list{
@@ -150,10 +162,12 @@ html, body { height: 100%; }
 }
 .row-time{ min-width: 4.2ch; }
 
-/* ===== الإطار 3: تأمل هذا الأسبوع ===== */
+/* =========================
+   8) الإطار 3: تأمل هذا الأسبوع
+   ========================= */
 .text-frame{
   position: absolute;
-  top: 0px; left: 0px;
+  top: 0; left: 0;
   width: 576px;
   height: 330px;
   border: 1px solid #000;
@@ -167,70 +181,90 @@ html, body { height: 100%; }
 }
 
 /* ===== ThirdFrame: عرض فقط (بدون تغيير JSX) ===== */
-.third-frame{
-  width: 100%;
-  height: 100%;        /* يملى الإطار 576×330 */
-  padding: 12px 16px;
-  box-sizing: border-box;
-}
-.third-frame .text-body{
+.third-frame {
   display: grid;
-  grid-template-columns: minmax(0,1fr) minmax(0,1fr);  /* نص = 1fr | صورة = 1fr */
+  grid-template-columns: 7fr 5fr;   /* النص = أوسع (يمين) | الصورة = أضيق (شمال) */
   gap: 16px;
-  height: 100%;
-  align-items: stretch; /* كل عمود يأخذ كامل الارتفاع */
+  align-items: stretch;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 16px;
 }
-.third-frame .text-col{ min-width: 0; height: 100%; }
 
-/* عمود النص */
-.third-frame .text-col--right{
+/* نص يمين */
+.tf-col--right {
   display: flex;
   flex-direction: column;
-}
-.third-frame .text-title{
-  margin: 0 0 8px;
-  font-weight: 700;
-  font-size: 1.25rem;
-  line-height: 1.3;
-  flex: 0 0 auto;
-}
-.third-frame .text-paragraph{
-  margin: 0;
-  line-height: 1.7;
-  flex: 1 1 auto;
-  overflow: auto;              /* نص طويل داخل نفس القياس */
-  overflow-wrap: anywhere;
-  word-break: break-word;
-  font-size: .83rem;
+  justify-content: center;
 }
 
-/* عمود الصورة */
-.third-frame .text-col--left{
-  display: flex;
-  align-items: center;         /* توسيط عمودي للصورة */
-  justify-content:center;     /* توسيط أفقي للصورة */
+/* صورة شمال */
+.tf-col--left {
+  align-self: flex-start;
+  margin-top: 17px; /* تنزل الصورة شوي لتحت */
 }
-.third-frame .text-image{
-  display: block;              /* يلغي baseline */
+
+.tf-title {
+  margin: 0 0 6px;
+  font-weight: 700;
+  font-size: 1.15rem;   /* أصغر شوي */
+  line-height: 1.3;
+}
+.tf-subtitle {
+  margin: 0 0 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1.35;
+}
+.tf-paragraph {
+  margin: 0;
+  line-height: 1.7;
+  font-size: .88rem;
+  overflow: visible;     /* ألغينا السكرول */
+  max-height: none;      /* السماح للنص يتمدد */
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  max-height: 100%;
+}
+
+/* صورة شمال مع حفاف */
+.image-4x5 {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  border-radius: 12px;                 /* حفاف دائري */
+  background: transparent;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px;              /* ظل خفيف */
+}
+.image-4x5 img {
+  display: block;
   max-width: 100%;
-  max-height: 90%;
+  max-height: 100%;
   width: auto;
-  height: 90%;
-  object-fit: contain;         /* تبين كاملة بدون قص */
-  object-position: center center;
-  
+  height: auto;
+  object-fit: contain;   /* الصورة كاملة */
 }
 
 /* (اختياري) مظهر ناعم للسكرول داخل الفقرة */
+/* حافظت على الاسمين لتجنّب أي كسر في HTML */
+.third-frame .tf-paragraph::-webkit-scrollbar,
 .third-frame .text-paragraph::-webkit-scrollbar{ width: 8px; }
+.third-frame .tf-paragraph::-webkit-scrollbar-thumb,
 .third-frame .text-paragraph::-webkit-scrollbar-thumb{ background: rgba(0,0,0,.2); border-radius: 8px; }
 
-/* ===== الكاروسول تحت الإطارات ===== */
+/* =========================
+   9) الكاروسولات تحت الإطارات
+   ========================= */
 .articles-section{
   max-width: 1200px;
-  margin: 24px auto 0;     /* يجي تحت الإطارات مباشرة */
+  margin: 24px auto 0;
   padding: 0 1rem;
 }
+
 /* === محاذاة "برامجنا" 1:1 مع الإطارات (frames-center = 1412px) === */
 /* لازم تكون هالكتلة في آخر HomePage.css لتربح الكاسكيد */
 main.homepage-rtl > section.programs-section {
@@ -241,149 +275,209 @@ main.homepage-rtl > section.programs-section {
   --edge: 0px !important;       /* أول/آخر كرت على نفس خط الإطار */
   box-sizing: content-box !important;
 }
-
-/* نتأكد ما في حواف خفية من العناصر الداخلية */
 main.homepage-rtl > section.programs-section .programs-header,
 main.homepage-rtl > section.programs-section .programs-title {
   padding-inline: 0 !important;
   margin-inline: 0 !important;
 }
-
-/* viewport و track بدون أي padding إضافي غير --edge */
 main.homepage-rtl > section.programs-section .carousel-viewport {
   padding-inline: 0 !important;
-  overflow: hidden; /* زي ما هو */
+  overflow: hidden;
 }
-
 main.homepage-rtl > section.programs-section .carousel-track {
   padding-inline: var(--edge) !important;
   scroll-padding-inline: var(--edge) !important;
   box-sizing: content-box !important;
 }
-
-/* الأسهم تبقى على حافة المحتوى نفسه (مو حافة الشاشة) */
+/* الأسهم تبقى على حافة المحتوى نفسه */
 main.homepage-rtl > section.programs-section .nav-prev { right: 6px !important; }
 main.homepage-rtl > section.programs-section .nav-next { left:  6px !important; }
 
-/* (اختياري) إذا بتحسي فرق بصري بسيط بسبب حدود الإطارات 1px: فعّلي التالي بدل 0px */
-/*
-main.homepage-rtl > section.programs-section { --edge: 1px !important; }
-*/
 /* === محاذاة "فقرات قصيرة" 1:1 مع الإطارات (frames-center = 1412px) === */
-/* لازم تكون هالكتلة في آخر HomePage.css لتربح الكاسكيد */
 main.homepage-rtl > section.shortsegs-section {
-  width: 1412px !important;     /* نفس عرض .frames-center */
+  width: 1412px !important;
   max-width: none !important;
   margin-inline: auto !important;
-  padding-inline: 0 !important;  /* لا padding داخلي */
-  --edge: 0px !important;        /* أول/آخر كرت على نفس خط الإطار */
+  padding-inline: 0 !important;
+  --edge: 0px !important;
   box-sizing: content-box !important;
 }
-
-/* لا تضيف حواف داخلية للرأس */
 main.homepage-rtl > section.shortsegs-section .shortsegs-header,
 main.homepage-rtl > section.shortsegs-section .shortsegs-title {
   padding-inline: 0 !important;
   margin-inline: 0 !important;
 }
-
-/* الـ viewport والـ track بدون أي padding إضافي غير --edge */
 main.homepage-rtl > section.shortsegs-section .shortsegs-viewport {
   padding-inline: 0 !important;
-  overflow: hidden; /* زي ما هو */
+  overflow: hidden;
 }
-
-/* نستخدم --edge لضبط بداية/نهاية المسار عند حدود الإطارين */
 main.homepage-rtl > section.shortsegs-section .shortsegs-track {
   padding-inline: var(--edge) !important;
   scroll-padding-inline: var(--edge) !important;
   box-sizing: content-box !important;
 }
-
-/* الأسهم على حافة المحتوى (مش حافة الشاشة) وبنفس سلوك برامجنا */
 main.homepage-rtl > section.shortsegs-section .shortsegs-arrow.prev { right: 6px !important; }
 main.homepage-rtl > section.shortsegs-section .shortsegs-arrow.next { left:  6px !important; }
 
-/* (اختياري) لو بدك تحسبي سماكة حدود الإطارات 1px */
- /* main.homepage-rtl > section.shortsegs-section { --edge: 1px !important; } */
-/* ========== موبايل: الإطارات تحت بعض بلا سكرول أفقي ========== */
+/* =========================
+   10) استجابات وحركات
+   ========================= */
+
+/* موبايل وتابلِت: سنترة وضبط حجم البث داخل الإطار (حتى 992px) */
+/* ===== MOBILE FINAL PATCH — ضعي هذه الكتلة في آخر سطر بملف CSS ===== */
+/* ===== MOBILE FINAL PATCH — كل شي للموبايل بمكان واحد ===== */
 @media (max-width: 768px){
 
-  /* الحاوية العامة بدل العرض الثابت */
+  /* منع أي سكرول أفقي على الصفحة */
+  html, body { overflow-x: hidden; }
+
+  /* الإطارات تحت بعض */
   .frames-center{
-    width: 100%;
-    max-width: 100%;
-    height: auto;                 /* ما في ارتفاع ثابت */
-    margin: 16px auto 0;
-    padding-inline: 12px;         /* تنفّس خفيف */
-    box-sizing: border-box;
-    display: flex;                /* رص عمودي */
-    flex-direction: column;
-    gap: 12px;
-    overflow-x: hidden;           /* يمنع أي سكرول أفقي */
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    margin: 16px auto 0 !important;
+    padding-inline: 12px !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    overflow-x: hidden !important;
   }
 
-  /* العناوين فوق البث: تصير بلوك عادي فوق الإطار */
+  /* العنوان/التاريخ فوق البث */
   .live-topline{
-    position: static;
-    width: 100%;
-    display: flex;
-    flex-direction: row-reverse;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 8px;
-    margin-bottom: 4px;
-    padding: 0 2px;
+    position: static !important;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: row-reverse !important;
+    justify-content: space-between !important;
+    align-items: baseline !important;
+    gap: 8px !important;
+    margin-bottom: 4px !important;
+    padding: 0 2px !important;
   }
 
-  /* كل إطار يأخذ عرض الشاشة، ومش مطلق التموضع */
+  /* الإطارات تتحول لوضع عادي */
   .live-frame,
   .schedule-frame,
   .text-frame{
-    position: static;    /* يلغي absolute */
-    width: 100%;
-    height: auto;
-    border-radius: 8px;
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    border-radius: 8px !important;
   }
 
-  /* البث: نسبة شاشة مريحة */
-  .live-box{
-    width: 100%;
-    aspect-ratio: 16 / 9;   /* يحافظ على النسبة */
-    border-radius: 0 0 8px 8px;
-    overflow: hidden;
-  }
-  .live-iframe{ width: 100%; height: 100%; border: 0; }
+  /* الصندوق الحاوي للبث */
+  .live-frame .live-box{
+    position: relative !important;
+    width: 100% !important;
+    aspect-ratio: 4 / 3 !important;   /* 👈 أكبر من 16:9 على الموبايل */
+    display: grid !important;
+    place-items: center !important;
+    overflow: hidden !important;
+    border-radius: 8px !important;
 
-  /* برنامج اليوم: حدد ارتفاع داخلي مع سكرول رأسي فقط */
+    /* يمنع سحب أفقي */
+    touch-action: pan-y !important;
+    overscroll-behavior: contain;
+    
+  }
+
+  /* الفيديو نفسه */
+  .live-frame .live-box iframe{
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    border: 0 !important;
+
+    object-fit: contain !important;
+    object-position: center center !important;
+    transform: none !important;
+
+    /* يمنع السحب يمين/شمال */
+      touch-action: pan-y !important;
+    overscroll-behavior: contain !important;
+  }
+
+  /* برنامج اليوم: سكرول رأسي فقط */
+    .schedule-frame{
+    touch-action: pan-y !important;
+    overscroll-behavior: contain !important;
+  }
+
+  /* ألغِ أي سكرول داخلي للإطار */
   .schedule-viewport{
-    max-height: 260px;  /* عدّليه حسب راحتك */
-    overflow: auto;
+    max-height: 260px !important;      /* عدّليها إذا بدك */
+    overflow: hidden !important;        /* بدل auto */
+    -webkit-overflow-scrolling: auto !important;
+    touch-action: pan-y !important;     /* تمرير الصفحة بس */
   }
 
-  /* نص وصورة التأمل: عمود واحد بدل عمودين */
-  .third-frame{ padding: 12px; }
-  .third-frame .text-body{
-    grid-template-columns: 1fr;   /* عمود واحد */
-    grid-template-rows: auto auto;
-    gap: 12px;
-  }
-  .third-frame .text-col--right{ order: 1; } /* النص أولاً */
-  .third-frame .text-col--left{  order: 2; } /* بعدها الصورة */
-  .third-frame .text-image{
-    max-width: 100%;
-    max-height: 50vh;    /* ما تتجاوز نصف الشاشة */
-    object-fit: contain;
+  /* ما يمسك اللمس/النقر – يمرّ للأب (الصفحة) */
+  .schedule-list{
+    pointer-events: none !important;    /* يمنع السحب داخل القائمة */
+    transition: transform 0.5s linear;  /* تبقى الأنيميشن شغّالة */
   }
 
-  /* خلي الكاروسولات تاخد عرض الموبايل الطبيعي بدل 1412px */
+.third-frame .text-body{
+    display: grid !important;
+    grid-template-columns: 6fr 4fr !important;  /* نصّ أوسع يمين | صورة أضيق شمال */
+    grid-template-rows: 1fr !important;
+    align-items: start !important;              /* النص يبقى فوق طبيعي */
+    gap: 12px !important;
+    height: 100% !important;
+  }
+
+  /* لو ما عندك .text-body وبتستعملي .third-frame مباشرة */
+  .third-frame{
+    display: grid !important;
+    grid-template-columns: 6fr 4fr !important;
+    grid-template-rows: 1fr !important;
+    align-items: start !important;
+    gap: 12px !important;
+  }
+
+  /* الصورة (العمود الشمال) تتمركز عموديًا */
+  .third-frame .tf-col--left,
+  .third-frame .text-col--left{
+    align-self: center !important;   /* 👈 بالنص عموديًا */
+    justify-self: center !important; /* بالنص أفقيًا داخل العمود */
+    margin-top: 0 !important;        /* يلغي أي دفع سابق */
+  }
+
+  /* النص (العمود اليمين) يبقى طبيعي */
+  .third-frame .tf-col--right,
+  .third-frame .text-col--right{
+    align-self: start !important;
+  }
+
+  /* حدود ارتفاع للإطار والصورة */
+  .text-frame{ min-height: clamp(340px, 55vh, 520px) !important; }
+  .image-4x5{
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    max-height: 100% !important;
+  }
+  .image-4x5 img{
+    max-height: 100% !important;
+    object-fit: contain !important;
+  }
+  .third-frame .text-col--right{ order: 1 !important; }
+  .third-frame .text-col--left { order: 2 !important; }
+
+  /* الكاروسولات تاخد عرض الموبايل */
   main.homepage-rtl > section.programs-section,
   main.homepage-rtl > section.shortsegs-section{
     width: 100% !important;
     max-width: 100% !important;
     margin-inline: auto !important;
     padding-inline: 12px !important;
-    --edge: 12px !important; /* بداية/نهاية المحتوى مع نفس البادينغ */
+    --edge: 12px !important;
     box-sizing: border-box !important;
   }
   main.homepage-rtl > section.programs-section .carousel-viewport,
@@ -396,66 +490,8 @@ main.homepage-rtl > section.shortsegs-section .shortsegs-arrow.next { left:  6px
     scroll-padding-inline: var(--edge) !important;
     box-sizing: border-box !important;
   }
-  /* الأسهم تكون على حواف المحتوى (اختياري) */
   main.homepage-rtl > section.programs-section .nav-prev,
   main.homepage-rtl > section.shortsegs-section .shortsegs-arrow.prev{ right: 6px !important; }
   main.homepage-rtl > section.programs-section .nav-next,
   main.homepage-rtl > section.shortsegs-section .shortsegs-arrow.next{ left: 6px !important; }
-}
-/* ===== موبايل وتابلت: سنترة وضبط حجم البث داخل الإطار ===== */
-@media (max-width: 992px){
-  /* ألغِ أي تموضع مطلق للـframe بالموبايل */
-  .live-frame{
-    position: static !important;
-    width: 100% !important;
-    height: auto !important;
-    display: block !important;
-    overflow: visible !important;
-  }
-
-  /* الصندوق الحاوي للفيديو: نسبة ثابتة وتوسيط */
-  .live-frame .live-box{
-    position: relative !important;
-    width: 100% !important;
-
-    /* استخدمي واحدة من الطريقتين (الأولى مضمونة أكثر): */
-    padding-top: 56.25% !important; /* 16:9 */
-    height: 0 !important;
-
-    /* بديل: aspect-ratio
-       aspect-ratio: 16 / 9 !important;  */
-
-    display: grid !important;
-    place-items: center !important;
-    overflow: hidden !important;
-    border-radius: 8px !important;
-  }
-
-  /* أمسك أي iframe مهما كان مساره داخل live-box */
-  .live-frame .live-box iframe,
-  .live-frame .live-box > * iframe,
-  .live-frame iframe{
-    position: absolute !important;
-    inset: 0 !important;         /* top/right/bottom/left = 0 */
-    width: 100% !important;
-    height: 100% !important;
-    max-width: 100% !important;
-    max-height: 100% !important;
-    border: 0 !important;
-
-    /* العرض كامل بدون قص (بدّليها إلى cover لو بدك يملأ حتى مع قص حواف) */
-    object-fit: contain !important;
-    object-position: center center !important;
-
-    /* ألغِ أي تحويلات قديمة */
-    transform: none !important;
-  }
-
-  /* لو في div وسيط من سكربت اليوتيوب، خلّيه يتمدّد مثل الصندوق */
-  .live-frame .live-box > div{
-    position: absolute !important;
-    inset: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-  }
 }

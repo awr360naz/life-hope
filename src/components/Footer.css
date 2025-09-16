@@ -31,18 +31,21 @@
   gap: 0.85rem;
   order: 2; /* اليمين */
 }
-
-.footer-logo-mark {
+/* احذف أي تعريف سابق لـ .footer-logo-mark وخلي هذا في النهاية */
+.footer-logo-mark{
   font-family: 'AraHamah1964', sans-serif;
   font-weight: 700;
-  font-style: bold;
-  font: size 3rem;
   line-height: 1;
   color: #000;
   white-space: nowrap;
   margin: 0;
-  
+  /* يكبر تدريجيًا: حد أدنى 3.5rem، مائع 8vw، حد أقصى 6rem */
+  font-size: clamp(3.5rem, 8vw, 6rem);
 }
+
+/* موبايل: ممكن تقلله شوي لو حبّيت أو تتركه */
+
+
 
 .footer-tagline,
 .footer-text {
@@ -121,5 +124,81 @@
   .footer-left-block {
     align-items: center;
     text-align: center;
+  }
+}
+/* تصحيحات سريعة */
+.footer {
+  background: rgba(246, 243, 238, 1);
+  border-top: 1px solid rgba(246, 243, 238, 1); /* كان ناقص نوع الحد */
+  padding: 1rem 2rem;
+}
+
+.footer-tagline,
+.footer-text {
+  font-family: "Cairo", sans-serif;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 1);
+  margin: 0;
+  max-width: 24rem;
+  font-size: 1.5rem; /* كان مكتوب font: size */
+}
+
+/* ===== موبايل ===== */
+@media (max-width: 600px) {
+  /* نكدّس العناصر عمودي */
+  .footer-bottom-row {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.75rem;
+  }
+
+  /* الترتيب العام للأعمدة */
+  .footer-right-stack { order: 1; align-items: center; text-align: center; }
+  .footer-left-block  { order: 3; align-items: center; text-align: center; }
+
+  /* تكبير الشعار في الموبايل ووضعه أولاً */
+.footer-logo-mark { 
+  order: 1;
+ font-size: clamp(3rem, 14vw, 4.5rem);
+}
+
+  /* النص التعريفي ثانياً */
+  .footer-tagline, 
+  .footer-text {
+    order: 2;
+    font-size: clamp(1rem, 4.6vw, 1.25rem);
+    max-width: 28rem;
+  }
+
+  /* كتلة "تابعنا أيضاً" مع الأيقونات ثالثاً داخل العمود الشمال */
+  .footer-left-block { display: flex; flex-direction: column; }
+  .footer-follow-label { 
+    order: 1; 
+    font-size: clamp(1rem, 4.6vw, 1.25rem);
+  }
+  .footer-social-icons { 
+    order: 2; 
+    display: flex; gap: 1rem; margin-top: 0.25rem;
+  }
+
+  /* "أينما كنتم نحن معكم" رابعاً — أعطِ هذا العنصر الكلاس التالي في الـHTML */
+  .footer-presence {
+    order: 4;
+    font-family: "Cairo", sans-serif;
+    font-weight: 400;
+    font-size: clamp(1rem, 4.6vw, 1.25rem);
+    color: rgba(0, 0, 0, 1);
+    margin-top: 0.75rem;
+    text-align: center;
+  }
+
+  /* حقوق النشر أخيراً */
+  .footer-copy {
+    order: 5;
+    font-size: clamp(0.9rem, 3.8vw, 1rem);
+    margin-top: 1rem;
+    text-align: center;
+    max-width: none;
   }
 }
