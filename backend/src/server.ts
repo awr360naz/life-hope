@@ -9,6 +9,13 @@ import type { Request, Response } from "express";
 import crypto from "node:crypto";
 import shortSegmentsRouter from "./routes/shortSegments.routes.js";
 import categoriesRouter from "./routes/categories.js";
+import path from "node:path";
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+
+
 
 
 const app = express();
@@ -23,6 +30,8 @@ app.use(
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
+
+
 
 /* فحص سريع: لازم يرجّع {ok:true} على :4000/api/_ping */
 app.get("/api/_ping", (_req, res) => res.json({ ok: true, at: new Date().toISOString() }));
@@ -578,6 +587,14 @@ app.use((req, res, next) => {
   if (req.path.startsWith("/api/")) return res.status(404).json({ error: "Not found" });
   next();
 });
+// ==== Serve React build (الجذر /build) ====
+const clientBuildDir = path.resolve(__dirname, "../../build");
+app.use(express.static(clientBuildDir));
+
+app.get(/^\/(?!api\/).*/, (_req, res) => {
+  res.sendFile(path.join(clientBuildDir, "index.html"));
+});
+
 
 /* =========================
    Error handler
@@ -590,11 +607,17 @@ app.use((err: any, _req: any, res: any, _next: any) => {
 /* =========================
    تشغيل السيرفر + معالجة EADDRINUSE
    ========================= */
-const PORT = Number(process.env.PORT || 4000);
+/* =========================
+   تشغيل السيرفر + معالجة EADDRINUSE
+   ========================= */
+
+// سمّه APP_PORT لتجنّب تضارب اسم PORT
+const APP_PORT = Number(process.env.PORT || 4000);
 
 const server = app
-  .listen(PORT, "127.0.0.1", () => {
-    console.log(`✅ Backend up at http://127.0.0.1:${PORT}`);
+  // مهم: لا تحدد "127.0.0.1" عشان Render يحتاج 0.0.0.0 — تركه بدون host = يسمع على كل الواجهات
+  .listen(APP_PORT, () => {
+    console.log(`✅ Backend up at :${APP_PORT}`);
     console.log(
       `   PROGRAMS_TABLE=${PROGRAMS_TABLE} | THIRD_TABLE=${THIRD_TABLE} | PROGRAMS_CATALOG_TABLE=${PROGRAMS_CATALOG_TABLE}`
     );
@@ -602,7 +625,7 @@ const server = app
   .on("error", (err: any) => {
     if (err?.code === "EADDRINUSE") {
       console.error(
-        `❌ البورت ${PORT} محجوز (EADDRINUSE).\n` +
+        `❌ البورت ${APP_PORT} محجوز (EADDRINUSE).\n` +
           `   إمّا تسكّر العملية الماسكة للبورت أو تشغّل الباكند مؤقتًا على بورت آخر:\n` +
           (process.platform === "win32"
             ? `   PowerShell:\n   $env:PORT=4001; npm run dev\n`
@@ -613,22 +636,3 @@ const server = app
     console.error("Server failed to start:", err);
   });
 
-/* =========================
-   إشعارات نظام/إغلاقات نظيفة
-   ========================= */
-process.on("unhandledRejection", (e) => {
-  console.error("UNHANDLED REJECTION:", e);
-});
-process.on("uncaughtException", (e) => {
-  console.error("UNCAUGHT EXCEPTION:", e);
-});
-for (const sig of ["SIGINT", "SIGTERM"] as const) {
-  process.on(sig, () => {
-    console.log(`Received ${sig}, closing server...`);
-    server.close(() => {
-      console.log("Server closed gracefully.");
-      process.exit(0);
-    });
-    setTimeout(() => process.exit(0), 2000).unref();
-  });
-}
