@@ -8,6 +8,7 @@ import ShortSegmentsCarousel from "../components/ShortSegmentsCarousel";
 import { Link } from "react-router-dom";
 
 
+
 function ThirdFrame() {
   const [item, setItem] = React.useState(null);
   const [err, setErr] = React.useState("");
@@ -21,13 +22,18 @@ function ThirdFrame() {
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data?.error || "HTTP " + res.status);
+
         const it = data?.content;
         if (!it) throw new Error("لا توجد بيانات.");
 
+        // 👈 أهم نقطة: خُذ hero_url أولاً ثم fallback على image_url
+        const img = (it.hero_url || it.image_url || "").trim();
+
         setItem({
-          title: it.title?.trim() || "",          // ممكن يكون فاضي — نخبّيه
+          title: (it.title || "").trim(),
+          // لو بدك تحافظ على السطور، خلي التعامل بالـ JSX (تحت) مع <div dangerouslySetInnerHTML>
           body: it.body || "",
-          image_url: it.image_url || null,
+          image_url: img || null,
         });
       } catch (e) {
         setErr("تعذّر تحميل معلومات الإطار الثالث: " + e.message);
@@ -44,14 +50,31 @@ function ThirdFrame() {
       <div className="tf-col tf-col--right">
         <h2 className="tf-title">تأمل هذا الأسبوع</h2>
         {item.title && <h3 className="tf-subtitle">{item.title}</h3>}
-        <p className="tf-paragraph">{item.body}</p>
+
+        {/* اعرض الـ body كـ HTML مع تحويل \n إلى <br/> */}
+        {item.body ? (
+          <div
+            className="tf-paragraph"
+            dangerouslySetInnerHTML={{
+              __html: String(item.body).replace(/\r?\n/g, "<br/>"),
+            }}
+          />
+        ) : null}
       </div>
 
       {/* الصورة شمال */}
       <div className="tf-col tf-col--left">
         <div className="image-4x5">
           {item.image_url ? (
-            <img src={item.image_url} alt={item.title || "صورة التأمل"} />
+            <img
+              src={item.image_url}
+              alt={item.title || "صورة التأمل"}
+              loading="lazy"
+              onError={(e) => {
+                // فالباك نظيف لو فشل التحميل
+                e.currentTarget.src = "https://placehold.co/800x1000?text=No+Image";
+              }}
+            />
           ) : (
             <div className="image-placeholder">لا توجد صورة</div>
           )}
@@ -60,6 +83,7 @@ function ThirdFrame() {
     </section>
   );
 }
+
 
 
 export default function HomePage() { 

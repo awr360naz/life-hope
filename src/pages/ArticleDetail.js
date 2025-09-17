@@ -1,66 +1,74 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React from "react";
 import { useParams, Link } from "react-router-dom";
-import "./ArticleDetail.css";
-
 
 export default function ArticleDetail() {
   const { slug } = useParams();
-  const [article, setArticle] = useState(null);
-  const [err, setErr] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [article, setArticle] = React.useState(null);
+  const [err, setErr] = React.useState("");
+  const [loading, setLoading] = React.useState(true);
 
-  // scroll لأعلى عند تغيير المقال
-  useEffect(() => { window.scrollTo(0, 0); }, [slug]);
+  React.useEffect(() => { window.scrollTo(0, 0); }, [slug]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     (async () => {
-      setErr(""); setLoading(true);
+      setLoading(true); setErr(""); setArticle(null);
       try {
         const res = await fetch(`/api/content/articles/${encodeURIComponent(slug)}`, {
           headers: { Accept: "application/json" },
         });
-        const text = await res.text();
-        let data = null; try { data = text ? JSON.parse(text) : null; } catch {}
-        if (!res.ok) throw new Error(data?.error || data?.message || text || `HTTP ${res.status}`);
-        setArticle(data);
+        const data = await res.json();
+        if (!res.ok || data?.ok === false) throw new Error(data?.error || `HTTP ${res.status}`);
+        setArticle(data.article);
       } catch (e) {
-        setErr(e.message || "خطأ غير معروف");
-      } finally { setLoading(false); }
+        setErr("تعذّر تحميل المقال: " + (e?.message || e));
+      } finally {
+        setLoading(false);
+      }
     })();
   }, [slug]);
 
-  const cover = useMemo(
-    () => article?.cover_url || article?.image_url || article?.["cover url"] || "",
-    [article]
-  );
-  const raw = useMemo(() => {
-    if (!article) return "";
-    return article.content ?? article.conent ?? article.body_html ?? article.body ?? "";
-  }, [article]);
-
-  // فكّ تغليف <article>/<main> إن وُجد
-  const html = useMemo(() => {
-    let s = String(raw || "");
-    s = s.replace(/^\s*<(article|main)\b[^>]*>/i, "");
-    s = s.replace(/<\/(article|main)>\s*$/i, "");
-    return s.trim();
-  }, [raw]);
-
-  const looksHtml = /^\s*<(?:[a-z!]|!--)/i.test(html);
-
-  if (loading) return <main dir="rtl" style={{maxWidth:900,margin:"2rem auto"}}>جارِ التحميل…</main>;
-  if (err) return <main dir="rtl" style={{maxWidth:900,margin:"2rem auto"}}>حدث خطأ: {err}</main>;
-  if (!article) return <main dir="rtl" style={{maxWidth:900,margin:"2rem auto"}}>لم يتم العثور على المقال.</main>;
+  if (loading) return <p>جارِ التحميل…</p>;
+  if (err) return <p style={{ color: "#b00" }}>{err}</p>;
+  if (!article) return null;
 
   return (
-    <main dir="rtl" style={{maxWidth:900, margin:"2rem auto", padding:"0 1rem", color:"#111"}}>
-
-      <h1 style={{margin:"1rem 0"}}>{article.title}</h1>
+    <article
+      style={{
+        maxWidth: 1100,
+        margin: "24px auto",
+        padding: "0 16px",
+        fontFamily: `"Cairo", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`,
+        direction: "rtl",       // الكتابة من اليمين لليسار
+        textAlign: "right",
+      }}
+    >
+      
+     
   
-      {looksHtml
-        ? <div dangerouslySetInnerHTML={{ __html: html }} style={{lineHeight:1.9}} />
-        : <div style={{whiteSpace:"pre-wrap", lineHeight:1.9}}>{html || "(لا يوجد محتوى)"}</div>
-      }
-    </main>
+
+      {/* تقسيم الصورة + المحتوى */}
+           {/* الصورة بالمركز + النص تحتها */}
+      <div style={{ textAlign: "center", marginBottom: "24px" }}>
+        {article.cover_url && (
+          <img
+            src={article.cover_url}
+            alt={article.title || ""}
+            style={{ maxWidth: "80%", borderRadius: 12 }}
+          />
+        )}
+      </div>
+
+      {/* النص (المحتوى) */}
+      <div
+        style={{
+          lineHeight: 1.9,
+          fontSize: "18px",
+          direction: "rtl",   // النصوص من اليمين
+          textAlign: "right", // محاذاة النص يمين
+        }}
+        dangerouslySetInnerHTML={{ __html: article.content || "" }}
+      />
+ 
+    </article>
   );
 }

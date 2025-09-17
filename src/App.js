@@ -20,7 +20,8 @@ import PrayerRequest from './pages/PrayerRequest';
 import SearchPage from './pages/SearchPage';
 import AboutPage from './pages/AboutPage';
 import CategoriesPage from "./pages/CategoriesPage";
-import CategoryArticlesPage from "./pages/CategoryArticlesPage";
+import ArticlesCategoriesPage from "./pages/ArticlesCategoriesPage.jsx";
+import CategoryArticlesPage from "./pages/CategoryArticlesPage.jsx";
 
 
 
@@ -43,7 +44,7 @@ export default function App() {
         <main className="app-main">
           <Routes>
   <Route path="/" element={<HomePage />} />
-  <Route path="/articles" element={<ArticlesPage />} />
+
   <Route path="/programs" element={<ProgramsPage />} />
   <Route path="/stories" element={<StoriesPage />} />
   <Route path="/live" element={<LivePage />} />
@@ -57,8 +58,10 @@ export default function App() {
 <Route path="/prayer-request" element={<PrayerRequest />} />
 <Route path="/search" element={<SearchPage />} />
 <Route path="/about" element={<AboutPage />} />
-  <Route path="/articles" element={<CategoriesPage />} />
-     
+ <Route path="/articles" element={<ArticlesCategoriesPage />} />
+     <Route path="/articles/category/:name" element={<CategoryArticlesPage />} />
+ 
+
 
  
 </Routes>

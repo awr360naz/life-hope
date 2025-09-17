@@ -11,7 +11,6 @@ import shortSegmentsRouter from "./routes/shortSegments.routes.js";
 import categoriesRouter from "./routes/categories.js";
 
 
-
 const app = express();
 app.set("trust proxy", true);
 
@@ -36,7 +35,6 @@ app.get("/api/health", (_req, res) => {
 /* =========================
    قصتنا — لازم يسبق أي app.use(...)
    ========================= */
-// بعد الميدلويرات و/_ping و/health مباشرة
 app.get("/api/content/about", async (_req, res) => {
   try {
     const supabase = getSupabase();
@@ -51,7 +49,7 @@ app.get("/api/content/about", async (_req, res) => {
     if (error) return res.status(500).json({ ok: false, error: "DB_ERROR" });
 
     if (!data) {
-      // إن بدك يختفي خطأ الفرونت مؤقتًا، رجّع 200 بفولباك جاهز:
+      // فولباك مؤقت
       return res.json({
         ok: true,
         data: {
@@ -64,8 +62,6 @@ app.get("/api/content/about", async (_req, res) => {
         },
         fallback: true,
       });
-      // ولو بدّك 404 تقليدي بدل الفولباك:
-      // return res.status(404).json({ ok: false, error: "NOT_FOUND" });
     }
 
     return res.json({ ok: true, data });
@@ -74,10 +70,8 @@ app.get("/api/content/about", async (_req, res) => {
   }
 });
 
-
 /* =========================
-   راوترات موجودة — بعد /api/content/about
-   (لا تكرّر تركيب نفس الراوتر)
+   راوترات خارجية
    ========================= */
 app.use(articlesRouter);
 app.use(categoriesRouter);
@@ -86,8 +80,6 @@ app.use(shortSegmentsRouter);
 /**
  * Simple Search endpoint
  * GET /api/content/search?q=كلمة&limit=20&offset=0
- * بيرجّع من جدولين: articles + programs_catalog
- * الحقول موحّدة وبكون معها type = "article" أو "program"
  */
 app.get("/api/content/search", async (req: Request, res: Response) => {
   const supabase = getSupabase();
@@ -95,7 +87,6 @@ app.get("/api/content/search", async (req: Request, res: Response) => {
   const limit = Math.min(parseInt((req.query.limit ?? "20") as string, 10) || 20, 50);
   const debug = String(req.query.debug || "") === "1";
 
-  // تطبيع عربي خفيف
   const AR_TATWEEL = /\u0640/g;
   const AR_DIACRITICS = /[\u064B-\u065F\u0670\u0674]/g;
   const norm = (s: string) =>
@@ -117,7 +108,6 @@ app.get("/api/content/search", async (req: Request, res: Response) => {
     return res.json([]);
   }
 
-  // Helpers
   const mapRecord = (r: any, type: "article" | "program") => ({
     id: r?.id ?? null,
     type,
@@ -154,15 +144,9 @@ app.get("/api/content/search", async (req: Request, res: Response) => {
   articles = articles.concat(await tryIlike("articles", "title", "*", "article"));
   programs = programs.concat(await tryIlike("programs_catalog", "title", "*", "program"));
 
-  if (articles.length === 0) {
-    articles = articles.concat(await tryIlike("articles", "excerpt", "*", "article"));
-  }
-  if (articles.length === 0) {
-    articles = articles.concat(await tryIlike("articles", "content", "*", "article"));
-  }
-  if (programs.length === 0) {
-    programs = programs.concat(await tryIlike("programs_catalog", "content", "*", "program"));
-  }
+  if (articles.length === 0) articles = articles.concat(await tryIlike("articles", "excerpt", "*", "article"));
+  if (articles.length === 0) articles = articles.concat(await tryIlike("articles", "content", "*", "article"));
+  if (programs.length === 0) programs = programs.concat(await tryIlike("programs_catalog", "content", "*", "program"));
 
   let merged = [...articles, ...programs].sort((a, b) => (b.created_at ?? "").localeCompare(a.created_at ?? ""));
   merged = merged.slice(0, limit);
@@ -199,19 +183,19 @@ app.get("/api/content/search", async (req: Request, res: Response) => {
 /* =========================
    إعدادات عامة من البيئة
    ========================= */
-const PROGRAMS_TABLE = process.env.PROGRAMS_TABLE || "programs"; // اليوم حسب اسم اليوم
+const PROGRAMS_TABLE = process.env.PROGRAMS_TABLE || "programs";
 const THIRD_TABLE = process.env.THIRD_FRAME_TABLE || "home_third_frame_items";
-const PROGRAMS_CATALOG_TABLE = process.env.PROGRAMS_CATALOG_TABLE || "programs_catalog"; // برامج عامة (كاروسول)
+const PROGRAMS_CATALOG_TABLE = process.env.PROGRAMS_CATALOG_TABLE || "programs_catalog";
 
 /* =========================
    أدوات مساعدة
    ========================= */
 function getTzDayName() {
-  return new Date().toLocaleString("en-US", { weekday: "long", timeZone: "Asia/Jerusalem" }); // مثال: "Wednesday"
+  return new Date().toLocaleString("en-US", { weekday: "long", timeZone: "Asia/Jerusalem" });
 }
 
 /* =========================
-   الإطار 2: برنامج اليوم (حسب اسم اليوم)
+   الإطار 2: برنامج اليوم
    ========================= */
 async function handleGetProgramToday(req: express.Request, res: express.Response) {
   const sb = getSupabase();
@@ -234,73 +218,197 @@ app.get("/api/programs/today", handleGetProgramToday); // جسر توافق
 
 /* =========================
    الإطار 3: نص + صورة (Home Third Frame)
+   — يرجّع نفس الشكل القديم { ok: true, content }
    ========================= */
+/* =========================
+   الإطار 3: نص + صورة (Home Third Frame)
+   — robust: بدون أعمدة محددة، و sorting في JS
+   ========================= */
+/* =========================
+   الإطار 3: نص + صورة (Home Third Frame)
+   — robust: بدون أعمدة محددة، و sorting في JS
+   ========================= */
+
+// helper: تنضيف URL (يشيل " والمسافات والبدايات الغلط)
+// ====== Helpers ======
+/* ========= Helpers ========= */
+function unwrapUrl(v: any): string | null {
+  let s = String(v ?? "").trim();
+  s = s.replace(/^["'\s]+|["'\s]+$/g, ""); // إزالة لفّافات
+
+  // http/https كامل
+  const m = s.match(/https?:\/\/[^\s"'<>)\]}]+/i);
+  if (m) return m[0];
+
+  // بروتوكول نسبي //cdn...
+  if (/^\/\//.test(s)) return "https:" + s;
+
+  // مسار مطلق /images/...
+  if (/^\//.test(s)) return s;
+
+  // bucket/path أو أي مسار نسبي ذو دلالة
+  if (/^[\w.-]+\/.+/.test(s)) return s;
+
+  return s ? s : null;
+}
+
+function toPublicStorageUrl(u: string | null): string | null {
+  if (!u) return null;
+  let s = String(u).trim().replace(/^["'\s]+|["'\s]+$/g, "");
+
+  // 1) رابط كامل
+  if (/^https?:\/\//i.test(s)) return s;
+
+  // 2) بروتوكول نسبي //cdn...
+  if (/^\/\//.test(s)) return "https:" + s;
+
+  // 3) مسار storage بدون دومين
+  if (/^\/storage\/v1\/object\//.test(s)) {
+    const base = process.env.SUPABASE_URL?.replace(/\/+$/, "");
+    return base ? `${base}${s}` : s;
+  }
+
+  // 4) bucket/path -> public URL
+  if (/^[\w.-]+\/.+/.test(s)) {
+    const base = process.env.SUPABASE_URL?.replace(/\/+$/, "");
+    return base ? `${base}/storage/v1/object/public/${s}` : s;
+  }
+
+  // 5) مسار مطلق داخل الموقع (غير storage)
+  if (/^\//.test(s)) return s;
+
+  return s || null;
+}
+
+/* ========= Handler ========= */
 async function handleGetHomeThird(req: express.Request, res: express.Response) {
   const sb = getSupabase();
-  if (!sb) return res.status(500).json({ ok: false, error: "Supabase not configured (env missing)" });
+  if (!sb) {
+    return res.status(500).json({ ok: false, error: "Supabase not configured (env missing)" });
+  }
 
-  // نقرأ sort من الـ path أو الـ query (الافتراضي 0)
   const rawSort = String((req.params as any)?.sort ?? req.query?.sort ?? "0").trim();
   const sortNum = /^\d+$/.test(rawSort) ? Number(rawSort) : 0;
+  const drafts = String(req.query.drafts || "") === "1";
 
-  // DEBUG: لازم تشوف هذا السطر عند كل طلب
-  console.log("[home-third-frame]", { url: req.originalUrl, rawSort, sortNum });
+  console.log("[home-third-frame]", { url: req.originalUrl, rawSort, sortNum, drafts });
 
   try {
-    const { data, error } = await sb
-      .from(THIRD_TABLE) // ← استخدم الثابت اللي عرّفتَه فوق
-      .select("id, title, body, text, image_url, img, sort_num, updated_at, created_at")
-      // ندعم كون العمود مخزَّن رقم أو نص
-      .or(`sort_num.eq.${sortNum},sort_num.eq.${rawSort}`)
-      .order("updated_at", { ascending: false, nullsFirst: false })
-      .order("created_at", { ascending: false, nullsFirst: false })
-      .limit(1)
-      .maybeSingle();
-
+    // لا نحدّد أعمدة لتفادي فشل عند اختلاف المخطط
+    const { data, error } = await sb.from(THIRD_TABLE).select("*");
     if (error) {
       console.error("[home-third-frame] DB_ERROR:", error);
       return res.status(500).json({ ok: false, error: "DB_ERROR" });
     }
-    if (!data) {
-      return res.status(404).json({ ok: false, error: "NOT_FOUND", sort: sortNum });
+
+    let rows: any[] = data ?? [];
+
+    // فلترة المنشور/غير المنشور
+    if (!drafts) {
+      rows = rows.filter((r: any) => {
+        const pub =
+          (typeof r.published === "boolean" ? r.published : null) ??
+          (typeof r.is_published === "boolean" ? r.is_published : null);
+        return pub === true;
+      });
     }
+
+    if (!rows.length) {
+      return res.status(404).json({ ok: false, error: "NOT_FOUND" });
+    }
+
+    // ترتيب آمن
+    const numVal = (v: any) => (Number.isFinite(Number(v)) ? Number(v) : 0);
+    const tsVal = (r: any) => (r?.updated_at || r?.created_at || "");
+    rows.sort((a: any, b: any) => {
+      const sa = numVal(a?.sort ?? a?.sort_num);
+      const sbv = numVal(b?.sort ?? b?.sort_num);
+      if (sa !== sbv) return sa - sbv;
+
+      const ta = tsVal(a);
+      const tb = tsVal(b);
+      const tcmp = (tb || "").localeCompare(ta || ""); // desc
+      if (tcmp !== 0) return tcmp;
+
+      return String(a?.id || "").localeCompare(String(b?.id || ""));
+    });
+
+    // اختيار العنصر حسب sortNum (index)
+    const pick = Math.max(0, Math.min(sortNum, rows.length - 1));
+    const r: any = rows[pick];
+
+    // تطبيع النص
+    const body =
+      (typeof r?.body === "string" && r.body) ??
+      (typeof r?.text === "string" && r.text) ??
+      (typeof r?.content === "string" && r.content) ??
+      "";
+
+    // جرّب كل الأعمدة المحتملة للصورة (أولوية لـ hero_url)
+    let heroRaw =
+      r?.hero_url ??
+      r?.image_url ??
+      r?.cover_url ??
+      r?.img ??
+      null;
+
+    // fallback: استخرج أول صورة من body إذا الأعمدة فاضية
+    if (!heroRaw && typeof body === "string") {
+      const m = body.match(/<img[^>]+src=["']([^"']+)["']/i);
+      if (m) heroRaw = m[1];
+    }
+
+    // URL نهائي وآمن (يدعم relative/bucket)
+    const hero_url = toPublicStorageUrl(unwrapUrl(heroRaw));
+
+    const images = r?.images ?? null;
+
+    const sortField =
+      Number.isFinite(Number(r?.sort)) ? Number(r.sort)
+      : Number.isFinite(Number(r?.sort_num)) ? Number(r.sort_num)
+      : 0;
+
+    const updated =
+      r?.updated_at ??
+      r?.created_at ??
+      null;
+
+    const debug = String(req.query.debug || "") === "1";
 
     return res.json({
       ok: true,
-      sort: sortNum,
       content: {
-        title: data.title ?? "—",
-        body: (data.body ?? data.text ?? "").trim(),
-        image_url: data.image_url ?? data.img ?? null,
-        updated_at: data.updated_at ?? data.created_at ?? null,
+        id: r?.id,
+        title: r?.title ?? "",
+        body: String(body).trim(),
+        hero_url,     // ← الحقل الذي يستهلكه الفرونت
+        images,
+        sort: sortField,
+        updated_at: updated,
+        ...(debug ? { _raw: r } : {}),
       },
     });
+
   } catch (e: any) {
     console.error("[home-third-frame] SERVER_ERROR:", e);
     return res.status(500).json({ ok: false, error: "SERVER_ERROR" });
   }
 }
 
-// ⚠️ ضَع هذه المسارات قبل أي راوتر ممكن يصطدم بـ /api/content/*
-app.get("/api/content/home-third-frame", handleGetHomeThird);       // ?sort=0
-app.get("/api/content/home-third-frame/:sort", handleGetHomeThird); // /.../0
+/* ========= Routes ========= */
+app.get("/api/content/home-third-frame", handleGetHomeThird);        // ?sort=0
+app.get("/api/content/home-third-frame/:sort", handleGetHomeThird);  // /.../0
 app.get("/api/home-third-frame", handleGetHomeThird);
 app.get("/api/home-third-frame/:sort", handleGetHomeThird);
 
-
 /* =========================
-   المقالات (قائمة + تفاصيل)
+   المقالات: باقي المسارات بالراوتر الخارجي
    ========================= */
 const ARTICLES_TABLE = process.env.ARTICLES_TABLE || "articles";
 
-
-
-
 /* =========================
    برامج عامة (كاروسول "برامجنا")
-   جدول: programs_catalog
    ========================= */
-// GET /api/content/programs
 app.get("/api/content/programs", async (req, res) => {
   try {
     const limit = Math.min(parseInt(String(req.query.limit || "24"), 10) || 24, 50);
@@ -321,13 +429,11 @@ app.get("/api/content/programs", async (req, res) => {
   }
 });
 
-// GET /api/content/programs/:id
 app.get("/api/content/programs/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const supabase = getSupabase();
 
-    // هات *كل* الحقول لهذا الصف (عشان نعرف شو موجود فعلياً)
     const { data, error } = await supabase.from(PROGRAMS_CATALOG_TABLE).select("*").eq("id", id).single();
 
     if (error) throw error;
@@ -350,15 +456,10 @@ app.get("/api/content/programs/:id", async (req, res) => {
 
     if (content && typeof content !== "string") {
       try {
-        if (content.html && typeof content.html === "string") {
-          content = content.html;
-        } else if (content.markdown && typeof content.markdown === "string") {
-          content = content.markdown;
-        } else if (content.text && typeof content.text === "string") {
-          content = content.text;
-        } else {
-          content = JSON.stringify(content, null, 2);
-        }
+        if (content.html && typeof content.html === "string") content = content.html;
+        else if (content.markdown && typeof content.markdown === "string") content = content.markdown;
+        else if (content.text && typeof content.text === "string") content = content.text;
+        else content = JSON.stringify(content, null, 2);
       } catch {
         content = String(content);
       }
@@ -377,7 +478,7 @@ app.get("/api/content/programs/:id", async (req, res) => {
 });
 
 /* =========================
-   فقرات قصيرة — نسخة مكيَّشة واحدة فقط
+   فقرات قصيرة — نسخة مكيَّشة
    ========================= */
 type ShortSeg = {
   id: string;
@@ -389,7 +490,6 @@ type ShortSeg = {
   updated_at?: string | null;
 };
 
-// كاش ذاكرة بسيط
 const memCache = new Map<string, { ts: number; data: ShortSeg[] }>();
 const TTL_MS = 5 * 60 * 1000; // 5 دقائق
 function setCache(key: string, data: ShortSeg[]) {
@@ -405,10 +505,8 @@ function getCache(key: string): ShortSeg[] | null {
   return v.data;
 }
 
-// helper موحّد لجلب آخر العناصر
 async function fetchShortSegs(limit = 30): Promise<ShortSeg[]> {
   const supabase = getSupabase();
-  // 1) المنشور فقط (اسم العمود published)
   const q1 = await supabase
     .from("short_segments")
     .select("id, title, video_url, duration_sec, published, created_at, updated_at")
@@ -418,10 +516,8 @@ async function fetchShortSegs(limit = 30): Promise<ShortSeg[]> {
 
   if (q1.error) throw q1.error;
   const publishedRows = q1.data ?? [];
-
   if (publishedRows.length > 0) return publishedRows;
 
-  // 2) fallback: بغض النظر عن published
   const q2 = await supabase
     .from("short_segments")
     .select("id, title, video_url, duration_sec, published, created_at, updated_at")
@@ -437,7 +533,6 @@ app.get("/api/content/short-segments", async (req: Request, res: Response) => {
     const limit = Math.max(1, Math.min(100, Number(req.query.limit) || 30));
     const cacheKey = `shortsegs:${limit}`;
 
-    // جرّب الكاش أولًا
     const cached = getCache(cacheKey);
     if (cached && cached.length > 0) {
       const etag = crypto.createHash("sha1").update(cached.map((x) => x.id).join("|")).digest("hex");
@@ -447,7 +542,6 @@ app.get("/api/content/short-segments", async (req: Request, res: Response) => {
     }
 
     const rows = await fetchShortSegs(limit);
-
     if (rows.length > 0) setCache(cacheKey, rows);
 
     const etag = crypto.createHash("sha1").update(rows.map((x) => x.id).join("|")).digest("hex");
@@ -456,7 +550,6 @@ app.get("/api/content/short-segments", async (req: Request, res: Response) => {
 
     return res.json({ items: rows });
   } catch (err: any) {
-    // في حال الخطأ: رجّع آخر كاش إن وُجد
     const cacheKey = `shortsegs:${Number(req.query.limit) || 30}`;
     const cached = getCache(cacheKey);
     if (cached && cached.length > 0) {
@@ -467,7 +560,7 @@ app.get("/api/content/short-segments", async (req: Request, res: Response) => {
   }
 });
 
-// جسور واضحة (Redirect 307) بدل الـhandle/next hacks
+// جسور Redirect صريحة
 app.get("/api/short-segments", (req, res) => {
   const qs = req.url.includes("?") ? req.url.slice(req.url.indexOf("?")) : "";
   res.redirect(307, `/api/content/short-segments${qs}`);
@@ -479,7 +572,7 @@ app.get("/api/programs", (req, res) => {
 });
 
 /* =========================
-   404 JSON فقط لمسارات /api/*
+   404 JSON لمسارات /api/*
    ========================= */
 app.use((req, res, next) => {
   if (req.path.startsWith("/api/")) return res.status(404).json({ error: "Not found" });
