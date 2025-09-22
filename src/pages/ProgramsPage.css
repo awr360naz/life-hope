@@ -33,4 +33,5 @@
    box-shadow: 0 4px 10px rgba(0,0,0,.05);
   content-visibility: auto;
   contain: layout paint size style; 
+  
 }

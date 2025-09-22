@@ -46,8 +46,7 @@ export default function ArticleDetail() {
      
   
 
-      {/* تقسيم الصورة + المحتوى */}
-           {/* الصورة بالمركز + النص تحتها */}
+     
       <div style={{ textAlign: "center", marginBottom: "24px" }}>
         {article.cover_url && (
           <img

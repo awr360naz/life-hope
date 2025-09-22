@@ -10,7 +10,7 @@ export default function ArticlesCategoriesPage() {
   // إعدادات الكروت/الشبكة — نفس تبعك
   const CARD_W = 260;
   const IMG_H  = 180;
-  const CARD_H = 340;
+  const CARD_H = 220;
   const GAP    = 16;
   const BUFFER_ROWS = 3;
 
@@ -93,7 +93,7 @@ export default function ArticlesCategoriesPage() {
 
   return (
     <main dir="rtl" style={{ maxWidth: 1200, margin: "2rem auto", padding: "0 1rem" }}>
-      <h1>التصنيفات</h1>
+      
       {loading && <div style={{ textAlign: "center", margin: "12px 0" }}>جارٍ التحميل…</div>}
 
       <div
@@ -132,20 +132,7 @@ export default function ArticlesCategoriesPage() {
               return (
                 <Link key={c.id || `i-${idx}`} to={to} style={{ textDecoration: "none", color: "inherit" }}>
                   <article
-                    style={{
-                      width: CARD_W,
-                      height: CARD_H,
-                      background: "#fff",
-                      border: "1px solid #eee",
-                      borderRadius: 12,
-                      padding: 6,
-                      boxSizing: "border-box",
-                      display: "grid",
-                      gridTemplateRows: "auto 1fr",
-                      contentVisibility: "auto",
-                      contain: "layout paint size style",
-                      boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
-                    }}
+       
                   >
                     {img ? (
                       <div style={{ width: "100%", height: IMG_H, overflow: "hidden", borderRadius: 10, background: "#f4f4f4" }}>
@@ -161,9 +148,7 @@ export default function ArticlesCategoriesPage() {
                     ) : (
                       <div style={{ width: "100%", height: IMG_H, borderRadius: 10, background: "#f4f4f4" }} />
                     )}
-                    <h3 style={{ marginTop: 10, fontSize: 16, lineHeight: 1.2 }} title={title}>
-                      {title}
-                    </h3>
+                 
                   </article>
                 </Link>
               );

@@ -29,7 +29,8 @@ export default function CategoryArticlesPage() {
 
   return (
     <main dir="rtl" style={{ maxWidth: 1100, margin: "2rem auto", padding: "0 1rem" }}>
-      <h1>مقالات تصنيف: {decodedName}</h1>
+      <h1 style={{ fontFamily: "'Cairo', sans-serif" }}>{decodedName}</h1>
+
       {loading && <p>جارٍ التحميل…</p>}
       {err && <p style={{ color: "crimson" }}>تعذّر التحميل: {err}</p>}
       {!loading && !err && !items.length && <p>لا توجد مقالات ضمن هذا التصنيف.</p>}
@@ -40,7 +41,7 @@ export default function CategoryArticlesPage() {
           const to = `/articles/${encodeURIComponent(a.slug || a.id)}`;
           return (
             <Link key={a.id} to={to} style={{ textDecoration: "none", color: "inherit" }}>
-              <article style={{ background: "#fff", border: "1px solid #eee", borderRadius: 12, overflow: "hidden" }}>
+              <article style={{fontFamily: "'Cairo', sans-serif", background: "#fff", border: "1px solid #eee", borderRadius: 12, overflow: "hidden" }}>
                 <div style={{ height: 160, background: "#f2f2f2" }}>
                   <img src={cover} alt={a.title || "مقال"} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                 </div>

@@ -32,6 +32,12 @@ useEffect(() => {
     }
   })();
 }, []);
+useEffect(() => {
+  console.log("🚩 ArticlesPage MOUNTED @", window.location.pathname + window.location.search);
+  document.title = "ARTICLES-PAGE-V3";                      // بصمة واضحة بالتبويب
+  document.body.setAttribute("data-where", "articles-v3");  // بصمة بالـ DOM
+}, []);
+
 
 function slugify(s) {
   return s
@@ -131,7 +137,9 @@ function slugify(s) {
                   />
                   <div style={titleBadgeStyle}>
                     <strong style={{ fontSize: "1.05rem" }}>{c.name}</strong>
-                    <span style={{ fontSize: ".9rem", opacity: 0.9 }}>{c.count} مقال</span>
+                   <span style={{ fontSize: ".9rem", opacity: 0.9 }}>{c.count} مقال</span>
+
+
                   </div>
                 </div>
               </article>
@@ -148,7 +156,7 @@ function slugify(s) {
   return (
     <main dir="rtl" style={{ maxWidth: 1100, margin: "2rem auto", padding: "0 1rem" }}>
       <header style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-        <h1 style={{ margin: "0.5rem 0" }}>{activeCat}</h1>
+        
         <button
           onClick={() => navigate("/articles")}
           style={{
