@@ -36,7 +36,7 @@ export default function ProgramsCarousel({
     })();
   }, [apiUrl]);
 
-  // اضبطي المؤشر إذا تغير عدد العناصر المرئية
+  // اضبط المؤشر إذا تغير عدد العناصر المرئية
   useEffect(() => {
     const max = Math.max(0, items.length - visible);
     if (index > max) setIndex(max);
@@ -118,9 +118,7 @@ const goToIndex = (nextIdx) => {
                             />
                           )}
                         </div>
-                        <h3 className="program-card-title" title={it.title}>
-                          {it.title}
-                        </h3>
+                     
                       </div>
                     </Link>
                   </article>

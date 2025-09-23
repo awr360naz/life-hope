@@ -6,7 +6,7 @@ const router = Router();
 
 /**
  * GET /api/content/articles
- * إرجاع جميع المقالات (افتراضيًا المنشورة فقط)
+ * إرجاع جميع المقالات (افتراضيًا المنشورة فقط) — مرتّبة حسب sort_index ثم created_at
  */
 router.get("/api/content/articles", async (req, res) => {
   res.setHeader("x-handler", "articles.ts:all-articles");
@@ -18,7 +18,8 @@ router.get("/api/content/articles", async (req, res) => {
 
     let q = sb
       .from("articles")
-      .select("id, slug, title, cover_url, category, created_at, published")
+      .select("id, slug, title, cover_url, category, created_at, published, sort_index")
+      .order("sort_index", { ascending: true, nullsFirst: false }) // غير المعيّن يروح آخر الصف
       .order("created_at", { ascending: false });
 
     if (!drafts) q = q.eq("published", true);
@@ -33,6 +34,7 @@ router.get("/api/content/articles", async (req, res) => {
       cover_url: typeof a.cover_url === "string" ? a.cover_url.trim() : null,
       category: (a.category ?? "").toString().trim(),
       created_at: a.created_at,
+      sort_index: typeof a.sort_index === "number" ? a.sort_index : null,
     }));
 
     return res.json({ ok: true, items });
@@ -43,7 +45,7 @@ router.get("/api/content/articles", async (req, res) => {
 
 /**
  * GET /api/content/articles-by-category/:name
- * إرجاع مقالات تصنيف معيّن
+ * إرجاع مقالات تصنيف معيّن — مرتّبة حسب sort_index ثم created_at
  */
 router.get("/api/content/articles-by-category/:name", async (req, res) => {
   res.setHeader("x-handler", "articles.ts:articles-by-category");
@@ -58,8 +60,9 @@ router.get("/api/content/articles-by-category/:name", async (req, res) => {
 
     let q = sb
       .from("articles")
-      .select("id, slug, title, cover_url, category, created_at, published")
+      .select("id, slug, title, cover_url, category, created_at, published, sort_index")
       .eq("category", name)
+      .order("sort_index", { ascending: true, nullsFirst: false })
       .order("created_at", { ascending: false });
 
     if (!drafts) q = q.eq("published", true);
@@ -74,6 +77,7 @@ router.get("/api/content/articles-by-category/:name", async (req, res) => {
       cover_url: typeof a.cover_url === "string" ? a.cover_url.trim() : null,
       category: (a.category ?? "").toString().trim(),
       created_at: a.created_at,
+      sort_index: typeof a.sort_index === "number" ? a.sort_index : null,
     }));
 
     return res.json({ ok: true, category: name, items });
@@ -84,10 +88,8 @@ router.get("/api/content/articles-by-category/:name", async (req, res) => {
 
 /**
  * GET /api/content/articles/:slug
- * تفاصيل مقال واحد حسب الـ slug
+ * تفاصيل مقال واحد حسب الـ slug — يرجّع content كما هو
  */
-// GET /api/content/articles/:slug
-// GET /api/content/articles/:slug  → يرجّع عمود content كما هو
 router.get("/api/content/articles/:slug", async (req, res) => {
   res.setHeader("x-handler", "articles.ts:article-detail");
   const sb = getSupabase();
@@ -101,12 +103,12 @@ router.get("/api/content/articles/:slug", async (req, res) => {
 
     let q = sb
       .from("articles")
-      .select("id, slug, title, content, cover_url, category, created_at, published")
+      .select("id, slug, title, content, cover_url, category, created_at, published, sort_index")
       .eq("slug", slug);
 
     if (!drafts) q = q.eq("published", true);
 
-    const { data, error } = await q.single(); // خلي .single() آخر خطوة
+    const { data, error } = await q.single(); // .single() آخر خطوة
     if (error || !data) {
       return res.status(404).json({ ok: false, error: "Article not found", slug });
     }
@@ -117,18 +119,17 @@ router.get("/api/content/articles/:slug", async (req, res) => {
         id: data.id,
         slug: data.slug,
         title: data.title,
-        content: data.content ?? "",     // <-- أهم سطر
+        content: data.content ?? "",
         cover_url: data.cover_url ?? null,
         category: data.category ?? "",
         created_at: data.created_at,
         published: !!data.published,
+        sort_index: typeof data.sort_index === "number" ? data.sort_index : null,
       },
     });
   } catch (e: any) {
     return res.status(500).json({ ok: false, error: e?.message || String(e) });
   }
 });
-
-
 
 export default router;

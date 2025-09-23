@@ -211,17 +211,7 @@
 }
 
 /* الإطار الأبيض (نفس .article-inner) */
-.programs-section .program-inner {
-  height: 100%;
-  border-radius: 8px;
-  background: #fff;
-  box-shadow: 0 1px 4px rgba(0,0,0,.08);
-  overflow: hidden;
-  padding: 6px;          /* أصغر */
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
+
 
 /* صورة (نفس .article-image-wrap / .article-image) */
 .programs-section .program-image-wrap {

@@ -15,22 +15,14 @@
       "react-hooks/exhaustive-deps": "warn"
     }
   },
-"scripts": {
-  "front": "react-scripts start",
-  "build:front": "react-scripts build",
-
-  "dev:back": "npm run dev --prefix backend",
-  "dev:front": "npm run front",
-  "dev:both": "concurrently \"npm run dev:back\" \"npm run dev:front\"",
-
-  "start:dev": "npm run dev:both",
-
-  "start:prod": "node backend/dist/server.js",
-  "start": "node backend/dist/server.js"
-}
-
-
-,
+  "scripts": {
+    "dev": "concurrently -k -n SERVER,WEB -c blue,magenta \"npm:dev:server\" \"npm:dev:frontend\"",
+    "dev:server": "cross-env PORT=4000 tsx watch backend/src/server.ts",
+    "dev:frontend": "cross-env BROWSER=none npm run start:frontend",
+    "start:frontend": "react-scripts start",
+    "build:server": "tsc -p backend",
+    "start": "node backend/dist/server.js"
+  },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",
     "cors": "^2.8.5",

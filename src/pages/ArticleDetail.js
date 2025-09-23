@@ -69,5 +69,7 @@ export default function ArticleDetail() {
       />
  
     </article>
+    
   );
+  
 }

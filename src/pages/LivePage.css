@@ -1,54 +1,44 @@
-/* يغطي كامل الشاشة ويُبقي المشغّل في الوسط */
-/* غطّي كل الشاشة بالخلفية */
+/* خلفية وتوسيط أفقي، بدون سكرول داخلي للحاوية */
 .live-fit-stage {
   display: flex;
-  justify-content: center;
+  flex-direction: column;  /* اللايف فوق، الصورة تحت */
   align-items: center;
-  min-height: 100vh;        /* يملأ طول الشاشة */
- background: linear-gradient(180deg, #FFFFFF 0%, #F6F3EE 20%);
+  min-height: 100vh;
+  background: linear-gradient(180deg, #FFFFFF 0%, #F6F3EE 20%);
   box-sizing: border-box;
+  overflow: visible;       /* لا سكرول داخلي هنا */
 }
 
-/* إطار بالحجم الأصلي ثم نكبّره بالـ scale */
-.live-fit-frame{
-  transform-origin: center center; /* تكبير من المنتصف */
-  border: none;
-  overflow: visible;                /* ما بنقص ولا طرف */
+/* يحجز مكان اللايف بعد التحجيم (مهم لمنع التداخل مع الصورة) */
+.live-box {
+display: flex;              /* تفعيل flex */
+  justify-content: center;    /* بالنص أفقي */
+  align-items: flex-start;    /* من فوق */
+  overflow: hidden;
+  position: relative;
 }
 
-/* الـiframe يملأ الإطار الأصلي */
-.live-iframe{
-  width: 100%;
-  height: 100%;
+/* العنصر الذي يُطبَّق عليه التحجيم */
+.live-scale {
+ 
+  inset: 0;
+}
+
+/* أبعاد اللايف الأصلية داخل العنصر المتحجّم */
+.live-iframe {
+  width: 900px;   /* = BASE_W */
+  height: 600px;  /* = BASE_H */
   border: 0;
   display: block;
 }
-.live-fit-stage {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-}
 
-.live-fit-frame {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem; /* مسافة بين اللايف والصورة */
-}
-
-.live-iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-}
-
-/* الصورة أسفل البث */
+/* الصورة تحت اللايف */
 .live-ad {
-  width: 80%;           /* أقل من عرض اللايف */
-  height: 220px;        /* ارتفاع قليل (مستطيل) */
+  margin-top: 16px;
+  width: 80%;
+  max-width: 900px;   /* لا تتعدى عرض اللايف */
+  height: 280px;
   border-radius: 8px;
-  object-fit: cover;    /* يملأ المستطيل بدون تمدد */
+  object-fit: cover;
   display: block;
 }
-

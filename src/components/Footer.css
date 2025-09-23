@@ -1,9 +1,8 @@
 .footer {
   background: rgba(246, 243, 238, 1);
-  border-top: 1px  rgba(246, 243, 238, 1);
+  border-top: 1px solid rgba(246, 243, 238, 1);
   padding: 1rem 2rem;
 }
-
 
 .footer-container {
   direction: ltr; /* يثبت الترتيب بغض النظر عن اللغة */
@@ -31,7 +30,7 @@
   gap: 0.85rem;
   order: 2; /* اليمين */
 }
-/* احذف أي تعريف سابق لـ .footer-logo-mark وخلي هذا في النهاية */
+
 .footer-logo-mark{
   font-family: 'AraHamah1964', sans-serif;
   font-weight: 700;
@@ -39,29 +38,19 @@
   color: #000;
   white-space: nowrap;
   margin: 0;
-  /* يكبر تدريجيًا: حد أدنى 3.5rem، مائع 8vw، حد أقصى 6rem */
-  font-size: clamp(3.5rem, 8vw, 6rem);
+  /* صغرنا الخط 20% */
+  font-size: clamp(2.8rem, 6.4vw, 4.8rem);
 }
-
-/* موبايل: ممكن تقلله شوي لو حبّيت أو تتركه */
-
-
 
 .footer-tagline,
 .footer-text {
   font-family: "Cairo", sans-serif;
   font-weight: 400;
-  font: size 1.5rem;
   color: rgba(0, 0, 0, 1);
   margin: 0;
   max-width: 24rem;
-  
-  
+  font-size: 1.2rem; /* كان 1.5rem */
 }
-
-
-
-
 
 /* ===== العمود الشمال ===== */
 .footer-left-block {
@@ -69,83 +58,40 @@
   flex-direction: column;
   align-items: flex-end; /* لليمين */
   order: 1; /* الشمال */
-
 }
-
-/* ترتيب العناصر داخل العمود الشمال */
-
-
-
 
 .footer-follow-label {
   font-family: "Cairo", sans-serif;
   font-weight: 400;
+  font-size: 1.2rem; /* كان 1.5rem */
 }
 
-
-
-.footer-follow-label {
-  font-size: 1.5rem;
-  color: rgba(0, 0, 0, 1);
-}
 .footer-social-icons {
   display: flex;
   gap: 1rem;
- 
 }
 .footer-social-icons a {
   color: rgba(0, 0, 0, 1);
-  font-size: 1.5rem;
+  font-size: 1.2rem; /* كان 1.5rem */
   transition: color 0.3s ease, transform 0.3s ease;
 }
 .footer-social-icons a:hover {
   color: rgba(240, 27, 27, 1);
   transform: scale(1.1);
 }
+
 .footer-copy {
-   font-family: "Cairo", sans-serif;
-  font-weight: 400;
-  font-size: 1.5rem;
-  color: rgba(0, 0, 0, 1);
-  margin: 0;
-  max-width: 24rem;
-  font-size: clamp(0.95rem, 2.2vh, 1.125rem);
-  margin-top: 1.5rem;
-}
-
-/* ===== موبايل ===== */
-@media (max-width: 600px) {
-  .footer-bottom-row {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-  .footer-right-stack,
-  .footer-left-block {
-    align-items: center;
-    text-align: center;
-  }
-}
-/* تصحيحات سريعة */
-.footer {
-  background: rgba(246, 243, 238, 1);
-  border-top: 1px solid rgba(246, 243, 238, 1); /* كان ناقص نوع الحد */
-  padding: 1rem 2rem;
-}
-
-.footer-tagline,
-.footer-text {
   font-family: "Cairo", sans-serif;
   font-weight: 400;
   color: rgba(0, 0, 0, 1);
   margin: 0;
   max-width: 24rem;
-  font-size: 1.5rem; /* كان مكتوب font: size */
+  margin-top: 1.5rem;
+  font-size: clamp(0.76rem, 1.76vh, 0.9rem); /* 20% أصغر */
 }
 
 /* ===== موبايل ===== */
 @media (max-width: 600px) {
-  /* نكدّس العناصر عمودي */
   .footer-bottom-row {
     flex-direction: column;
     align-items: center;
@@ -153,50 +99,47 @@
     gap: 0.75rem;
   }
 
-  /* الترتيب العام للأعمدة */
-  .footer-right-stack { order: 1; align-items: center; text-align: center; }
-  .footer-left-block  { order: 3; align-items: center; text-align: center; }
+  .footer-right-stack,
+  .footer-left-block {
+    align-items: center;
+    text-align: center;
+  }
 
-  /* تكبير الشعار في الموبايل ووضعه أولاً */
-.footer-logo-mark { 
-  order: 1;
- font-size: clamp(3rem, 14vw, 4.5rem);
-}
+  .footer-logo-mark { 
+    order: 1;
+    font-size: clamp(2.4rem, 11.2vw, 3.6rem); /* كان 3rem-4.5rem */
+  }
 
-  /* النص التعريفي ثانياً */
   .footer-tagline, 
   .footer-text {
     order: 2;
-    font-size: clamp(1rem, 4.6vw, 1.25rem);
+    font-size: clamp(0.8rem, 3.68vw, 1rem); /* كان 1rem-1.25rem */
     max-width: 28rem;
   }
 
-  /* كتلة "تابعنا أيضاً" مع الأيقونات ثالثاً داخل العمود الشمال */
   .footer-left-block { display: flex; flex-direction: column; }
   .footer-follow-label { 
     order: 1; 
-    font-size: clamp(1rem, 4.6vw, 1.25rem);
+    font-size: clamp(0.8rem, 3.68vw, 1rem); /* 20% أقل */
   }
   .footer-social-icons { 
     order: 2; 
     display: flex; gap: 1rem; margin-top: 0.25rem;
   }
 
-  /* "أينما كنتم نحن معكم" رابعاً — أعطِ هذا العنصر الكلاس التالي في الـHTML */
   .footer-presence {
     order: 4;
     font-family: "Cairo", sans-serif;
     font-weight: 400;
-    font-size: clamp(1rem, 4.6vw, 1.25rem);
+    font-size: clamp(0.8rem, 3.68vw, 1rem); /* 20% أقل */
     color: rgba(0, 0, 0, 1);
     margin-top: 0.75rem;
     text-align: center;
   }
 
-  /* حقوق النشر أخيراً */
   .footer-copy {
     order: 5;
-    font-size: clamp(0.9rem, 3.8vw, 1rem);
+    font-size: clamp(0.72rem, 3.04vw, 0.8rem); /* 20% أقل */
     margin-top: 1rem;
     text-align: center;
     max-width: none;

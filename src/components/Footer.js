@@ -40,7 +40,7 @@ const Footer = () => {
               <a href="https://www.instagram.com/awr_arabic/" target="_blank" rel="noopener noreferrer"><FaInstagram /></a>
               <a href="https://www.tiktok.com/@awr_arabic" target="_blank" rel="noopener noreferrer"><FaTiktok /></a>
               <a href="https://www.youtube.com/channel/UCc6W4vs9rTKvl-5arOBs7WA" target="_blank" rel="noopener noreferrer"><FaYoutube /></a>
-              <a href="https://twitter.com/awr_arabic" target="_blank" rel="noopener noreferrer"><FaTwitter /></a>
+            
             </div><br></br><br></br><br></br>
              <p className="footer-copy">2025 - جميع الحقوق محفوظة</p>
           </div>

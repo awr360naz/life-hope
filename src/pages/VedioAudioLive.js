@@ -47,7 +47,7 @@ export default function VedioAudioLive() {
       <iframe
         width="100%"
         height="100%"
-        src="http://www.alsolnet.com/stream/awraraaudio/"
+        src="https://www.alsolnet.com/stream/awraraaudio/"
         title="Radio Audio Stream"
         frameBorder="0"
         allow=" encrypted-media"

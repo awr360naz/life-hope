@@ -3,18 +3,31 @@ import "./LivePage.css";
 import AdAwr from "./AdAwr.jpg";
 
 export default function LivePage() {
-  // الحجم الأصلي التقريبي للمشغّل داخل closeradio (عدّليه إذا لزم)
-  const BASE_W = 900;   // العرض الأصلي
-  const BASE_H = 600;   // الارتفاع الأصلي
+  const BASE_W = 900;
+  const LIVE_CORE_H = 600;   // محتوى المشغل
+  const CONTROL_H  = 72; 
+const BASE_H = LIVE_CORE_H + CONTROL_H;
 
   const [scale, setScale] = useState(1);
+  const [headerH, setHeaderH] = useState(0);
 
+
+  // قياس الهيدر حتى ما يغطي الأعلى
+  useEffect(() => {
+    const measure = () => {
+      const h = document.querySelector("header")?.offsetHeight || 0;
+      setHeaderH(h);
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, []);
+
+  // التحجيم على أساس العرض فقط (يكبّر اللايف أقصى ما يمكن)
   useEffect(() => {
     const fit = () => {
       const vw = window.innerWidth;
-      const vh = window.innerHeight;
-      // أصغر مقياس حتى نحتوي المشغل بالكامل
-      const s = Math.min(vw / BASE_W, vh / BASE_H);
+      const s = vw / BASE_W;
       setScale(s);
     };
     fit();
@@ -22,32 +35,38 @@ export default function LivePage() {
     return () => window.removeEventListener("resize", fit);
   }, []);
 
-  return (
-    <div className="live-fit-stage">
-      <div
-        className="live-fit-frame"
-        style={{
-          width: `${BASE_W}px`,
-          height: `${BASE_H}px`,
-          transform: `scale(${scale})`,
-        }}
-      >
-        {/* البث المباشر */}
-        <iframe
-          src="https://closeradio.tv/awrara/"
-          title="Radio Live Stream"
-          className="live-iframe"
-          allow="autoplay; encrypted-media"
-          allowFullScreen
-        />
+  const scaledW = Math.round(BASE_W * scale);
+  const scaledH = Math.round(BASE_H * scale);
 
-        {/* الصورة تحت البث */}
-        <img
-          src={AdAwr}
-          alt="Ad"
-          className="live-ad"
-        />
-      </div>
+  return (
+    <div className="live-fit-stage" style={{ paddingTop: headerH }}>
+      {/* الصندوق الخارجي يحجز المساحة بالحجم المتحجّم */}
+     <div
+  className="live-box"
+  style={{ width: `${scaledW}px`, height: `${scaledH}px` }}
+>
+  <div
+    className="live-scale"
+    style={{
+      width: `${BASE_W}px`,
+      height: `${BASE_H}px`,
+      transform: `scale(${scale})`,
+      transformOrigin: "top center",
+    }}
+  >
+    <iframe
+      src="https://closeradio.tv/awrara/"
+      title="Radio Live Stream"
+      className="live-iframe"
+      allow="autoplay; encrypted-media"
+      allowFullScreen
+    />
+  </div>
+</div>
+
+
+      {/* الصورة خارج التحجيم وتحت اللايف */}
+      <img src={AdAwr} alt="Ad" className="live-ad" />
     </div>
   );
 }
