@@ -1,25 +1,92 @@
-.cats-page { direction: rtl; padding: 16px; }
-.cats-title { margin: 0 0 16px; font-size: 1.5rem; }
+/* الحاوية العامة */
+.cats-main {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
 
-.categories-grid {
+/* حالات */
+.cats-loading,
+.cats-error,
+.cats-empty {
+  padding: 16px;
+  text-align: center;
+}
+
+/* منطقة التمرير */
+.cats-scroller {
+  height: 80vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-radius: 12px;
+  background: transparent;
+  will-change: transform;
+}
+
+/* شبكة البطاقات (المسافات ثابتة مثل كودك) */
+.cats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 16px;
+  
+  justify-content: space-between;
+  padding: 0 4px;
 }
 
-.category-card {
-  background: #fff;
-  border-radius: 16px;
+/* رابط الكرت */
+.card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+
+
+/* صورة الكرت */
+.image-wrap {
+  width: 100%;
+  background: #f4f4f4;
   overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0,0,0,.06);
-  display: flex;
-  flex-direction: column;
+  border-radius: 10px;
 }
 
-.image-wrap { width: 100%; height: 160px; background: #f2f2f2; overflow: hidden; }
-.image-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.img-placeholder { height: 100%; display: grid; place-items: center; color: #777; font-size: .9rem; }
+.image-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
 
-.card-body { padding: 12px; }
-.cat-name { margin: 0; font-size: 1.1rem; font-weight: 600; }
-.cats-loading, .cats-error, .cats-empty { padding: 16px; }
+.img-placeholder {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: #777;
+  font-size: .9rem;
+}
+
+
+/* ============ نسخة الموبايل ============ */
+/* على الشاشات الصغيرة: عمود واحد والكرت بالنص بدون ما نغيّر المقاسات */
+@media (max-width: 768px) {
+  .cats-grid {
+    /* نخليها عمود واحد */
+    grid-template-columns: 1fr !important;
+    /* نخلي العناصر بالنص */
+    justify-content: center;
+    justify-items: center;
+  }
+
+  .category-card {
+    /* نفس عرض الكرت الأصلي (CARD_W = 260px) */
+    width: 260px !important;
+  }
+   .cats-scroller{
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  /* مساحة أمان بسيطة قبل الفوتر */
+  .cats-main{
+    padding-bottom: 10px;
+  }
+}

@@ -193,3 +193,66 @@
   text-align: center;
   color: #c0162e;
 }
+
+
+/* 2) مهم جداً: اعطِ عرض للخطوط */
+.hamburger span{
+  display: block;
+  width: 100%;              /* ← كان ناقص */
+  height: 2px;
+  border-radius: 2px;
+  background: #000;
+  transition: transform .25s ease, opacity .2s ease;
+}
+
+/* 3) بالموبايل: أظهر الزر وقلّل تزاحم الهيدر */
+/* تأكيد ستايل الديسكتوب (بدون تغيير) */
+@media (max-width: 992px){
+  .main-nav, .live-btn, .spacer { display: none !important; }
+
+  .header-inner{
+    direction: ltr;                 /* مهم جداً */
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;    /* نرتّب من اليسار لليمين الآن */
+    height: 58px;
+    padding-inline: 6%;
+    gap: .5rem;
+  }
+
+  /* البحث أقصى الشمال (يسار) */
+  .search{
+    order: 1;
+    margin-right: auto;             /* ⬅️ يدفع كل شيء لليمين */
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    width: 110px; height: 30px;
+    padding: 0 .5rem;
+    background: rgba(120,120,128,0.16);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+  .search-icon{ font-size: 14px; flex-shrink: 0; }
+  .search-input{ font-size: 13px; width: 100%; }
+
+  /* يمين الشاشة: الهامبرغر ثم اللوجو ملاصقين */
+  .hamburger{
+    order: 3;                       /* آخر واحد، في الطرف اليمين */
+    display: inline-flex !important;
+    width: 28px; height: 20px;
+    margin-left: .3rem;             /* مسافة صغيرة قبل اللوجو */
+  }
+  .hamburger span{ width:100%; height:2px; background:#000; }
+
+  .logo{
+    order: 2;                       /* يجي قبل الهامبرغر مباشرة */
+    max-width: 140px; flex-shrink: 0;
+  }
+  .logo-mark{ font-size: 1.7rem; line-height: 1; }
+
+  /* شاشات أصغر جداً: اخفِ البحث */
+  @media (max-width: 380px){
+    .search{ display: none !important; }
+  }
+}

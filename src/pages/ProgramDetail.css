@@ -9,20 +9,21 @@
 /* عنوان بسيط غير مركّز وبحجم معقول */
 .pd-title {
   font-family:"Cairo", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  margin: 0 0 10px;
- font-size: 2rem; 
+
+    margin: 0 0 16px 0;
   font-weight: 700;
-  text-align: start !important; /* يمنع التوسيط */
-  line-height: 1.25;
-  color: inherit !important;     /* بدون ألوان خاصة */
+  font-size: clamp(1.8rem, 2.2vw + 1rem, 2.4rem);
+  
 }
 
 /* نص المحتوى بسيط */
 .pd-content {
   font-family:"Cairo", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  font-size: 1.5rem;
-  line-height: 1.85;
-  color: inherit;                /* وراثة اللون بدون ثيم */
+  line-height: 1.9;
+  font-size: 1.125rem;           
+  margin-bottom: 20px;
+  text-align: start;           
+
 }
 
 /* لو المحتوى HTML */

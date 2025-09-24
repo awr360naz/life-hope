@@ -58,3 +58,8 @@
   text-align: right;            /* عربي */
 }
 
+/* كان height: 80vh; */
+.cats-scroller{
+  height: calc(100vh - 220px); /* 220px ≈ الهيدر + الفوتر + الهوامش */
+  overflow-y: auto;
+}

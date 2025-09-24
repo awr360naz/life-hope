@@ -10,7 +10,7 @@ export default function Mp3LivePage() {
         <div className="mp3-audio">
           <iframe
             className="mp3-iframe"
-            src="http://www.alsolnet.com/stream/awraraaudio/"
+            src="https://www.alsolnet.com/stream/awraraaudio/"
             title="Radio Live Stream"
             allow="autoplay; encrypted-media"
             allowFullScreen

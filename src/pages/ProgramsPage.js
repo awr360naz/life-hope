@@ -1,14 +1,11 @@
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import "./ProgramsPage.css";
 
 /**
- * ProgramsPage — افتراضية نافذة محسّنة (بدون سكروولر داخلي) 
- *
- * تحسينات الأداء الرئيسية:
- * 1) عدم استدعاء getBoundingClientRect() على كل scroll — بنحسب موضع الشبكة مرة واحدة ونحدّثه فقط عند الريسايز.
- * 2) عدم تغيير DOM (spacers) أثناء التمرير — بنستخدم حاوية بارتفاع إجمالي + translateY للجزء الظاهر.
- * 3) منع إعادة التصيير إن لم تتغير نافذة الصفوف (bail-out).
- * 4) content-visibility على الكرت لتقليل layout/paint لعناصر خارج الشاشة.
+ * المطلوب:
+ * - موبايل: عامود واحد + عرض كل العناصر (بدون افتراضية/تقطيع) حتى لو الجهاز أفقي.
+ * - ديسكتوب: تقليل الفراغ العمودي فعليًا.
  */
 
 export default function ProgramsPage() {
@@ -19,27 +16,24 @@ export default function ProgramsPage() {
   // إعدادات الكروت/الشبكة
   const CARD_W = 260;   // عرض الكرت
   const IMG_H  = 180;   // ارتفاع صورة الكرت
-  const CARD_H = 340;   // الارتفاع الكلي التقريبي للكرت
-  const GAP    = 16;    // مسافة بين الكروت
-  const BUFFER_ROWS = 3; // صفوف إضافية قبل/بعد النافذة لتمرير سلس
+  const CARD_H = 192;   // ✅ ارتفاع الكرت الفعلي تقريبًا (180 صورة + 12 هامش/هواء بسيط)
+  const GAP    = 8;     // ✅ فجوة أصغر حقيقية
+  const BUFFER_ROWS = 3;
 
-  // مراجع
-  const gridRef = useRef(null);      // عنصر الشبكة (wrapper)
-  const listRef = useRef(null);      // عنصر الارتفاع الإجمالي
+  const gridRef = useRef(null);
 
-  // حالة قياسات الشبكة + offset ثابت
   const [layout, setLayout] = useState({
     width: 0,
-    height: 0,        // window.innerHeight
+    height: 0,
     perRow: 1,
     rowHeight: CARD_H + GAP,
-    gridTopOnPage: 0, // موضع الشبكة على الصفحة — محسوب مرة عند التغيير
+    gridTopOnPage: 0,
+    isMobile: false,   // ✅ نمط الموبايل (نلغي الافتراضية ونعرِض الكل)
   });
 
-  // نافذة العرض الافتراضية (بالصفوف)
   const [windowState, setWindowState] = useState({ startRow: 0, endRow: 0 });
 
-  /* ========== جلب البيانات ========== */
+  /* جلب البيانات */
   useEffect(() => {
     (async () => {
       try {
@@ -57,12 +51,12 @@ export default function ProgramsPage() {
     })();
   }, []);
 
-  /* ========== أدوات مساعدة ========== */
-  const getPageScrollY = () => window.pageYOffset || document.documentElement.scrollTop || 0;
+  /* أدوات مساعدة */
+  const getPageScrollY = () =>
+    window.pageYOffset || document.documentElement.scrollTop || 0;
 
   const computeGridTopOnPage = (el) => {
     if (!el) return 0;
-    // أسرع/أرخص من getBoundingClientRect في كل scroll: بنحسب مرة واحدة
     let top = 0;
     let node = el;
     while (node) {
@@ -72,23 +66,30 @@ export default function ProgramsPage() {
     return top;
   };
 
-  /* ========== تحديث القياسات عند التغيير/الريسايز ========== */
+  /* تحديث القياسات */
   useLayoutEffect(() => {
     const updateLayout = () => {
       const grid = gridRef.current;
       if (!grid) return;
-      const width = grid.clientWidth;            // عرض الشبكة
-      const height = window.innerHeight;         // ارتفاع نافذة المتصفح
-      const perRow = Math.max(1, Math.floor((width + GAP) / (CARD_W + GAP)));
+
+      const width = grid.clientWidth;
+      const height = window.innerHeight;
+
+      // نعتبر الموبايل لكل الشاشات اللمسية/العرض الأصغر نسبيًا
+      // حتى لو قلبتِ الهاتف أفقي: نظل موبايل
+      const mobileBreakpoint = 1024; // ✅ أعلى من 768 حتى لما تقلبِ التليفون يظل عامود واحد
+      const isMobile = window.innerWidth <= mobileBreakpoint || matchMedia("(pointer: coarse)").matches;
+
+      let perRow = Math.max(1, Math.floor((width + GAP) / (CARD_W + GAP)));
+      if (isMobile) perRow = 1; // ✅ قفل عامود واحد
+
       const rowHeight = CARD_H + GAP;
       const gridTopOnPage = computeGridTopOnPage(grid);
-      setLayout({ width, height, perRow, rowHeight, gridTopOnPage });
+      setLayout({ width, height, perRow, rowHeight, gridTopOnPage, isMobile });
     };
 
     updateLayout();
     window.addEventListener("resize", updateLayout);
-
-    // لو تغيّر قياس الحاوية بعد تحميل صور/خطوط
     const ro = new ResizeObserver(updateLayout);
     if (gridRef.current) ro.observe(gridRef.current);
 
@@ -96,12 +97,14 @@ export default function ProgramsPage() {
       window.removeEventListener("resize", updateLayout);
       ro.disconnect();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /* ========== حساب نافذة الصفوف على تمرير النافذة ========== */
+  /* تمرير الصفحة (للديسكتوب فقط؛ الموبايل نعرض الكل) */
   useEffect(() => {
-    let ticking = false;
+    if (layout.isMobile) return; // ✅ لا افتراضية/لا slicing على الموبايل
 
+    let ticking = false;
     const onScroll = () => {
       if (ticking) return;
       ticking = true;
@@ -110,13 +113,11 @@ export default function ProgramsPage() {
         const viewportTop = getPageScrollY();
         const viewportH = window.innerHeight;
 
-        // تمرير محلي داخل الشبكة
         const localScrollTop = Math.max(0, viewportTop - gridTopOnPage);
 
         const nextStartRow = Math.max(0, Math.floor(localScrollTop / rowHeight) - BUFFER_ROWS);
         const nextEndRow = Math.floor((localScrollTop + viewportH) / rowHeight) + BUFFER_ROWS;
 
-        // ✅ ما نعيد التصيير إذا ما تغيّر شيء
         setWindowState((prev) => {
           if (prev.startRow === nextStartRow && prev.endRow === nextEndRow) return prev;
           return { startRow: nextStartRow, endRow: nextEndRow };
@@ -126,7 +127,6 @@ export default function ProgramsPage() {
       });
     };
 
-    // نافذة أولية + مستمع تمرير
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -134,64 +134,74 @@ export default function ProgramsPage() {
 
   if (err) {
     return (
-      <main dir="rtl" style={{ maxWidth: 1200, margin: "2rem auto", padding: "0 1rem" }}>
+      <main dir="rtl" className="programs-main">
         حدث خطأ: {err}
       </main>
     );
   }
 
-  /* ========== حسابات الشبكة ========== */
+  /* حسابات الديسكتوب (الموبايل ما يحتاجها) */
   const total = items.length;
-  const { perRow, rowHeight } = layout;
+  const { perRow, rowHeight, isMobile } = layout;
   const itemsPerRow = Math.max(1, perRow);
-  const totalRows = Math.max(1, Math.ceil(total / itemsPerRow));
-  const totalHeight = totalRows * rowHeight; // ارتفاع كامل اللست
 
-  // نطاق الصفوف الظاهرة فعلاً (مع قيود)
+  if (isMobile) {
+    // ✅ موبايل: عامود واحد + عرض جميع العناصر + لا ارتفاع ثابت + لا translateY
+    return (
+      <main dir="rtl" className="programs-main">
+        {loading && <div className="programs-loading">جارٍ التحميل…</div>}
+        <div ref={gridRef} className="programs-grid-wrapper">
+          <div
+            className="programs-grid programs-grid-mobile"
+            style={{ gridTemplateColumns: `1fr` }}
+          >
+            {items.map((p, i) => {
+              if (!p || typeof p !== "object") return null;
+              const slugOrId = p.slug || p.id || p.day || `i-${i}`;
+              const img = p.cover_url || p.image_url || p.thumbnail || p.image;
+              const title = p.title || p.name || "— بدون عنوان —";
+              const href = `/programs/${encodeURIComponent(slugOrId)}`;
+              return (
+                <Card
+                  key={slugOrId}
+                  href={href}
+                  title={title}
+                  img={img}
+                  CARD_W={CARD_W}
+                  CARD_H={CARD_H}
+                  IMG_H={IMG_H}
+                />
+              );
+            })}
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  // ✅ ديسكتوب: افتراضية عادية لكن مع CARD_H واقعي و GAP صغير
+  const totalRows = Math.max(1, Math.ceil(total / itemsPerRow));
+  const totalHeight = totalRows * rowHeight;
+
   const startRow = Math.min(windowState.startRow, Math.max(0, totalRows - 1));
   const endRow = Math.min(windowState.endRow, totalRows - 1);
 
-  // عناصر النافذة الحالية (slice)
   const sliceStart = startRow * itemsPerRow;
   const sliceEnd = Math.min(total, (endRow + 1) * itemsPerRow);
-
   const visibleItems = items.slice(sliceStart, sliceEnd);
 
-
-  // إزاحة الجزء الظاهر باستخدام translateY بدل spacers DOM
   const translateY = startRow * rowHeight;
 
   return (
-    <main dir="rtl" style={{ maxWidth: 1200, margin: "2rem auto", padding: "0 1rem" }}>
-      {loading && <div style={{ textAlign: "center", margin: "12px 0" }}>جارٍ التحميل…</div>}
+    <main dir="rtl" className="programs-main">
+      {loading && <div className="programs-loading">جارٍ التحميل…</div>}
 
-      {/* غلاف اللست: ارتفاع كامل ثابت لمنع تغييرات layout أثناء التمرير */}
-      <div ref={gridRef} style={{ position: "relative" }}>
-        <div
-          ref={listRef}
-          style={{
-            position: "relative",
-            height: totalHeight,
-            contain: "layout paint",
-          }}
-        >
-          {/* الجزء الظاهر فقط — مزاح بـ translateY */}
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              transform: `translateY(${translateY}px)`,
-              willChange: "transform", // فقط على هذا العنصر الصغير
-            }}
-          >
+      <div ref={gridRef} className="programs-grid-wrapper">
+        <div className="programs-list" style={{ height: totalHeight }}>
+          <div className="programs-visible-window" style={{ transform: `translateY(${translateY}px)` }}>
             <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: `repeat(${itemsPerRow}, ${CARD_W}px)`,
-                gap: `${GAP}px`,
-                justifyContent: "space-between",
-                padding: "0 4px",
-              }}
+              className="programs-grid"
+              style={{ gridTemplateColumns: `repeat(${itemsPerRow}, ${CARD_W}px)` }}
             >
               {visibleItems.map((p, i) => {
                 if (!p || typeof p !== "object") return null;
@@ -199,9 +209,17 @@ export default function ProgramsPage() {
                 const slugOrId = p.slug || p.id || p.day || `i-${idx}`;
                 const img = p.cover_url || p.image_url || p.thumbnail || p.image;
                 const title = p.title || p.name || "— بدون عنوان —";
-
+                const href = `/programs/${encodeURIComponent(slugOrId)}`;
                 return (
-                  <Card key={slugOrId} href={`/programs/${encodeURIComponent(slugOrId)}`} title={title} img={img} CARD_W={CARD_W} CARD_H={CARD_H} IMG_H={IMG_H} />
+                  <Card
+                    key={slugOrId}
+                    href={href}
+                    title={title}
+                    img={img}
+                    CARD_W={CARD_W}
+                    CARD_H={CARD_H}
+                    IMG_H={IMG_H}
+                  />
                 );
               })}
             </div>
@@ -212,33 +230,25 @@ export default function ProgramsPage() {
   );
 }
 
-/* ========== كرت منفصل + memo للتقليل من إعادة التصيير ========== */
+/* ========== الكرت ========== */
 const Card = React.memo(function Card({ href, title, img, CARD_W, CARD_H, IMG_H }) {
   return (
-    <Link to={href} style={{ textDecoration: "none", color: "inherit" }}>
-      <article
-        style={{
-    borderRadius: 12
-        }}
-      >
-        {img ? (
-         <div style={{ width: "100%", height: IMG_H, overflow: "hidden", borderRadius: 10, background: "#f4f4f4" }}>
+    <Link to={href} className="card-link">
+      <article className="pc-card" style={{ width: CARD_W, height: CARD_H }}>
+        <div className="image-wrap" style={{ height: IMG_H }}>
+          {img ? (
             <img
               src={img}
               alt={title}
               loading="lazy"
               decoding="async"
               crossOrigin="anonymous"
-              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
             />
-          </div>
-        ) : (
-          <div style={{ width: "100%", height: IMG_H, background: "#f4f4f4" }} />
-        )}
-
-        <div style={{ padding: "10px 12px" }}>
-         
+          ) : (
+            <div className="img-placeholder">—</div>
+          )}
         </div>
+        <div className="pc-card-body">{/* فارغ */}</div>
       </article>
     </Link>
   );

@@ -320,15 +320,11 @@ main.homepage-rtl > section.shortsegs-section .shortsegs-arrow.prev { right: 6px
 main.homepage-rtl > section.shortsegs-section .shortsegs-arrow.next { left:  6px !important; }
 
 /* =========================
-   10) استجابات وحركات
+   10) نسخة الموبايل — بدون أي تأثير على الديسكتوب
    ========================= */
-
-/* موبايل وتابلِت: سنترة وضبط حجم البث داخل الإطار (حتى 992px) */
-/* ===== MOBILE FINAL PATCH — ضعي هذه الكتلة في آخر سطر بملف CSS ===== */
-/* ===== MOBILE FINAL PATCH — كل شي للموبايل بمكان واحد ===== */
 @media (max-width: 768px){
 
-  /* منع أي سكرول أفقي على الصفحة */
+  /* الصفحة */
   html, body { overflow-x: hidden; }
 
   /* الإطارات تحت بعض */
@@ -345,18 +341,10 @@ main.homepage-rtl > section.shortsegs-section .shortsegs-arrow.next { left:  6px
     overflow-x: hidden !important;
   }
 
-  /* العنوان/التاريخ فوق البث */
-  .live-topline{
-    position: static !important;
-    width: 100% !important;
-    display: flex !important;
-    flex-direction: row-reverse !important;
-    justify-content: space-between !important;
-    align-items: baseline !important;
-    gap: 8px !important;
-    margin-bottom: 4px !important;
-    padding: 0 2px !important;
-  }
+  /* ترتيب فقط (لا تغيّر DOM) */
+  .live-frame{ order: 1 !important; }
+  .text-frame, .third-frame{ order: 2 !important; }   /* تأمّل */
+  .schedule-frame{ order: 3 !important; }             /* برنامج اليوم */
 
   /* الإطارات تتحول لوضع عادي */
   .live-frame,
@@ -368,109 +356,88 @@ main.homepage-rtl > section.shortsegs-section .shortsegs-arrow.next { left:  6px
     border-radius: 8px !important;
   }
 
-  /* الصندوق الحاوي للبث */
+  /* عنوان/تاريخ البث فوق الفيديو */
+  .live-topline{
+    position: static !important;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: row-reverse !important;
+    justify-content: space-between !important;
+    align-items: baseline !important;
+    gap: 8px !important;
+    margin-bottom: 6px !important;
+    padding: 0 2px !important;
+  }
+
+  /* اللايف: الفيديو “قد الإطار بالزبط” */
   .live-frame .live-box{
     position: relative !important;
     width: 100% !important;
-    aspect-ratio: 4 / 3 !important;   /* 👈 أكبر من 16:9 على الموبايل */
+    aspect-ratio: 16 / 9 !important;   /* ثابت 16:9 */
     display: grid !important;
     place-items: center !important;
     overflow: hidden !important;
     border-radius: 8px !important;
-
-    /* يمنع سحب أفقي */
+  
     touch-action: pan-y !important;
-    overscroll-behavior: contain;
+    overscroll-behavior: contain !important;
     
-  }
 
-  /* الفيديو نفسه */
-  .live-frame .live-box iframe{
+  }
+  .live-frame .live-box iframe,
+  .live-frame iframe{
     position: absolute !important;
-    inset: 0 !important;
     width: 100% !important;
     height: 100% !important;
     max-width: 100% !important;
     max-height: 100% !important;
     border: 0 !important;
-
-    object-fit: contain !important;
-    object-position: center center !important;
-    transform: none !important;
-
-    /* يمنع السحب يمين/شمال */
-      touch-action: pan-y !important;
-    overscroll-behavior: contain !important;
+    display: block !important;
+      inset: 2.5% !important;              /* ← يترك 5% من كل جانب = 90% عرض/ارتفاع */
+    width: 95% !important;
+    height: 95% !important;
   }
 
-  /* برنامج اليوم: سكرول رأسي فقط */
-    .schedule-frame{
+  /* تأمّل: نص فقط — اخفاء الصورة تمامًا */
+  .text-frame .image-4x5,
+  .text-frame .image-4x5 img,
+  .text-frame .tf-col--left,
+  .text-frame .text-col--left{
+    display: none !important;
+  }
+  .text-frame .tf-col--right,
+  .text-frame .text-col--right{
+    width: 100% !important;
+    align-self: start !important;
+  }
+  /* إلغاء أي Grid عام على third-frame بالموبايل لتجنب التكسير */
+  .third-frame{ display: block !important; padding: 12px 16px !important; }
+
+  /* برنامج اليوم: إطار أصغر، 4 عناصر، غير قابل للنقر */
+  .schedule-frame{
+    --rowH: 24px;  /* مطابق لتعريفك في الديسكتوب */
+    padding: 8px 0 !important;
     touch-action: pan-y !important;
     overscroll-behavior: contain !important;
   }
-
-  /* ألغِ أي سكرول داخلي للإطار */
   .schedule-viewport{
-    max-height: 260px !important;      /* عدّليها إذا بدك */
-    overflow: hidden !important;        /* بدل auto */
-    -webkit-overflow-scrolling: auto !important;
-    touch-action: pan-y !important;     /* تمرير الصفحة بس */
+    max-height: calc(var(--rowH) * 4) !important;  /* 4 أسطر بالضبط */
+    overflow: hidden !important;                    /* منع سكرول داخلي */
+  }
+  /* تعطيل النقر داخل الجدول فقط (مش على الإطار) */
+  .schedule-frame .schedule-viewport,
+  .schedule-frame .schedule-list,
+  .schedule-frame .schedule-list *{
+    pointer-events: none !important;
+    cursor: default !important;
+  }
+  .schedule-list{ transition: transform 0.5s linear; }
+  .schedule-row{
+    height: var(--rowH) !important;
+    line-height: var(--rowH) !important;
   }
 
-  /* ما يمسك اللمس/النقر – يمرّ للأب (الصفحة) */
-  .schedule-list{
-    pointer-events: none !important;    /* يمنع السحب داخل القائمة */
-    transition: transform 0.5s linear;  /* تبقى الأنيميشن شغّالة */
-  }
-
-.third-frame .text-body{
-    display: grid !important;
-    grid-template-columns: 6fr 4fr !important;  /* نصّ أوسع يمين | صورة أضيق شمال */
-    grid-template-rows: 1fr !important;
-    align-items: start !important;              /* النص يبقى فوق طبيعي */
-    gap: 12px !important;
-    height: 100% !important;
-  }
-
-  /* لو ما عندك .text-body وبتستعملي .third-frame مباشرة */
-  .third-frame{
-    display: grid !important;
-    grid-template-columns: 6fr 4fr !important;
-    grid-template-rows: 1fr !important;
-    align-items: start !important;
-    gap: 12px !important;
-  }
-
-  /* الصورة (العمود الشمال) تتمركز عموديًا */
-  .third-frame .tf-col--left,
-  .third-frame .text-col--left{
-    align-self: center !important;   /* 👈 بالنص عموديًا */
-    justify-self: center !important; /* بالنص أفقيًا داخل العمود */
-    margin-top: 0 !important;        /* يلغي أي دفع سابق */
-  }
-
-  /* النص (العمود اليمين) يبقى طبيعي */
-  .third-frame .tf-col--right,
-  .third-frame .text-col--right{
-    align-self: start !important;
-  }
-
-  /* حدود ارتفاع للإطار والصورة */
-  .text-frame{ min-height: clamp(340px, 55vh, 520px) !important; }
-  .image-4x5{
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    max-height: 100% !important;
-  }
-  .image-4x5 img{
-    max-height: 100% !important;
-    object-fit: contain !important;
-  }
-  .third-frame .text-col--right{ order: 1 !important; }
-  .third-frame .text-col--left { order: 2 !important; }
-
-  /* الكاروسولات تاخد عرض الموبايل */
+  /* الكاروسولات تاخد عرض الموبايل (لا تمسّ الديسكتوب) */
   main.homepage-rtl > section.programs-section,
   main.homepage-rtl > section.shortsegs-section{
     width: 100% !important;
@@ -494,4 +461,42 @@ main.homepage-rtl > section.shortsegs-section .shortsegs-arrow.next { left:  6px
   main.homepage-rtl > section.shortsegs-section .shortsegs-arrow.prev{ right: 6px !important; }
   main.homepage-rtl > section.programs-section .nav-next,
   main.homepage-rtl > section.shortsegs-section .shortsegs-arrow.next{ left: 6px !important; }
+}
+
+@media (max-width: 768px){
+  /* الإطار نفسه */
+  .live-frame .live-box{
+    position: relative !important;
+    width: 100% !important;
+    aspect-ratio: 16 / 9 !important;   /* أو خليه كما هو عندك */
+    overflow: hidden !important;
+    border-radius: 8px !important;
+    display: block !important;
+  }
+
+  /* ✨ الـiframe أصغر 10% ومتمركز بالملّي */
+  .live-frame .live-box iframe,
+  .live-frame iframe{
+    position: absolute !important;
+
+    /* نلغي أي inset قديم كان عامل انحياز */
+    inset: auto !important;
+
+    /* تمركز مثالي */
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+
+    /* خلي الفجوة حوالين الفيديو: 10% (عدّلها لـ 95% لو بدك 5%) */
+    width: 90% !important;
+    height: 90% !important;
+
+    border: 0 !important;
+    display: block !important;
+
+    /* لا جرّ ولا سكرول داخل الإطار، مع إبقاء نقر الأزرار طبيعي */
+    -webkit-user-drag: none !important;
+    user-select: none !important;
+    touch-action: pan-y !important;  /* يمنع السحب الأفقي داخل المشغّل */
+  }
 }

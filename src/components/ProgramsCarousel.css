@@ -153,10 +153,10 @@
 .programs-section .program-card {
   flex: 0 0 calc((100% - (var(--gap) * 3) - (var(--edge) * 2)) / 4);
   max-width: calc((100% - (var(--gap) * 3) - (var(--edge) * 2)) / 4);
-  min-height: 160px;   /* عدّليها إذا بدك الطول أكبر/أصغر */
-  background: #fff;
+  min-height: 160px;   
+  background:transparent;
   border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  box-shadow: none;
   overflow: hidden;
   scroll-snap-align: start;
 }

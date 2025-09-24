@@ -1,37 +1,123 @@
-
 :root {
-   --card-bg:#fff; 
-  --ink:#1a1a1a; 
-  --muted:#777;
-  --ring:#e9e6e0;
-   --brand:#7A5B3A;
- }
-.programs-page { padding: 24px min(4vw, 32px) 48px;
-   background: transparent;
-   }
-.programs-page .programs-header { 
-  text-align: right;
-   margin: 8px 0 18px;
- }
-.programs-page .programs-header h1 { margin: 0 0 6px; 
-  font-size: clamp(24px,3.2vw,34px); 
-  font-weight: 700; letter-spacing: .2px;
- }
-.programs-page .programs-header .sub {
-   margin:0; 
-   color: var(--muted); 
-  font-size: 14px;
- }
-.grid.pc-as-grid {
-   display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 14px;
-   }
-.pc-card { 
-  background: var(--card-bg); border: 1px solid var(--ring); 
-  border-radius: 14px;
-   padding: 10px; 
-   box-shadow: 0 4px 10px rgba(0,0,0,.05);
+  --card-bg: #fff;
+  --ink: #1a1a1a;
+  --muted: #777;
+  --ring: #e9e6e0;
+  --brand: #7A5B3A;
+}
+
+/* الحاوية العامة */
+.programs-main {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  background: transparent;
+  /* مساحة أمان قبل الفوتر */
+  padding-bottom: 24px;
+}
+
+/* حالات */
+.programs-loading {
+  text-align: center;
+  margin: 12px 0;
+}
+
+/* غلاف الشبكة */
+.programs-grid-wrapper {
+  position: relative;
+}
+
+/* اللست ذات الارتفاع الكلي (لديسكتوب فقط) */
+.programs-list {
+  position: relative;
+  contain: layout paint;
+}
+
+/* النافذة الظاهرة (لديسكتوب فقط) */
+.programs-visible-window {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+
+/* شبكة العناصر */
+.programs-grid {
+  display: grid;
+  gap: 8px; /* = GAP */
+  justify-content: space-between;
+  padding: 0 4px;
+}
+
+/* نسخة الموبايل: نثبت عمود واحد وتوسيط العنصر */
+.programs-grid-mobile {
+  grid-template-columns: 1fr !important;
+  justify-content: center;
+  justify-items: center;
+}
+
+/* رابط الكرت */
+.card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+/* الكرت — بدون “بياض” */
+.pc-card {
+  background: transparent !important;
+  border: 0 !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+
   content-visibility: auto;
-  contain: layout paint size style; 
-  
+  contain: layout paint size style;
+  display: flex;
+  flex-direction: column;
+}
+
+/* الصورة */
+.image-wrap {
+  width: 100%;
+  background: #f4f4f4;
+  overflow: hidden;
+  border-radius: 10px;
+}
+.image-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.img-placeholder {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: #777;
+  font-size: .9rem;
+}
+
+/* جسم الكرت (فارغ حسب الكود) */
+.pc-card-body {
+  padding: 0; /* بدون حشوة للتزامن مع CARD_H الواقعي */
+}
+
+/* ضمان الموبايل حتى بالأفقي */
+@media (max-width: 1024px), (pointer: coarse) {
+  .programs-grid {
+    grid-template-columns: 1fr !important;
+    justify-content: center;
+    justify-items: center;
+  }
+  .pc-card {
+    width: 260px !important; /* = CARD_W */
+  }
+
+  /* لا أي قيود تمنع ظهور الفوتر */
+  .programs-grid-wrapper,
+  .programs-list,
+  .programs-visible-window {
+    overflow: visible !important;
+    max-height: none !important;
+    position: static !important; /* يلغي التمركز المطلق للموبايل */
+  }
 }

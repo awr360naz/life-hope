@@ -7,7 +7,7 @@ export default function ArticlesCategoriesPage() {
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // إعدادات الكروت/الشبكة — نفس تبعك
+  // نفس إعداداتك 1:1
   const CARD_W = 260;
   const IMG_H  = 180;
   const CARD_H = 220;
@@ -77,7 +77,11 @@ export default function ArticlesCategoriesPage() {
   }, [layout]);
 
   if (err) {
-    return <main dir="rtl" style={{ maxWidth: 1200, margin: "2rem auto", padding: "0 1rem" }}>حدث خطأ: {err}</main>;
+    return (
+      <main dir="rtl" className="cats-main">
+        حدث خطأ: {err}
+      </main>
+    );
   }
 
   const total = items.length;
@@ -92,31 +96,18 @@ export default function ArticlesCategoriesPage() {
   const visibleItems = items.slice(sliceStart, sliceEnd);
 
   return (
-    <main dir="rtl" style={{ maxWidth: 1200, margin: "2rem auto", padding: "0 1rem" }}>
-      
-      {loading && <div style={{ textAlign: "center", margin: "12px 0" }}>جارٍ التحميل…</div>}
+    <main dir="rtl" className="cats-main">
+      {loading && <div className="cats-loading">جارٍ التحميل…</div>}
 
-      <div
-        ref={scrollerRef}
-        style={{
-          height: "80vh",
-          overflowY: "auto",
-          overscrollBehavior: "contain",
-          borderRadius: 12,
-          background: "transparent",
-          willChange: "transform",
-        }}
-      >
+      <div ref={scrollerRef} className="cats-scroller">
         <div ref={gridRef}>
           {topSpacerHeight > 0 && <div style={{ height: topSpacerHeight }} />}
 
           <div
+            className="cats-grid"
             style={{
-              display: "grid",
-              gridTemplateColumns: `repeat(${Math.max(1, perRow)}, ${CARD_W}px)`,
-              gap: `${GAP}px`,
-              justifyContent: "space-between",
-              padding: "0 4px",
+              // ديناميكي (يبقى كما هو) — يعتمد على perRow مثل كودك الأصلي
+              gridTemplateColumns: `repeat(${Math.max(1, perRow)}, ${CARD_W}px)`
             }}
           >
             {visibleItems.map((c, i) => {
@@ -125,30 +116,26 @@ export default function ArticlesCategoriesPage() {
               const title = c.name || c.slug || "— بدون اسم —";
               const img = c.cover_url || null;
 
-              // نمرّر "name" بالـ URL (حسب طلبك المطابقة بالاسم)
               const nameParam = encodeURIComponent(c.name || "");
               const to = `/articles/category/${nameParam}`;
 
               return (
-                <Link key={c.id || `i-${idx}`} to={to} style={{ textDecoration: "none", color: "inherit" }}>
-                  <article
-       
-                  >
-                    {img ? (
-                      <div style={{ width: "100%", height: IMG_H, overflow: "hidden", borderRadius: 10, background: "#f4f4f4" }}>
+                <Link key={c.id || `i-${idx}`} to={to} className="card-link">
+                  <article className="category-card" style={{ width: CARD_W, height: CARD_H }}>
+                    <div className="image-wrap" style={{ height: IMG_H }}>
+                      {img ? (
                         <img
                           src={img}
                           alt={title}
                           loading="lazy"
                           decoding="async"
                           crossOrigin="anonymous"
-                          style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                         />
-                      </div>
-                    ) : (
-                      <div style={{ width: "100%", height: IMG_H, borderRadius: 10, background: "#f4f4f4" }} />
-                    )}
-                 
+                      ) : (
+                        <div className="img-placeholder">—</div>
+                      )}
+                    </div>
+                    {/* مافي نص داخلي بالكرت في كودك الحالي، محافظين عليه */}
                   </article>
                 </Link>
               );

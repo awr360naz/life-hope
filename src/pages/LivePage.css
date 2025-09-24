@@ -1,33 +1,30 @@
-/* خلفية وتوسيط أفقي، بدون سكرول داخلي للحاوية */
+/* الخلفية وتوسيط أفقي */
 .live-fit-stage {
   display: flex;
-  flex-direction: column;  /* اللايف فوق، الصورة تحت */
+  flex-direction: column;
   align-items: center;
-  min-height: 100vh;
+  min-height: 100vh; /* رح نلغيها على الموبايل */
   background: linear-gradient(180deg, #FFFFFF 0%, #F6F3EE 20%);
   box-sizing: border-box;
-  overflow: visible;       /* لا سكرول داخلي هنا */
+  overflow: visible;
 }
 
-/* يحجز مكان اللايف بعد التحجيم (مهم لمنع التداخل مع الصورة) */
+/* مكان اللايف بعد التحجيم على الديسكتوب */
 .live-box {
-display: flex;              /* تفعيل flex */
-  justify-content: center;    /* بالنص أفقي */
-  align-items: flex-start;    /* من فوق */
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
   overflow: hidden;
   position: relative;
 }
 
-/* العنصر الذي يُطبَّق عليه التحجيم */
-.live-scale {
- 
-  inset: 0;
-}
+/* العنصر المتحوّل (يبقى للديسكتوب) */
+.live-scale {}
 
-/* أبعاد اللايف الأصلية داخل العنصر المتحجّم */
+/* أبعاد اللايف الأصلية */
 .live-iframe {
-  width: 900px;   /* = BASE_W */
-  height: 600px;  /* = BASE_H */
+  width: 900px;
+  height: 600px;
   border: 0;
   display: block;
 }
@@ -35,10 +32,47 @@ display: flex;              /* تفعيل flex */
 /* الصورة تحت اللايف */
 .live-ad {
   margin-top: 16px;
-  width: 80%;
-  max-width: 900px;   /* لا تتعدى عرض اللايف */
-  height: 280px;
+  width: min(900px, 92vw);
+  height: auto;
+  object-fit: contain;
   border-radius: 8px;
-  object-fit: cover;
   display: block;
+}
+
+/* ======== موبايل: عطّل التحجيم بالـJS وخلي اللايف يملى العرض بنسبة 16:9 ======== */
+@media (max-width: 768px) {
+  .live-fit-stage {
+    /* شيل الطول الإجباري عشان الصورة ما تروح “تحت تحت” */
+    min-height: auto;
+    padding-inline: 0;
+  }
+
+  /* تجاهل قيم الـJS (scaledW/scaledH) وخلي البوكس على عرض الشاشة */
+  .live-box {
+    width: 100vw !important;
+    height: auto !important;
+  }
+
+  /* أبطِل الـtransform وخلي المحتوى يتمدّد طبيعي */
+  .live-scale {
+    width: 100% !important;
+    height: auto !important;
+    transform: none !important;
+  }
+
+  /* خلّي الـiframe يستجيب بنسبة 16:9 ويملأ العرض */
+  .live-iframe {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 16 / 9;
+    border: 0;
+    display: block;
+  }
+
+  /* الصورة تكون قريبة وتاخذ عرض الشاشة */
+  .live-ad {
+    width: 100%;
+    margin-top: 12px;
+    border-radius: 6px;
+  }
 }

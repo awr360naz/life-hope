@@ -45,7 +45,7 @@ function ThirdFrame() {
   if (!item) return null;
 
   return (
-    <section className="third-frame" dir="rtl" aria-label="تأمل هذا الأسبوع">
+    <section className="third-frame"  dir="rtl" aria-label="تأمل هذا الأسبوع">
       {/* النص يمين */}
       <div className="tf-col tf-col--right">
         <h2 className="tf-title">تأمل هذا الأسبوع</h2>
@@ -171,6 +171,7 @@ export default function HomePage() {
             <iframe
               className="live-iframe"
               src={LIVE_SRC}
+              scrolling="no"
               title="البث المباشر"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowFullScreen
