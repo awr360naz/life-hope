@@ -48,8 +48,10 @@
 /* الصورة */
 .shortseg-thumb {
   position: relative;
-  aspect-ratio: 4 / 5;
+   aspect-ratio: 9 / 16; 
   background: #f2f2f2;
+  overflow: hidden;  
+
 }
 .shortseg-thumb img {
   width: 100%;
@@ -138,3 +140,6 @@
 @media (max-width: 768px) {
   .shortseg-modal-content { inset: 8% 4%; }
 }
+
+
+

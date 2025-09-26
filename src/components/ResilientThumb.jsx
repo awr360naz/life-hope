@@ -54,3 +54,14 @@ export default function ResilientThumb({ item, className = "", alt = "" }) {
     />
   );
 }
+function YouTubePicture({ ytid, alt }) {
+  const base = `https://i.ytimg.com/vi/${ytid}`;
+  const maxres = `${base}/maxresdefault.jpg`;
+  const hq     = `${base}/hqdefault.jpg`;
+  return (
+    <picture>
+      <source srcSet={`${maxres} 1080w, ${hq} 720w`} />
+      <img src={hq} alt={alt} loading="lazy" decoding="async" />
+    </picture>
+  );
+}

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import "./ShortSegmentsPage.css";
 import ResilientThumb from "../components/ResilientThumb";
 
+
 function toYouTubeId(urlOrId = "") {
   if (!urlOrId) return "";
   if (/^[a-zA-Z0-9_-]{10,15}$/.test(urlOrId)) return urlOrId;
@@ -18,9 +19,12 @@ function toYouTubeId(urlOrId = "") {
   }
 }
 
-function ytEmbed(id) {
-  // نستخدم youtube-nocookie لخصوصية أفضل
-  return `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1`;
+function ytEmbed(id, { autoplay = true } = {}) {
+  // مستمرّين مع youtube-nocookie لخصوصية أفضل
+  const base = `https://www.youtube-nocookie.com/embed/${id}`;
+  const common = `playsinline=1&modestbranding=1&rel=0&iv_load_policy=3&fs=1`;
+  const auto = autoplay ? `&autoplay=1&mute=1` : ``; // iOS يحتاج mute مع autoplay
+  return `${base}?${common}${auto}`;
 }
 
 export default function ShortSegmentsPage() {
@@ -114,12 +118,14 @@ export default function ShortSegmentsPage() {
               ✕
             </button>
             <div className="shortseg-iframe-wrap">
-              <iframe
-                src={ytEmbed(player.ytid)}
-                title="Short Segment"
-                allow="autoplay; encrypted-media; picture-in-picture"
-                allowFullScreen
-              />
+             <iframe
+  src={ytEmbed(player.ytid, { autoplay: true })}
+  title="Short Segment"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+  referrerPolicy="strict-origin-when-cross-origin"
+  allowFullScreen
+/>
+
             </div>
           </div>
         </div>

@@ -1,176 +1,87 @@
-/* ===== فقرات قصيرة ===== */
-
-.shortsegs-section .shortsegs-viewport {
-  position: relative;
-  overflow: hidden;
-}
-
-/* مسار السكول */
-.shortsegs-section .shortsegs-track {
-  --gap: 12px;   /* المسافة بين الكروت */
-  --edge: 12px;  /* حافة يمين/يسار المسار */
-
-  display: flex;
-  align-items: stretch;
-  gap: var(--gap);
-  padding-inline: var(--edge);
-  overflow-x: auto;
-  scroll-behavior: smooth;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-}
-.shortsegs-section .shortsegs-track::-webkit-scrollbar { display: none; }
-
-/* حجم الكرت = (100% - مجموع الفراغات) / عدد الظاهر (نفس برامجنا) */
-.shortsegs-section .shortsegs-card {
-  flex: 0 0 calc(
-    (100% - ( (var(--perView, 4) - 1) * var(--gap, 12px) ))
-    / var(--perView, 4)
-  );
-  max-width: calc(
-    (100% - ( (var(--perView, 4) - 1) * var(--gap, 12px) ))
-    / var(--perView, 4)
-  );
-  box-sizing: border-box;
-  min-height: 160px;            /* زي برامجنا؛ عدّلي لو بدك */
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  overflow: hidden;
-  scroll-snap-align: start;
+/* نضبط الكرت ليكون عمودي: صورة فوق + عنوان تحت */
+/* نرفع الأسبقية باستخدام .shorts-like-programs .program-card.short-card */
+.shorts-like-programs .program-card.short-card {
   display: flex;
   flex-direction: column;
-  text-decoration: none;        /* لو كانت <a> */
-  color: inherit;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  scroll-snap-align: start;
 }
 
-/* إطار داخلي خفيف (اختياري – يطابق Programs) */
-.shortsegs-section .shortsegs-card .shortsegs-aspect-9x16 {
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-/* صورة 9:16 (قصيرة) */
-.shortsegs-section .shortsegs-aspect-9x16 {
-  aspect-ratio: 9 / 16;   /* ثابت: 9×16 */
-  background: #eee;
-  width: 100%;
+/* زر يغطي الكرت بالكامل */
+.shorts-like-programs .short-open-btn {
   display: block;
+  width: 100%;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  text-align: start;
+  cursor: pointer;
 }
-.shortsegs-section .shortsegs-aspect-9x16 img {
+
+/* الصورة 9:16 فوق */
+.shorts-like-programs .short-image-wrap {
+  position: relative;
+  aspect-ratio: 9 / 16;
+  background: #f2f2f2;
+  overflow: hidden;
+  border-radius: 8px;
+}
+.shorts-like-programs .short-image-wrap img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
-
-/* عنوان الكرت */
-.shortsegs-section .shortsegs-card-title {
-  font-weight: 700;
-  font-size: 14px;
-  line-height: 1.4;
-  margin: 8px 10px 10px;
-  text-align: right; /* RTL */
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  
-}
-
-/* عنوان القسم والرابط */
-.shortsegs-section .shortsegs-title {
-  text-align: right;
-  margin: 0 ;
-}
-.shortsegs-section .shortsegs-viewall {
-  color: inherit;
-  text-decoration: none;
-  margin-inline-start: auto;
-  color: red;
-}
-.shortsegs-section .shortsegs-viewall:hover {
-  text-decoration: none;
-}
-
-/* ===== الأسهم نفس برامجنا تماماً ===== */
-.shortsegs-section .nav-btn {
+/* أيقونة تشغيل */
+.shorts-like-programs .short-play {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 2;
-  width: 34px;
-  height: 34px;
-  border: 0;
-  border-radius: 50%;
+  inset-inline-start: 8px;
+  inset-block-end: 8px;
+  width: 26px; height: 26px;
+  border-radius: 999px;
+  display: grid; place-items: center;
+  background: rgba(0,0,0,.6);
+  color: #fff; font-size: 14px;
+}
+
+/* العنوان بخلفية بيضاء تحت الصورة */
+.shorts-like-programs .short-title-wrap {
   background: #fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,.15);
-  cursor: pointer;
+  padding: 10px 12px 14px;
+  border-radius: 8px;
+  margin-top: 6px;
 }
-.shortsegs-section .nav-prev { right: 6px; }
-.shortsegs-section .nav-next { left: 6px; }
-.shortsegs-section .nav-btn:disabled { opacity: .4; cursor: default; }
-/* هيكل تحميل (اختياري) */
-.shortsegs-section .shortsegs-skeleton {
-  display: grid;
-  grid-auto-flow: column;
-  gap: 12px;
-  padding-inline: 12px;
-}
-.shortsegs-section .shortsegs-skel-card {
-  width: 220px;
-  height: 160px;
-  border-radius: 12px;
-  background: linear-gradient(90deg, #eee, #f6f6f6, #eee);
-  background-size: 200% 100%;
-  animation: shortShimmer 1.2s linear infinite;
+.shorts-like-programs .short-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: right;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;       /* مثل صفحة الشورتس */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-@keyframes shortShimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+/* ===== المودال (نفس صفحة الشورتس) ===== */
+.shortseg-modal { position: fixed; inset: 0; z-index: 999; }
+.shortseg-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.55); }
+.shortseg-modal-content {
+  position: absolute; inset: 5% 8%;
+  background: #000; border-radius: 16px; overflow: hidden;
+  display: flex; flex-direction: column;
 }
+.shortseg-close {
+  position: absolute; inset-inline-end: 12px; inset-block-start: 10px;
+  z-index: 2; width: 36px; height: 36px; border-radius: 999px; border: none;
+  background: rgba(255,255,255,.12); color: #fff; cursor: pointer; font-size: 18px;
+}
+.shortseg-iframe-wrap { position: relative; width: 100%; height: 100%; }
+.shortseg-iframe-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 
-/* موبايل: نفس تصغير برامجنا */
-@media (max-width: 600px) {
-  .shortsegs-section .shortsegs-card,
-  .shortsegs-section .shortsegs-skel-card {
-    flex-basis: 180px;
-    max-width: 180px;
-    min-height: 130px;
-  }
-}
-
-.shortsegs-section .shortsegs-header {
-  display: flex;
-  align-items: center;
-}
-.shortsegs-section .nav-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  border: none;
-  background: rgba(0, 0, 0, 0.6); /* خلفية غامقة شبه شفافة */
-  color: #fff;                    /* السهم أبيض */
-  font-size: 22px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 2;
-  box-shadow: 0 2px 6px rgba(0,0,0,.25);
-}
-
-.shortsegs-section .nav-prev {
-  right: calc(var(--edge, 12px) + 2px);
-}
-.shortsegs-section .nav-next {
-  left: calc(var(--edge, 12px) + 2px);
-}
-
-.shortsegs-section .nav-btn:disabled {
-  opacity: 0.35;
-  cursor: default;
+@media (max-width: 768px) {
+  .shortseg-modal-content { inset: 8% 4%; }
 }

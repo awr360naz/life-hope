@@ -1,10 +1,9 @@
-import React, { useEffect, useRef, useState } from "react";
-import "./ShortSegmentsCarousel.css";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
+import "./ShortSegmentsCarousel.css";
+import ResilientThumb from "./ResilientThumb"; // ← عدّل المسار إذا لزم
 
-const LS_KEY = "shortSegs";
-const API_URL = "/api/content/short-segments?limit=24";
-
+// === نفس الـ helpers تبع صفحة الشورتس ===============================
 function toYouTubeId(urlOrId = "") {
   if (!urlOrId) return "";
   if (/^[a-zA-Z0-9_-]{10,15}$/.test(urlOrId)) return urlOrId;
@@ -20,191 +19,206 @@ function toYouTubeId(urlOrId = "") {
     return "";
   }
 }
-function toYouTubeURL(urlOrId = "") {
-  const id = toYouTubeId(urlOrId);
-  return id ? `https://www.youtube.com/watch?v=${id}` : (urlOrId || "");
-}
-function toCover(item) {
-  if (item?.cover_url) return item.cover_url;
-  const vid = toYouTubeId(item?.video_url || item?.url || "");
-  return vid ? `https://i.ytimg.com/vi/${vid}/hqdefault.jpg` : null;
+
+function ytEmbed(id, { autoplay = true } = {}) {
+  const base = `https://www.youtube-nocookie.com/embed/${id}`;
+  const common = `playsinline=1&modestbranding=1&rel=0&iv_load_policy=3&fs=1`;
+  const auto = autoplay ? `&autoplay=1&mute=1` : ``; // iOS يحتاج mute مع autoplay
+  return `${base}?${common}${auto}`;
 }
 
+function useResponsivePerView(defaultPerView = 4) {
+  const [pv, setPv] = useState(defaultPerView);
+  useEffect(() => {
+    const update = () => {
+      const w = window.innerWidth;
+      if (w < 640) setPv(2);
+      else if (w < 960) setPv(3);
+      else setPv(defaultPerView);
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, [defaultPerView]);
+  return pv;
+}
+
+// === component ==========================================================
 export default function ShortSegmentsCarousel({
   title = "فقرات قصيرة",
   perView = 4,
   step = 1,
+  apiUrl = "/api/content/short-segments?limit=24",
   linkTo = "/shorts",
 }) {
-  const [items, setItems] = useState([]);
+  const [raw, setRaw] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
   const [index, setIndex] = useState(0);
-  const reqIdRef = useRef(0);
+
+  // مودال المُشغِّل
+  const [player, setPlayer] = useState({ open: false, ytid: "", title: "" });
+
+  const visible = useResponsivePerView(perView);
   const trackRef = useRef(null);
 
-  // تحميل من الكاش + الشبكة
   useEffect(() => {
-    try {
-      const cached = JSON.parse(localStorage.getItem(LS_KEY) || "[]");
-      if (Array.isArray(cached) && cached.length > 0) {
-        setItems(cached);
-        setLoading(false);
-      }
-    } catch {}
-
-    const myId = ++reqIdRef.current;
     (async () => {
+      setLoading(true);
+      setErr("");
       try {
-        const res = await fetch(API_URL, { headers: { Accept: "application/json" } });
-        const text = await res.text();
-        let data = null;
-        try { data = text ? JSON.parse(text) : null; } catch {}
-        if (!res.ok) throw new Error(data?.error || data?.message || text || `HTTP ${res.status}`);
-        if (myId !== reqIdRef.current) return;
-
-        const list = Array.isArray(data?.items) ? data.items : [];
-        if (list.length > 0) {
-          localStorage.setItem(LS_KEY, JSON.stringify(list));
-          setItems(list);
-          setErr("");
+        const tryFetch = async (url) => {
+          const res = await fetch(url, { headers: { Accept: "application/json" } });
+          const text = await res.text();
+          let data = null; try { data = text ? JSON.parse(text) : null; } catch {}
+          if (!res.ok) throw new Error(data?.error || data?.message || text || `HTTP ${res.status}`);
+          return Array.isArray(data?.items) ? data.items : (Array.isArray(data) ? data : []);
+        };
+        let list = [];
+        try { list = await tryFetch(apiUrl); }
+        catch {
+          // جسر توافق مع مسار قديم
+          list = await tryFetch("/api/short-segments?limit=24");
         }
+        setRaw(list);
       } catch (e) {
-        if (!items.length) setErr(e?.message || "خطأ في التحميل");
+        setErr(e?.message || "فشل الجلب");
       } finally {
         setLoading(false);
       }
     })();
-    return () => { reqIdRef.current++; };
-  }, []);
+  }, [apiUrl]);
 
-  const visible = useResponsivePerView(perView);
+  // طبعنة مثل الصفحة: نضيف _ytid
+  const items = useMemo(() => {
+    return raw
+      .map((it) => {
+        const id =
+          it.youtube_id ||
+          toYouTubeId(it.youtube_url || it.url || it.video_url || it.short_url || it.id || it.slug || "");
+        if (!id) return null;
+        const title = it.title || "فقرة قصيرة";
+        return { ...it, _ytid: id, _title: title, _key: it.id || it.slug || id };
+      })
+      .filter(Boolean);
+  }, [raw]);
 
-  // اضبط الإندكس إذا تغيّر
+  // اربطي المؤشّر لما يتغيّر المرئي
   useEffect(() => {
     const max = Math.max(0, items.length - visible);
     if (index > max) setIndex(max);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible, items.length]);
 
   const maxIndex = Math.max(0, items.length - visible);
   const canPrev = items.length > visible && index > 0;
   const canNext = items.length > visible && index < maxIndex;
 
-  function getTrackGapPx(trackEl) {
-    const st = getComputedStyle(trackEl);
-    const g1 = parseFloat(st.columnGap || "0");
-    const g2 = parseFloat(st.gap || "0");
-    const g = Math.max(isNaN(g1) ? 0 : g1, isNaN(g2) ? 0 : g2);
-    return Number.isFinite(g) && g > 0 ? g : 12;
-  }
-
+  // نفس حساب “برامجنا”: عرض الكرت + الفجوة
   const goToIndex = (nextIdx) => {
     const track = trackRef.current;
     if (!track) return;
-    const firstCard = track.querySelector(".shortsegs-card");
-    if (!firstCard) return;
-
-    const gap = getTrackGapPx(track);
-    const cardWidth = firstCard.offsetWidth + gap;
-
+    const card = track.querySelector(".program-card");
+    if (!card) return;
+    const styles = getComputedStyle(track);
+    const gap = parseInt(styles.getPropertyValue("--gap")) || 12;
+    const cardWidth = card.getBoundingClientRect().width + gap;
+    const delta = (nextIdx - index) * cardWidth;
+    track.scrollBy({ left: -delta, behavior: "smooth" });
     const clamped = Math.max(0, Math.min(maxIndex, nextIdx));
-    const deltaItems = clamped - index;
-    const deltaPx = deltaItems * cardWidth;
-
-    track.scrollBy({ left: -deltaPx, behavior: "smooth" });
     setIndex(clamped);
   };
 
-  if (!loading && !items.length) {
-    return (
-      <section className="shortsegs-section">
-        <div className="shortsegs-header">
-          <h2 className="shortsegs-title">{title}</h2>
-        </div>
-        <div className="shortsegs-empty">
-          {err ? `خطأ: ${err}` : "لا يوجد محتوى حالياً."}
-        </div>
-      </section>
-    );
-  }
+  const onCardClick = (it) => setPlayer({ open: true, ytid: it._ytid, title: it._title });
 
   return (
-    <section className="shortsegs-section" dir="rtl" aria-labelledby="shortsegs-title">
-      <div className="shortsegs-header">
-        <h2 id="shortsegs-title" className="shortsegs-title">{title}</h2>
-        {linkTo && <Link to={linkTo} className="shortsegs-viewall">عرض الكل </Link>}
+    // نستخدم نفس حاوية “برامجنا” حرفيًا
+    <section className="programs-section shorts-like-programs" dir="rtl" aria-labelledby="shorts-title">
+      <div className="programs-header">
+        <h2 id="shorts-title" className="programs-title">{title}</h2>
+        {linkTo && <Link to={linkTo} className="programs-viewall">عرض الكل</Link>}
       </div>
-<br></br>
-      <div className="shortsegs-viewport">
-        <div
-          className="shortsegs-track"
-          ref={trackRef}
-          dir="rtl"
-          style={{ "--perView": visible }}
-        >
-          {items.map((it, i) => {
-            const cover = toCover(it);
-            const href = toYouTubeURL(it?.video_url || it?.url || it?.youtube_id || "");
-            const clickable = !!href;
-            const CardTag = clickable ? "a" : "div";
-            return (
-              <CardTag
-                key={it.id ?? i}
-                className="shortsegs-card"
-                {...(clickable ? { href, target: "_blank", rel: "noopener noreferrer" } : {})}
-                aria-label={it?.title || "مشاهدة الفيديو"}
-              >
-                <div className="shortsegs-aspect-9x16">
-                  {cover ? (
-                    <img src={cover} alt={it?.title || "short"} loading="lazy" />
-                  ) : (
-                    <div className="shortsegs-noimg">No Cover</div>
-                  )}
-                </div>
-                {it?.title ? <h3 className="shortsegs-card-title">{it.title}</h3> : null}
-              </CardTag>
-            );
-          })}
-        </div>
 
-        {/* الأزرار نفس برامجنا */}
-        <button
-          type="button"
-          className="nav-btn nav-prev"
-          aria-label="السابق"
-          onClick={() => goToIndex(index - step)}
-          disabled={!canPrev}
-        >
-          ‹
-        </button>
-        <button
-          type="button"
-          className="nav-btn nav-next"
-          aria-label="التالي"
-          onClick={() => goToIndex(index + step)}
-          disabled={!canNext}
-        >
-          ›
-        </button>
+      <div className={`carousel ${loading ? "is-loading" : ""}`}>
+        {err && <div className="carousel-error">خطأ: {err}</div>}
+
+        {loading && (
+          <div className="carousel-skeleton" style={{ "--perView": visible }}>
+            {Array.from({ length: visible }).map((_, i) => <div className="skeleton-card" key={i} />)}
+          </div>
+        )}
+
+        {!loading && !err && items.length > 0 && (
+          <div className="carousel-viewport">
+            <div ref={trackRef} className="carousel-track" dir="rtl" style={{ "--perView": visible }}>
+              {items.map((it) => (
+                <article key={it._key} className="program-card shortseg-card">
+                  <button
+                    type="button"
+                    className="card-link short-open-btn"
+                    onClick={() => onCardClick(it)}
+                    aria-label={it._title}
+                  >
+                    <div className="shortseg-thumb">
+                      <ResilientThumb item={it} alt={it._title} />
+                      <span className="shortseg-play" aria-hidden>▶</span>
+                    </div>
+                    <div className="shortseg-body">
+                      <h3 className="shortseg-title" title={it._title}>{it._title}</h3>
+                    </div>
+                  </button>
+                </article>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              className="nav-btn nav-prev"
+              aria-label="السابق"
+              onClick={() => goToIndex(index - step)}
+              disabled={!canPrev}
+            >‹</button>
+
+            <button
+              type="button"
+              className="nav-btn nav-next"
+              aria-label="التالي"
+              onClick={() => goToIndex(index + step)}
+              disabled={!canNext}
+            >›</button>
+          </div>
+        )}
+
+        {!loading && !err && items.length === 0 && (
+          <div className="carousel-empty">لا يوجد مقاطع لعرضها.</div>
+        )}
       </div>
+
+      {/* ===== مودال مطابق لصفحة الشورتس ===== */}
+      {player.open && (
+        <div className="shortseg-modal" role="dialog" aria-modal="true">
+          <div className="shortseg-backdrop" onClick={() => setPlayer({ open: false, ytid: "", title: "" })} />
+          <div className="shortseg-modal-content">
+            <button
+              className="shortseg-close"
+              onClick={() => setPlayer({ open: false, ytid: "", title: "" })}
+              aria-label="إغلاق"
+              type="button"
+            >
+              ✕
+            </button>
+            <div className="shortseg-iframe-wrap">
+              <iframe
+                src={ytEmbed(player.ytid, { autoplay: true })}
+                title={player.title || "Short Segment"}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
-}
-
-/* ==== أدوات مساعدة ==== */
-function useResponsivePerView(base = 4) {
-  const [pv, setPv] = useState(base);
-  useEffect(() => {
-    const update = () => {
-      const w = window.innerWidth;
-      if (w < 500) setPv(1);
-      else if (w < 800) setPv(Math.min(2, base));
-      else if (w < 1100) setPv(Math.min(3, base));
-      else setPv(base);
-    };
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
-  }, [base]);
-  return pv;
 }
