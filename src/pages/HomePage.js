@@ -6,10 +6,11 @@ import ArticlesCarousel from "../components/ArticlesCarousel";
 import ProgramsCarousel from "../components/ProgramsCarousel";
 import ShortSegmentsCarousel from "../components/ShortSegmentsCarousel";
 import { Link } from "react-router-dom";
+import ThirdFrame from "./ThirdFrame"; 
 
 
 
-function ThirdFrame() {
+/* function ThirdFrame() {
   const [item, setItem] = React.useState(null);
   const [err, setErr] = React.useState("");
 
@@ -46,12 +47,12 @@ function ThirdFrame() {
 
   return (
     <section className="third-frame"  dir="rtl" aria-label="تأمل هذا الأسبوع">
-      {/* النص يمين */}
+      
       <div className="tf-col tf-col--right">
         <h2 className="tf-title">تأمل هذا الأسبوع</h2>
         {item.title && <h3 className="tf-subtitle">{item.title}</h3>}
 
-        {/* اعرض الـ body كـ HTML مع تحويل \n إلى <br/> */}
+       
         {item.body ? (
           <div
             className="tf-paragraph"
@@ -62,7 +63,7 @@ function ThirdFrame() {
         ) : null}
       </div>
 
-      {/* الصورة شمال */}
+      
       <div className="tf-col tf-col--left">
         <div className="image-4x5">
           {item.image_url ? (
@@ -84,7 +85,7 @@ function ThirdFrame() {
   );
 }
 
-
+*/
 
 export default function HomePage() { 
   // تاريخ اليوم بأرقام إنجليزية (Asia/Jerusalem)

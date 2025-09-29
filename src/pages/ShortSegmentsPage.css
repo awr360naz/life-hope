@@ -19,26 +19,30 @@
 .shortseg-grid {
   --gap: 12px;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 220px)); /* ← ثابت */
   gap: var(--gap);
+  justify-content: center;    /* ← وسّط الشبكة */
+  align-content: start;
   align-items: stretch;
+  overflow: visible;
 }
 
-/* الكرت كبَتن (مش Link) عشان النقر يشغّل الفيديو */
+/* الكرت */
 .shortseg-card {
   display: flex;
   flex-direction: column;
   border-radius: 16px;
-  overflow: hidden;
+  overflow: visible;
   background: #fff;
   box-shadow: 0 2px 10px rgba(0,0,0,.06);
   text-decoration: none;
   color: inherit;
-  min-height: 420px;
+  min-height: 0;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
   border: none;
   text-align: start;
+  align-content: start;
 }
 .shortseg-card:hover {
   transform: translateY(-4px);
@@ -48,10 +52,9 @@
 /* الصورة */
 .shortseg-thumb {
   position: relative;
-   aspect-ratio: 9 / 16; 
+  aspect-ratio: 9 / 16;
   background: #f2f2f2;
-  overflow: hidden;  
-
+  overflow: hidden;
 }
 .shortseg-thumb img {
   width: 100%;
@@ -137,9 +140,58 @@
   height: 100%;
   border: 0;
 }
-@media (max-width: 768px) {
-  .shortseg-modal-content { inset: 8% 4%; }
+
+.shortseg-page.wrap {
+  overflow: visible;
+  min-height: auto;
 }
 
+/* === الترقيم === */
+.shortseg-pager{
+  display:flex;
+  justify-content: space-between;
+  align-items:center;
+  gap: .75rem;
+  margin-top: 12px;
+  font-size: 14px;
+}
+.shortseg-count{ opacity:.75; }
+
+.shortseg-buttons{ display:flex; gap:.5rem; }
+.shortseg-btn{
+  border: 1px solid #ddd;
+  background:#fff;
+  border-radius:10px;
+  padding:.5rem .8rem;
+  cursor:pointer;
+}
+.shortseg-btn:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+.shortseg-btn.is-active{
+  border-color:#111;
+  font-weight:700;
+}
+
+
+
+  .shortseg-card {
+    min-height: auto; /* يخلي الكرت يتأقلم مع الطول */
+  }
+
+@media (max-width: 768px) {
+  .shortseg-grid {
+    grid-template-columns: repeat(3, 110px); /* 3 أعمدة ثابتة العرض */
+    justify-content: center; /* يوسّط الشبكة */
+  }
+     .shortseg-card {
+    min-height: auto; /* يخلي الكرت يتأقلم مع الطول */
+  }
+    .shortseg-title {
+    font-size: 12px;   /* أصغر شوي من 16px */
+    -webkit-line-clamp: 4; /* يخلي 3 أسطر بدل 2 */
+  }
+  }
 
 

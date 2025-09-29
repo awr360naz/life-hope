@@ -322,12 +322,11 @@ main.homepage-rtl > section.shortsegs-section .shortsegs-arrow.next { left:  6px
 /* =========================
    10) نسخة الموبايل — بدون أي تأثير على الديسكتوب
    ========================= */
-@media (max-width: 768px){
+/* نسخة الموبايل (عمودي + عرض) */
+@media (max-width: 768px), (max-width: 1024px) and (orientation: landscape) {
 
-  /* الصفحة */
   html, body { overflow-x: hidden; }
 
-  /* الإطارات تحت بعض */
   .frames-center{
     width: 100% !important;
     max-width: 100% !important;
@@ -341,12 +340,10 @@ main.homepage-rtl > section.shortsegs-section .shortsegs-arrow.next { left:  6px
     overflow-x: hidden !important;
   }
 
-  /* ترتيب فقط (لا تغيّر DOM) */
   .live-frame{ order: 1 !important; }
-  .text-frame, .third-frame{ order: 2 !important; }   /* تأمّل */
-  .schedule-frame{ order: 3 !important; }             /* برنامج اليوم */
+  .text-frame, .third-frame{ order: 2 !important; }
+  .schedule-frame{ order: 3 !important; }
 
-  /* الإطارات تتحول لوضع عادي */
   .live-frame,
   .schedule-frame,
   .text-frame{
@@ -356,7 +353,6 @@ main.homepage-rtl > section.shortsegs-section .shortsegs-arrow.next { left:  6px
     border-radius: 8px !important;
   }
 
-  /* عنوان/تاريخ البث فوق الفيديو */
   .live-topline{
     position: static !important;
     width: 100% !important;
@@ -369,36 +365,34 @@ main.homepage-rtl > section.shortsegs-section .shortsegs-arrow.next { left:  6px
     padding: 0 2px !important;
   }
 
-  /* اللايف: الفيديو “قد الإطار بالزبط” */
   .live-frame .live-box{
     position: relative !important;
     width: 100% !important;
-    aspect-ratio: 16 / 9 !important;   /* ثابت 16:9 */
-    display: grid !important;
-    place-items: center !important;
+    aspect-ratio:16 / 9 !important;
     overflow: hidden !important;
     border-radius: 8px !important;
-  
-    touch-action: pan-y !important;
-    overscroll-behavior: contain !important;
-    
-
+    display: grid !important;
+    place-items: center !important;
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
   }
+
   .live-frame .live-box iframe,
   .live-frame iframe{
     position: absolute !important;
-    width: 100% !important;
-    height: 100% !important;
-    max-width: 100% !important;
-    max-height: 100% !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) scale(0.7) !important;
+    transform-origin: center center !important;
+    width: 133.33% !important;
     border: 0 !important;
     display: block !important;
-      inset: 2.5% !important;              /* ← يترك 5% من كل جانب = 90% عرض/ارتفاع */
-    width: 95% !important;
-    height: 95% !important;
+    -webkit-user-drag: none !important;
+    user-select: none !important;
+    touch-action: pan-y !important;  
+    object-fit: contain !important;  
   }
 
-  /* تأمّل: نص فقط — اخفاء الصورة تمامًا */
   .text-frame .image-4x5,
   .text-frame .image-4x5 img,
   .text-frame .tf-col--left,
@@ -410,21 +404,18 @@ main.homepage-rtl > section.shortsegs-section .shortsegs-arrow.next { left:  6px
     width: 100% !important;
     align-self: start !important;
   }
-  /* إلغاء أي Grid عام على third-frame بالموبايل لتجنب التكسير */
   .third-frame{ display: block !important; padding: 12px 16px !important; }
 
-  /* برنامج اليوم: إطار أصغر، 4 عناصر، غير قابل للنقر */
   .schedule-frame{
-    --rowH: 24px;  /* مطابق لتعريفك في الديسكتوب */
+    --rowH: 24px;
     padding: 8px 0 !important;
     touch-action: pan-y !important;
     overscroll-behavior: contain !important;
   }
   .schedule-viewport{
-    max-height: calc(var(--rowH) * 4) !important;  /* 4 أسطر بالضبط */
-    overflow: hidden !important;                    /* منع سكرول داخلي */
+    max-height: calc(var(--rowH) * 4) !important;
+    overflow: hidden !important;
   }
-  /* تعطيل النقر داخل الجدول فقط (مش على الإطار) */
   .schedule-frame .schedule-viewport,
   .schedule-frame .schedule-list,
   .schedule-frame .schedule-list *{
@@ -437,7 +428,6 @@ main.homepage-rtl > section.shortsegs-section .shortsegs-arrow.next { left:  6px
     line-height: var(--rowH) !important;
   }
 
-  /* الكاروسولات تاخد عرض الموبايل (لا تمسّ الديسكتوب) */
   main.homepage-rtl > section.programs-section,
   main.homepage-rtl > section.shortsegs-section{
     width: 100% !important;
@@ -463,40 +453,34 @@ main.homepage-rtl > section.shortsegs-section .shortsegs-arrow.next { left:  6px
   main.homepage-rtl > section.shortsegs-section .shortsegs-arrow.next{ left: 6px !important; }
 }
 
-@media (max-width: 768px){
-  /* الإطار نفسه */
+
+/* موبايل بالعرض (Landscape فقط) */
+@media (max-width: 1024px) and (orientation: landscape) {
+
+  /* صندوق اللايف بدون حواف علوية/سفلية + توسيط داخلي */
   .live-frame .live-box{
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    aspect-ratio: 16 / 9 !important;
     position: relative !important;
-    width: 100% !important;
-    aspect-ratio: 16 / 9 !important;   /* أو خليه كما هو عندك */
+    display: grid !important;
+    place-items: center !important; /* يوسّط أفقي + عمودي */
     overflow: hidden !important;
-    border-radius: 8px !important;
-    display: block !important;
   }
 
-  /* ✨ الـiframe أصغر 10% ومتمركز بالملّي */
+  /* الإطار نفسه يملأ الصندوق ويتوسّط تماماً */
   .live-frame .live-box iframe,
   .live-frame iframe{
     position: absolute !important;
-
-    /* نلغي أي inset قديم كان عامل انحياز */
-    inset: auto !important;
-
-    /* تمركز مثالي */
-    top: 50% !important;
+    top: 65% !important;
     left: 50% !important;
-    transform: translate(-50%, -50%) !important;
+    transform: translate(-50%, -50%) !important; /* توسيط حقيقي */
+    transform-origin: center center !important;
 
-    /* خلي الفجوة حوالين الفيديو: 10% (عدّلها لـ 95% لو بدك 5%) */
-    width: 90% !important;
-    height: 90% !important;
-
+    width: 100% !important;
+    height: 100% !important;
     border: 0 !important;
     display: block !important;
-
-    /* لا جرّ ولا سكرول داخل الإطار، مع إبقاء نقر الأزرار طبيعي */
-    -webkit-user-drag: none !important;
-    user-select: none !important;
-    touch-action: pan-y !important;  /* يمنع السحب الأفقي داخل المشغّل */
+    object-fit: contain !important; /* يظل كامل بدون قص */
   }
 }

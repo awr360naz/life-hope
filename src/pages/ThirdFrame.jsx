@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import "./ThirdFrame.css";
 
 /* ===================== Helpers ===================== */
@@ -7,190 +7,178 @@ function pickFirstString(...vals) {
   return null;
 }
 
-function extractFirstImgSrc(html) {
-  if (typeof html !== "string") return null;
-  const m = html.match(/<img[^>]+src=["']([^"']+)["']/i);
-  return m ? m[1] : null;
+function nowIsoUtc() {
+  return new Date().toISOString();
 }
 
-function extractFirstUrl(text) {
-  if (typeof text !== "string") return null;
-  const m = text.match(/https?:\/\/[^\s)'"<>]+/i);
-  return m ? m[0] : null;
+function coerceBodyToHtml(body) {
+  if (body == null) return "";
+  const toHtml = (s) =>
+    s
+      .replace(/\r?\n/g, "<br/>") // سطور -> <br/>
+      .replace(/[ \t]+/g, " ")    // تقليل مضاعفات المسافات
+      .trim();
+
+  if (typeof body === "string") {
+    const trimmed = body.trim();
+    return trimmed.startsWith("<") ? trimmed : toHtml(trimmed);
+  }
+  if (typeof body === "object") {
+    const cand =
+      (typeof body.html === "string" && body.html) ||
+      (typeof body.rendered === "string" && body.rendered) ||
+      (typeof body.content === "string" && body.content) ||
+      (typeof body.text === "string" && body.text) ||
+      Object.values(body).find((v) => typeof v === "string" && v.trim());
+    if (!cand) return "";
+    const trimmed = cand.trim();
+    return trimmed.startsWith("<") ? trimmed : toHtml(trimmed);
+  }
+  return String(body);
 }
 
+// تنظيف صارم للصورة: يشيل الفراغات ويصلّح https(s) وينقلها لـhttps عند الحاجة
 function sanitizeImageUrl(url) {
   if (!url) return null;
   try {
-    const u = new URL(url, window.location.origin);
+    let s = String(url).trim().replace(/\s+/g, ""); // احذف كل الفراغات
+    s = s
+      .replace(/^httpss:\/\//i, "https://") // httpss:// -> https://
+      .replace(/^https:\/\//i, "https://")  // توحيد
+      .replace(/^http:\/\//i, window.location.protocol === "https:" ? "https://" : "http://")
+      .replace(/^https:\/\/g+/i, "https://g"); // لو صار تكرار g بالغلط
+    const u = new URL(s, window.location.origin);
     if (window.location.protocol === "https:" && u.protocol === "http:") {
       u.protocol = "https:";
     }
     return u.toString();
   } catch {
-    return url;
+    return null; // رجّع null ليفعّل placeholder بدل صورة مكسورة
   }
 }
 
-function coerceBody(value) {
-  if (value == null) return { text: "" };
-  if (typeof value === "string") {
-    if (value.trim().startsWith("<")) return { html: value };
-    return { text: value };
-  }
-  if (Array.isArray(value)) {
-    const joined = value.map(v => (typeof v === "string" ? v : "")).filter(Boolean).join(" ");
-    return { text: joined };
-  }
-  if (typeof value === "object") {
-    if (typeof value.html === "string") return { html: value.html };
-    if (typeof value.text === "string") return { text: value.text };
-    if (typeof value.content === "string") {
-      if (value.content.trim().startsWith("<")) return { html: value.content };
-      return { text: value.content };
-    }
-    if (typeof value.rendered === "string") return { html: value.rendered };
-    for (const k of Object.keys(value)) {
-      const v = value[k];
-      if (typeof v === "string" && v.trim()) {
-        if (v.trim().startsWith("<")) return { html: v };
-        return { text: v };
-      }
-    }
-    return { text: "" };
-  }
-  return { text: String(value) };
-}
-
-/* تثبيت الدوران الأسبوعي على أول خميس بالسنة */
-function firstThursdayOfYear(d = new Date()) {
+/* === مرسى التناوب الأسبوعي: أول جمعة من السنة الساعة 10:00 === */
+function firstFriday10OfYear(d = new Date()) {
   const y = d.getFullYear();
-  const x = new Date(y, 0, 1);
-  const day = x.getDay();               // 0=Sun .. 4=Thu
-  const offset = (4 - day + 7) % 7;     // إلى الخميس
-  x.setDate(x.getDate() + offset);
-  x.setHours(0, 0, 0, 0);
-  return x;
+  const x = new Date(y, 0, 1, 10, 0, 0, 0); // 1 Jan, 10:00
+  const day = x.getDay(); // 0=Sun..6=Sat
+  const toFri = (5 - day + 7) % 7; // 5=Fri
+  x.setDate(x.getDate() + toFri);
+  return x; // أول جمعة 10:00
 }
-function weeklyIndexAnchoredOnThursday(now = new Date()) {
-  const anchor = firstThursdayOfYear(now);
+
+function weeklyIndexAnchoredOnFriday10(now = new Date()) {
+  const anchor = firstFriday10OfYear(now);
   const diff = now.getTime() - anchor.getTime();
   return Math.floor(diff / (7 * 24 * 60 * 60 * 1000)); // 0,1,2,...
 }
 
 /* ===================== Fetch + Normalize ===================== */
-async function fetchThirdFrameItem() {
-  const res = await fetch("/api/content/home-third-frame", {
+async function fetchThirdFrameItems() {
+  // مرّر at= الآن (UTC ISO)
+  const at = nowIsoUtc();
+  const res = await fetch(`/api/content/home-third-frame?at=${encodeURIComponent(at)}`, {
     headers: { Accept: "application/json" },
+    cache: "no-store",
   });
+
   const text = await res.text();
-  let data = null; try { data = text ? JSON.parse(text) : null; } catch {}
+  let data = null;
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch {
+    /* ignore parse errors and show raw message below */
+  }
 
   if (!res.ok) {
     const serverMsg = data?.error || data?.message || text;
     throw new Error(serverMsg ? `${res.status}: ${serverMsg}` : `HTTP ${res.status}`);
   }
 
+  // دعم أشكال مختلفة للرد
   let list = [];
   if (Array.isArray(data)) list = data;
   else if (Array.isArray(data?.items)) list = data.items;
-  else if (Array.isArray(data?.rows)) list = data.rows;
   else if (Array.isArray(data?.data)) list = data.data;
+  else if (Array.isArray(data?.rows)) list = data.rows;
+  else if (data?.content) list = [data.content];
   else if (data && typeof data === "object") list = [data];
 
   if (!Array.isArray(list) || list.length === 0) {
     throw new Error("لا توجد عناصر لعرضها في الإطار الثالث.");
   }
 
+  // طبعنة العناصر لنفس مفاتيحك (title, bodyHtml, image_url)
   const normalized = list.map((it) => {
-    // Body
-    const bodyCandidate = it.body ?? it.text ?? it.content ?? it.description ?? it.summary ?? it;
-    const { text: bodyText, html: bodyHtml } = coerceBody(bodyCandidate);
-
-    // Image (جرّب مفاتيح كثيرة + استخرج من HTML أو من النص)
-    let rawImg = pickFirstString(
-      it.image_url, it.imageUrl, it.image,
-      it.cover_url, it.coverUrl, it.cover,
-      it.thumbnail, it.thumbnail_url, it.thumb, it.thumb_url,
-      it.photo, it.pic
+    const title = (it.title || it.name || "").trim();
+    const bodyHtml = coerceBodyToHtml(
+      it.body ?? it.content ?? it.description ?? it.summary ?? it.text ?? it
     );
-    if (!rawImg) rawImg = extractFirstImgSrc(bodyHtml);
-    if (!rawImg) rawImg = extractFirstUrl(bodyText);
+    // hero_url أولاً ثم بدائل أخرى
+    const rawImg = pickFirstString(it.hero_url, it.image_url, it.cover_url, it.thumbnail, it.photo);
+    const image_url = sanitizeImageUrl(rawImg) || null;
 
-    const imageUrl = sanitizeImageUrl(rawImg) || "/assets/placeholder.jpg";
-
-    return {
-      title: it.title ?? "—",
-      bodyText,
-      bodyHtml,
-      imageUrl,
-      updated_at: it.updated_at ?? it.updatedAt ?? null,
-    };
+    return { title, bodyHtml, image_url };
   });
 
-  // اختيار العنصر حسب منطق الخميس
-  const now = new Date();
-  const weekIdx = weeklyIndexAnchoredOnThursday(now);
-
-  const savedRaw = localStorage.getItem("thirdFrameIndex");
-  let saved = Number.isFinite(parseInt(savedRaw, 10)) ? parseInt(savedRaw, 10) : 0;
-  if (normalized.length > 0) saved = Math.max(0, Math.min(saved, normalized.length - 1));
-
-  const idx = (now.getDay() === 4)
-    ? ((weekIdx % normalized.length) + normalized.length) % normalized.length
-    : saved;
-
-  localStorage.setItem("thirdFrameIndex", String(idx));
-  return normalized[idx];
+  return normalized;
 }
 
 /* ===================== Component ===================== */
 export default function ThirdFrame() {
-  const [item, setItem] = useState(null);
-  const [err, setErr] = useState("");
+  const [item, setItem] = React.useState(null);
+  const [err, setErr] = React.useState("");
 
-  useEffect(() => {
-    fetchThirdFrameItem()
-      .then(setItem)
-      .catch((e) => setErr(`خطأ في الجلب: ${e.message}`));
+  React.useEffect(() => {
+    (async () => {
+      try {
+        const items = await fetchThirdFrameItems();
+
+        // اختيار العنصر وفق "الجمعة 10:00"
+        const weekIdx = weeklyIndexAnchoredOnFriday10(new Date());
+        const idx = ((weekIdx % items.length) + items.length) % items.length;
+
+        setItem(items[idx]);
+      } catch (e) {
+        setErr("تعذّر تحميل معلومات الإطار الثالث: " + e.message);
+      }
+    })();
   }, []);
 
-  if (err) return <p className="third-frame__error">{err}</p>;
+  if (err) return <p className="third-frame-error">{err}</p>;
   if (!item) return null;
 
   return (
-    <section className="third-frame" dir="rtl">
-      <div className="text-body">
-        <div className="text-col text-col--right">
-          <h2 className="text-title">تأمل هذا الأسبوع</h2>
+    <section className="third-frame" dir="rtl" aria-label="تأمل هذا الأسبوع">
+      {/* النص يمين */}
+      <div className="tf-col tf-col--right">
+        <h2 className="tf-title">تأمل هذا الأسبوع</h2>
+        {item.title && <h3 className="tf-subtitle">{item.title}</h3>}
 
-          {item.bodyHtml ? (
-            <div
-              className="text-paragraph"
-              dangerouslySetInnerHTML={{ __html: item.bodyHtml }}
+        {item.bodyHtml ? (
+          <div
+            className="tf-paragraph"
+            dangerouslySetInnerHTML={{ __html: item.bodyHtml }}
+          />
+        ) : null}
+      </div>
+
+      {/* الصورة شمال */}
+      <div className="tf-col tf-col--left">
+        <div className="image-4x5">
+          {item.image_url ? (
+            <img
+              src={item.image_url}
+              alt={item.title || "صورة التأمل"}
+              loading="lazy"
+              onError={(e) => {
+                e.currentTarget.src = "https://placehold.co/800x1000?text=No+Image";
+              }}
             />
           ) : (
-            <p className="text-paragraph">{item.bodyText}</p>
+            <div className="image-placeholder">لا توجد صورة</div>
           )}
         </div>
-
-        <div className="text-col text-col--left">
-  {item.imageUrl ? (
-    <img
-      className="text-image"
-      src={item.imageUrl}
-      alt={item.title}
-      onError={(e) => {
-        if (!e.currentTarget.src.endsWith("/assets/placeholder.jpg")) {
-          e.currentTarget.src = "/assets/placeholder.jpg";
-        }
-      }}
-    />
-  ) : (
-    <div className="text-image text-image--fallback" aria-hidden="true" />
-  )}
-</div>
-
       </div>
     </section>
   );
