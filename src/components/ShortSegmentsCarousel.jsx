@@ -23,7 +23,7 @@ function toYouTubeId(urlOrId = "") {
 function ytEmbed(id, { autoplay = true } = {}) {
   const base = `https://www.youtube-nocookie.com/embed/${id}`;
   const common = `playsinline=1&modestbranding=1&rel=0&iv_load_policy=3&fs=1`;
-  const auto = autoplay ? `&autoplay=1&mute=1` : ``; // iOS يحتاج mute مع autoplay
+   const auto = autoplay ? `&autoplay=1` : ``;
   return `${base}?${common}${auto}`;
 }
 
