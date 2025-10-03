@@ -78,7 +78,10 @@ async function fetchWithFallback(limit: number): Promise<ShortSeg[]> {
 }
 
 router.get("/api/content/short-segments", async (req: Request, res: Response) => {
-  const limit = Math.min(Math.max(parseInt(String(req.query.limit ?? "12"), 10) || 12, 1), 48);
+  const limit = Math.min(
+    Math.max(parseInt(String(req.query.limit ?? "48"), 10) || 48, 1),
+    48
+  );
   const allowEmpty = String(req.query.allowEmpty ?? "0") === "1"; // لو بدك تجربي رجوع فاضي صراحة
   const fresh = now() - memCache.updatedAt < memCache.ttlMs;
 

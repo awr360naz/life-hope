@@ -37,7 +37,7 @@ function toYouTubeId(urlOrId = "") {
 }
 
 function ytEmbed(id, { autoplay = true } = {}) {
-  const base = `https://www.youtube-nocookie.com/embed/${id}`;
+  const base = `https://www.youtube.com/embed/${id}`;
   const common = `playsinline=1&modestbranding=1&rel=0&iv_load_policy=3&fs=1`;
   const auto = autoplay ? `&autoplay=1` : ``; // موبايل: سيتم تمرير false
   return `${base}?${common}${auto}`;
@@ -52,6 +52,8 @@ export default function ShortSegmentsPage() {
   const [err, setErr] = useState("");
   const [player, setPlayer] = useState({ open: false, ytid: "" });
   const [page, setPage] = useState(1);
+  const shownLenRef = React.useRef(0);   // طول ما هو معروض حالياً — لمنع “التقلّص”
+
 
   useEffect(() => {
     let alive = true;
@@ -180,11 +182,10 @@ export default function ShortSegmentsPage() {
   );
 
   // السقف الكلي (بحد أقصى 48)
-  const totalCap = Math.min(normalized.length, MAX_PAGES * PAGE_SIZE);
-  const totalPages = Math.max(
-    1,
-    Math.min(MAX_PAGES, Math.ceil(totalCap / PAGE_SIZE) || 1)
-  );
+const totalCap = Math.min(normalized.length, MAX_PAGES * PAGE_SIZE);
+// ثابت 4 أزرار — والـno-shrink سيمنع تقلص المعروض للأقل
+const totalPages = MAX_PAGES;
+
 
   // تصحيح الصفحة لو خرجت عن النطاق
   useEffect(() => {
