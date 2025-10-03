@@ -7,6 +7,7 @@ import ProgramsCarousel from "../components/ProgramsCarousel";
 import ShortSegmentsCarousel from "../components/ShortSegmentsCarousel";
 import { Link } from "react-router-dom";
 import ThirdFrame from "./ThirdFrame"; 
+import OurPicks from "./OurPicks";
 
 
 
@@ -244,8 +245,11 @@ export default function HomePage() {
   step={1}
   apiUrl="/api/content/short-segments"
   toAllHref="/shorts"
-  limit={30}
+  limit={48}
 />
+  <OurPicks
+       
+      />
 
 
     </main>

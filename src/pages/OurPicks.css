@@ -1,0 +1,140 @@
+.our-picks { padding: 8px 0 20px; }
+.our-picks__inner { max-width: 1420px; margin-inline: auto; padding-inline: 10px; }
+.our-picks__heading { font-size: 20px; font-weight: 700; margin: 6px 0 12px; }
+
+/* شبكة: الشورت يسار على صفّين، يمين فيديو فوق وصورة تحت */
+/* جعل الشورت أضيق بشكل واضح (ريل) */
+.our-picks__grid {
+  --gap: 10px;
+  display: grid;
+  grid-template-columns: 0.8fr 1.6fr;  /* الشورت أضيق، يمين أعرض */
+  grid-template-areas:
+    "short video"
+    "short image";
+  gap: var(--gap);
+  align-items: stretch;
+}
+
+/* الكروت */
+.ourpicks-card {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  background: transparent;
+  border: none;
+}
+.ourpicks-card--short { grid-area: short; cursor: pointer; }
+.ourpicks-card--video { grid-area: video; }
+.ourpicks-card--image { grid-area: image; text-decoration: none; }
+
+/* ارتفاعات عبر aspect-ratio:
+   - الشورت ريل 9:16
+   - الفيديو 16:9 (أطول)
+   - الصورة 16:5 (أقصر من الفيديو بشكل ملحوظ) */
+.ourpicks-card--short .ourpicks-box { aspect-ratio: 9 / 16; }
+.ourpicks-card--video .ourpicks-box { aspect-ratio: 16 / 9; }
+.ourpicks-card--image .ourpicks-box { aspect-ratio: 16 / 5; }
+
+.ourpicks-box {
+  position: relative;
+  width: 100%;
+  height: auto;
+  background: #000;
+}
+
+.ourpicks-box > img,
+.ourpicks-box > iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  border: 0;
+  display: block;
+}
+
+/* حالة فاضية */
+.ourpicks-empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #eee;
+  background: #111;
+  font-weight: 600;
+}
+
+/* زر التشغيل للشورت */
+.ourpicks-play {
+  position: absolute;
+  bottom: 10px;
+  inset-inline-end: 10px;
+  background: rgba(0,0,0,.55);
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 10px;
+  font-weight: 700;
+  line-height: 1;
+  pointer-events: none;
+}
+
+/* تعطيل أي موشن */
+.ourpicks-card,
+.ourpicks-box,
+.ourpicks-box img,
+.ourpicks-play {
+  transition: none !important;
+  transform: none !important;
+}
+.ourpicks-card:hover *,
+.ourpicks-card:focus * {
+  transition: none !important;
+  transform: none !important;
+  opacity: 1 !important;
+}
+
+/* ===== مودال تشغيل الشورت ===== */
+.ourpicks-modal { position: fixed; inset: 0; z-index: 999; }
+.ourpicks-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.55); }
+.ourpicks-modal-content {
+  position: fixed;
+  top: 50%; left: 50%; transform: translate(-50%,-50%);
+  background: #000;
+  border-radius: 14px;
+  overflow: hidden;
+  width: min(860px, 72vw);
+  aspect-ratio: 16 / 9;
+  max-height: 80vh;
+}
+.ourpicks-close {
+  position: absolute;
+  inset-inline-end: 10px;
+  inset-block-start: 8px;
+  z-index: 2;
+  width: 34px; height: 34px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(255,255,255,.12);
+  color:#fff; cursor: pointer; font-size: 18px;
+}
+.ourpicks-iframe-wrap { position: relative; width: 100%; height: 100%; }
+.ourpicks-iframe-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+/* موبايل: عمود واحد، النسب طبيعية */
+@media (max-width: 992px) {
+  .our-picks__heading { font-size: 18px; }
+
+  .our-picks__grid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "short"
+      "video"
+      "image";
+  }
+
+  /* نخلي النسب واضحة بالموبايل */
+  .ourpicks-card--short .ourpicks-box { aspect-ratio: 9 / 16; }
+  .ourpicks-card--video .ourpicks-box { aspect-ratio: 16 / 9; }
+  .ourpicks-card--image .ourpicks-box { aspect-ratio: 16 / 9; } /* طبيعي */
+}

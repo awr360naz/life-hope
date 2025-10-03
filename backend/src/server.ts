@@ -11,8 +11,10 @@ import shortSegmentsRouter from "./routes/shortSegments.routes.js";
 import categoriesRouter from "./routes/categories.js";
 import path from "node:path";
 import { fileURLToPath } from "url";
+import ourPicksRouter from "./routes/ourPicks.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
 
 
 
@@ -85,6 +87,7 @@ app.get("/api/content/about", async (_req, res) => {
 app.use(articlesRouter);
 app.use(categoriesRouter);
 app.use(shortSegmentsRouter);
+app.use("/api/content/our-picks", ourPicksRouter);
 
 /**
  * Simple Search endpoint
