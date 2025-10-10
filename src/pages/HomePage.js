@@ -8,6 +8,7 @@ import ShortSegmentsCarousel from "../components/ShortSegmentsCarousel";
 import { Link } from "react-router-dom";
 import ThirdFrame from "./ThirdFrame"; 
 import OurPicks from "./OurPicks";
+import MiniScheduleWidget from "./MiniScheduleWidget";
 
 
 
@@ -158,19 +159,28 @@ export default function HomePage() {
   const items2 = items.length ? [...items, ...items] : [];
 
   return (
+    
     <main className="homepage-rtl">
+      
       <div className="frames-center">
+        
+        
         {/* ===== عنوان/تاريخ البث ===== */}
+        
         <div className="live-topline">
+          
            <span className="live-date">{todayStr}</span>
           <span className="live-title">البث المباشر</span>
          
         </div>
-
+         
         {/* ===== الإطار 1: البث ===== */}
         <section className="live-frame">
+          
           <div className="live-box">
+            
             <iframe
+            
               className="live-iframe"
               src={LIVE_SRC}
               scrolling="no"
@@ -182,7 +192,8 @@ export default function HomePage() {
         </section>
 
         {/* ===== الإطار 2: برنامج اليوم ===== */}
-        <section
+{/* ===== الإطار 2: برنامج اليوم ===== */}
+<section
   className="schedule-frame"
   onMouseEnter={() => setPaused(true)}
   onMouseLeave={() => setPaused(false)}
@@ -191,51 +202,22 @@ export default function HomePage() {
   onMouseDown={() => setPaused(true)}
   onMouseUp={() => setPaused(false)}
 >
-
-          <div className="frame-header center">
-            <span className="schedule-title">برنامج اليوم</span>
-          </div>
-
-          {err ? <div className="schedule-error">خطأ في الجلب: {err}</div> : null}
-
-          <div className="schedule-viewport">
-            {loading ? (
-              <ul className="schedule-list">
-                <li className="schedule-row">
-                  <time className="row-time">…</time>
-                  <span className="row-title">… جاري التحميل</span>
-                </li>
-              </ul>
-            ) : items.length === 0 ? (
-              <ul className="schedule-list">
-                <li className="schedule-row">
-                  <time className="row-time">—</time>
-                  <span className="row-title">لا يوجد فقرات مُسجّلة لليوم</span>
-                </li>
-              </ul>
-            ) : (
-              <ul
-                className={`schedule-list ${resetting ? "no-anim" : ""}`}
-                style={{ transform: `translateY(${-index * ROW_H}px)` }}
-                onTransitionEnd={handleTransitionEnd}
-              >
-                {items2.map((it, i) => (
-                  <li key={i} className="schedule-row">
-                    <time className="row-time">{it.time}</time>
-                    <span className="row-title">{it.title}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </section>
+  {/* مهم: لا تعمل “على الهواء” خارج المكوّن—المكوّن نفسه يعرِضها تحت الستة أسطر */}
+  <MiniScheduleWidget className="msw-wide" paused={paused} />
+</section>
 
         {/* ===== الإطار 3 ===== */}
         <section className="text-frame frame-3" dir="rtl">
           <ThirdFrame />
         </section>
       </div>
+      
+      
+
+
+
 <br></br>
+
    <ProgramsCarousel title="برامجنا" />
    <br></br><br></br>
  

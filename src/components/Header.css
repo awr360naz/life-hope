@@ -1,32 +1,32 @@
-/* الهيدر الأساسي */
-.header{
- 
+/* =========================
+   HEADER — Desktop (النسخة القديمة)
+   ========================= */
+.header {
   align-items: center;
   justify-content: space-between;
   flex-wrap: nowrap;
   padding: 8px 16px;
   min-height: 64px;
-  box-sizing:border-box;
-  position: sticky; top: 0;
+  box-sizing: border-box;
+  position: sticky;
+  top: 0;
   z-index: 1000;
   background: white;
   border-bottom: none;
-
+  overflow: visible; /* يسمح للأوف-كانفاس يبين فوق */
 }
 
-
-.header-inner{
+.header-inner {
   padding-inline-start: 10%;
   padding-inline-end: 15%;
   height: 64px;
   display: flex;
   align-items: center;
-  gap: .5rem;                 /* قربنا العناصر لبعض */
+  gap: 0.5rem;
   direction: rtl;
 }
 
-
-.hamburger{
+.hamburger {
   width: 23.5px;
   height: 17.5px;
   display: inline-flex;
@@ -34,225 +34,241 @@
   justify-content: space-between;
   background: none;
   border: 0;
-  padding: 0; 
+  padding: 0;
   cursor: pointer;
-  
 }
-.hamburger span{
+.hamburger span {
   display: block;
-  height: 2px; border-radius: 2px;
+  height: 2px;
+  border-radius: 2px;
   background: #000;
-  transition: transform .25s ease, opacity .2s ease;
+  transition: transform 0.25s ease, opacity 0.2s ease;
 }
-.hamburger.is-open span:nth-child(1){ transform: translateY(9px) rotate(45deg); }
-.hamburger.is-open span:nth-child(2){ opacity: 0; }
-.hamburger.is-open span:nth-child(3){ transform: translateY(-9px) rotate(-45deg); }
+.hamburger.is-open span:nth-child(1) { transform: translateY(9px) rotate(45deg); }
+.hamburger.is-open span:nth-child(2) { opacity: 0; }
+.hamburger.is-open span:nth-child(3) { transform: translateY(-9px) rotate(-45deg); }
 
-
-.logo{
+.logo {
   display: inline-flex;
   align-items: center;
   text-decoration: none;
-    flex-shrink: 0;        /* ممنوع يتصغّر أكتر من حجمه */
-  max-width: 180px;      /* بتحط حد أقصى عشان يضل مناسب */
+  flex-shrink: 0;
+  max-width: 180px;
   height: auto;
 }
-.logo-mark{
+.logo-mark {
   font-family: "AraHamah1964", sans-serif;
   font-weight: 700;
-  font-size: 3rem;          
+  font-size: 3rem;
   line-height: 1;
   color: #000;
 }
 
-
-.main-nav{
+.main-nav {
   display: inline-flex;
   align-items: center;
-  gap: 3.5rem;                  /* قربنا الروابط */
-  margin-inline-start: 5rem; /* مسافة خفيفة بعد الشعار */
+  gap: 3.5rem;
+  margin-inline-start: 5rem;
 }
-.nav-link{
+.nav-link {
   text-decoration: none;
   font-family: "Cairo", sans-serif;
   font-weight: 600;
   font-size: 1.5rem;
   color: #797979;
 }
-.nav-link:hover{ color: #000; }
+.nav-link:hover { color: #000; }
 
-
-.live-btn{
-  display: inline-flex; 
+.live-btn {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-inline-start: 3.5rem; /* قريب من الروابط */
+  margin-inline-start: 3.5rem;
 }
-.live-btn img{
-  height: 28px;               /* صغرناه */
+.live-btn img {
+  height: 28px;
   display: block;
 }
 
 /* يدفش البحث للطرف الشمالي */
-.spacer{ flex: 1 1 auto; }
+.spacer { flex: 1 1 auto; }
 
 /* البحث */
-.search{
+.search {
   display: inline-flex;
   align-items: center;
   width: 236px;
   height: 35px;
-  gap: .5rem;
-  background: rgba(120,120,128,0.16);   /* Fills/Secondary */
+  gap: 0.5rem;
+  background: rgba(120, 120, 128, 0.16);
   border-radius: 100px;
-  padding: 0 .9rem;
+  padding: 0 0.9rem;
   cursor: text;
 }
-
-.search-icon{
-  font-size: 18px;
-  color: #666;           /* لون أيقونة البحث */
-}
-
-.search-text{
-  font-family: "Cairo", sans-serif;
-  font-size: 16px;
-  color: #999;           /* لون نص Search */
-}
-
-.search-input{
+.search-icon { font-size: 18px; color: #666; }
+.search-text { font-family: "Cairo", sans-serif; font-size: 16px; color: #999; }
+.search-input {
   border: none;
   background: transparent;
   outline: none;
   font-size: 16px;
   color: #000;
 }
-.search-input::placeholder{
-  color: #999;
-}
+.search-input::placeholder { color: #999; }
 
-/* ——— موبايل ——— */
-@media (max-width: 992px){
-  .header-inner{ height: 58px; padding-inline: 10%; }
-  .main-nav, .live-btn{ display: none; } /* بالموبايل منخليهم بالمنيو */
-  .logo-mark{ font-size: 1.7rem; }       /* توازن على الشاشات الصغيرة */
-  .search input{ width: 180px; height: 32px; }
+/* ===== الأوف-كانفاس (المنيو) ===== */
+.drawer {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  z-index: 2000; /* فوق الهيدر */
+  direction: rtl; /* ترتيب عربي داخل المنيو */
 }
+.drawer--open { opacity: 1; pointer-events: auto; }
 
-/* أوف-كانفاس */
-.drawer{
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,.35);
-  opacity: 0; pointer-events: none;
-  transition: opacity .25s ease;
-}
-.drawer--open{ opacity: 1; pointer-events: auto; }
-
-.drawer-panel{
-  position: absolute; top: 0; right: 0; /* RTL: من اليمين */
-  width: min(80vw, 320px); height: 100%;
+.drawer-panel {
+  position: absolute;
+  top: 0;
+  right: 0; /* RTL */
+  width: min(80vw, 320px);
+  height: 100%;
   background: #fff;
-  box-shadow: -2px 0 12px rgba(0,0,0,.08);
+  box-shadow: -2px 0 12px rgba(0, 0, 0, 0.08);
   padding: 1rem 1.25rem;
-  display: flex; flex-direction: column; gap: .75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
   transform: translateX(100%);
-  transition: transform .25s ease;
+  transition: transform 0.25s ease;
+  z-index: 2100;
+  overflow-y: auto;
 }
-.drawer--open .drawer-panel{ transform: translateX(0); }
+.drawer--open .drawer-panel { transform: translateX(0); }
 
-.drawer-link{
+.drawer-link {
   text-decoration: none;
   font-family: "Cairo", sans-serif;
   font-weight: 600;
   font-size: 1.05rem;
   color: #222;
-  padding: .5rem .25rem;
+  padding: 0.5rem 0.25rem;
   border-radius: 8px;
 }
-.drawer-link:hover{ background: rgba(0,0,0,.04); }
+.drawer-link:hover { background: rgba(0, 0, 0, 0.04); }
 
-.drawer-live{
-  margin-top: .5rem;
+.drawer-live {
+  margin-top: 0.5rem;
   display: inline-block;
-  padding: .6rem .9rem;
+  padding: 0.6rem 0.9rem;
   border-radius: 999px;
-  border: 1px solid rgba(0,0,0,.1);
-  text-decoration: none;
-  font-weight: 700;
-  text-align: center;
-  color: #c0162e;
-}
-.drawer-live{
-  margin-top: .5rem;
-  display: inline-block;
-  padding: .6rem .9rem;
-  border-radius: 999px;
-  border: 1px solid rgba(0,0,0,.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   text-decoration: none;
   font-weight: 700;
   text-align: center;
   color: #c0162e;
 }
 
-
-/* 2) مهم جداً: اعطِ عرض للخطوط */
-.hamburger span{
+/* إعادة تأكيد خطوط الهامبرغر */
+.hamburger span {
   display: block;
-  width: 100%;              /* ← كان ناقص */
+  width: 100%;
   height: 2px;
   border-radius: 2px;
   background: #000;
-  transition: transform .25s ease, opacity .2s ease;
+  transition: transform 0.25s ease, opacity 0.2s ease;
 }
 
-/* 3) بالموبايل: أظهر الزر وقلّل تزاحم الهيدر */
-/* تأكيد ستايل الديسكتوب (بدون تغيير) */
-@media (max-width: 992px){
-  .main-nav, .live-btn, .spacer { display: none !important; }
-
-  .header-inner{
-    direction: ltr;                 /* مهم جداً */
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;    /* نرتّب من اليسار لليمين الآن */
-    height: 58px;
-    padding-inline: 6%;
-    gap: .5rem;
+/* =========================
+   Mobile — New (≤ 992px)
+   ========================= */
+@media (max-width: 992px) {
+  .main-nav,
+  .live-btn {
+    display: none !important; /* نخفيهم بالموبايل */
   }
 
-  /* البحث أقصى الشمال (يسار) */
-  .search{
+  .header-inner {
+    direction: ltr;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 58px;
+    padding-inline: 4%; /* كان 6% */
+    gap: .35rem;        /* كان .5rem */
+  }
+
+  /* البحث أقصى الشمال فعليًا */
+  .search {
     order: 1;
-    margin-right: auto;             /* ⬅️ يدفع كل شيء لليمين */
+    margin-left: 0;
+    margin-right: auto;      /* يطرد باقي العناصر لليمين */
     display: inline-flex;
     align-items: center;
-    gap: .4rem;
-    width: 110px; height: 30px;
-    padding: 0 .5rem;
-    background: rgba(120,120,128,0.16);
+    gap: 0.4rem;
+    width: 120px;            /* أوسع شوي للمرونة */
+    height: 30px;
+    padding: 0 0.5rem;
+    background: rgba(120, 120, 128, 0.16);
     border-radius: 100px;
     overflow: hidden;
   }
-  .search-icon{ font-size: 14px; flex-shrink: 0; }
-  .search-input{ font-size: 13px; width: 100%; }
+  .search-icon { font-size: 14px; flex-shrink: 0; }
+  .search-input { font-size: 13px; width: 100%; }
 
-  /* يمين الشاشة: الهامبرغر ثم اللوجو ملاصقين */
-  .hamburger{
-    order: 3;                       /* آخر واحد، في الطرف اليمين */
+  /* اللوجو والهامبرغر عاليمين */
+  .logo {
+    order: 2;
+    max-width: 128px;  /* كان 140px */
+    flex-shrink: 0;
+  }
+  .logo-mark {
+    font-size: 1.6rem; /* كان 1.7rem */
+    line-height: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .hamburger {
+    order: 3;
     display: inline-flex !important;
-    width: 28px; height: 20px;
-    margin-left: .3rem;             /* مسافة صغيرة قبل اللوجو */
+    width: 24px;       /* كان 28px */
+    height: 18px;
+    margin-left: .25rem;
   }
-  .hamburger span{ width:100%; height:2px; background:#000; }
+  .hamburger span { width: 100%; height: 2px; background: #000; }
 
-  .logo{
-    order: 2;                       /* يجي قبل الهامبرغر مباشرة */
-    max-width: 140px; flex-shrink: 0;
-  }
-  .logo-mark{ font-size: 1.7rem; line-height: 1; }
+  /* ما بدنا أي روابط تبين */
+  .spacer { display: none !important; }
+}
 
-  /* شاشات أصغر جداً: اخفِ البحث */
-  @media (max-width: 380px){
-    .search{ display: none !important; }
-  }
+/* ——— شاشات أصغر جدًا (≤ 390px) ——— */
+@media (max-width: 390px) {
+  .header-inner { padding-inline: 3.5%; gap: .3rem; }
+  .search { width: 104px; }
+  .search-input { font-size: 12.5px; }
+  .logo { max-width: 116px; }
+  .logo-mark { font-size: 1.5rem; }
+  .hamburger { width: 22px; height: 16px; }
+}
+
+/* ——— صغيرة جدًا جدًا (≤ 360px) ——— */
+@media (max-width: 360px) {
+  .header-inner { padding-inline: 3%; gap: .25rem; }
+  .search { width: 96px; }
+  .search-icon { font-size: 13px; }
+  .search-input { font-size: 12px; }
+  .logo { max-width: 108px; }
+  .logo-mark { font-size: 1.4rem; }
+}
+
+/* ——— أضيق حالات (≤ 340px) ——— */
+@media (max-width: 340px) {
+  .search { width: 88px; }
+  .search-input::placeholder { opacity: .6; }
+  .logo { max-width: 100px; }
+  .logo-mark { font-size: 1.35rem; }
 }

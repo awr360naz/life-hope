@@ -1,0 +1,43 @@
+/* ShortsegPlayerModal.css */
+.shortseg-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+}
+.shortseg-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+}
+.shortseg-modal-content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(92vw, 920px);
+  aspect-ratio: 16/9;
+  background: #000;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.shortseg-close{
+  position: absolute;
+  top: 8px; inset-inline-end: 8px;
+  z-index: 2;
+  background: rgba(0,0,0,.6);
+  color: #fff; border: 0; border-radius: 999px;
+  width: 32px; height: 32px; cursor: pointer;
+}
+.shortseg-player-frame{
+  position: absolute; inset: 0;
+}
+.shortseg-fallback-thumb{
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: #000;
+  text-decoration: none;
+  color: #fff;
+}
+.shortseg-fallback-thumb img{
+  max-width: 100%; max-height: 100%; object-fit: contain;
+}

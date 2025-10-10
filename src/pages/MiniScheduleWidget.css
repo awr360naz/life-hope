@@ -1,0 +1,152 @@
+.mini-schedule{
+  height: 100%;
+  display: grid;
+  /* نخلي المحتوى يلزق فوق */
+  grid-template-rows: auto 1fr auto;
+  gap: 4px;
+  box-sizing: border-box;
+  padding: 0;
+  align-content: start;
+}
+
+/* العنوان */
+.mini-schedule .schedule-title{
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: underline;
+  line-height: 1.2;
+  margin: 0;
+  padding: 0 2px;
+}
+
+/* الـ viewport ارتفاعه يُحقن Inline ليطابق عدد الأسطر */
+.mini-schedule .schedule-viewport{
+  overflow: hidden;
+}
+
+.mini-schedule .schedule-list{
+  list-style: none;
+  margin: 0;
+  padding: 4px 8px;           /* أقرب للعنوان */
+  font-weight: 600;
+  font-size: 11px;
+  line-height: 24px;          /* = ROW_H */
+  transition: transform 300ms cubic-bezier(.22,.61,.36,1);
+  will-change: transform;
+}
+.mini-schedule .schedule-list.no-anim{ transition: none; }
+
+/* 🔁 قلبنا ترتيب العناصر داخل الصف: العنوان ثم الوقت */
+.mini-schedule .schedule-row{
+  display: grid;
+  grid-template-columns: 1fr auto;  /* العنوان يتمدّد، الوقت ضيّق */
+  gap: 8px;
+  white-space: nowrap;
+  align-items: center;
+}
+
+.mini-schedule .row-title{
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mini-schedule .row-time{
+  flex: 0 0 auto;
+  width: max-content;
+  opacity: 0.85;
+}
+
+/* على الهواء */
+.onair-box{
+  padding: 6px 8px;
+  border: 1px dashed #e0e0e0;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* بنخلّي الافتراضي سطرين فوق بعض بالديسكتوب */
+.onair-lines{
+  display: grid;
+  gap: 4px;
+}
+.onair-line{
+  display: flex;
+  align-items: center;
+  min-height: 22px;
+}
+.onair-text{
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* التالي */
+.next-line{
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+}
+.next-line .next-label{
+  font-weight: 700;
+}
+
+/* كبسولة لايف */
+.live-pill{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,0,0,0.08);
+  color: #d80000;
+  border: 1px solid rgba(216,0,0,0.35);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 1;
+  margin-inline-end: 8px;
+}
+
+/* نقطة نابضة */
+.live-pill .dot{
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff1a1a;
+  box-shadow: 0 0 0 0 rgba(255, 26, 26, 0.7);
+  animation: pulse 1200ms ease-out infinite;
+}
+@keyframes pulse{
+  0%   { box-shadow: 0 0 0 0 rgba(255,26,26,0.7); }
+  70%  { box-shadow: 0 0 0 8px rgba(255,26,26,0); }
+  100% { box-shadow: 0 0 0 0 rgba(255,26,26,0); }
+}
+
+/* 📱 على الموبايل: خلّي "الآن" و"التالي" حد بعض */
+@media (max-width: 768px){
+  .onair-lines{
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: nowrap;
+    overflow: hidden;
+  }
+  .onair-line,
+  .next-line{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 50%;
+    min-width: 0;          /* للسماح بالـellipsis */
+  }
+  .onair-text,
+  .next-text{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+/* احترام تقليل الحركة */
+@media (prefers-reduced-motion: reduce){
+  .mini-schedule .schedule-list{ transition-duration: 0ms; }
+  .live-pill .dot{ animation: none; }
+}

@@ -1,139 +1,126 @@
 // src/pages/youtube.js
+// Utilities للتعامل مع روابط يوتيوب + بناء embed URLs آمنة لكروم
 
-// يحوّل &amp; إلى & ويقصّ الفراغات
-function htmlUnescape(s = "") {
-  return String(s).replace(/&amp;/g, "&").trim();
+/* ========== Helpers أساسيّة ========== */
+export function htmlUnescape(s = "") {
+  return String(s)
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .trim();
 }
 
-// يحاول يفكّ ترميز URL مرتين لو لزم
-function safeDecode(s = "") {
-  try { s = decodeURIComponent(s); } catch {}
-  try { s = decodeURIComponent(s); } catch {}
-  return s;
-}
-
-// يلقط أوّل https://... من نصّ (للإنقاذ بحالات غريبة)
 function firstHttpUrlFromText(s = "") {
   const m = String(s).match(/https?:\/\/[^\s"'<>()]+/i);
   return m ? m[0] : "";
 }
 
-// ينظّف روابط Redirect (Google, Facebook, إلخ) ويُعيد الهدف الأصلي
+function safeDecode(s = "") {
+  // أحياناً اللينك بيكون double-encoded
+  try { s = decodeURIComponent(s); } catch {}
+  try { s = decodeURIComponent(s); } catch {}
+  return s;
+}
+
+/**
+ * ينظّف روابط محوّلة (redirect) مثل:
+ * google.com/url?…&q=https://youtu.be/… أو نص فيه رابط داخل HTML
+ */
 export function cleanYouTubeUrl(raw = "") {
   if (!raw) return "";
   let input = htmlUnescape(raw);
-
-  // لو النص نفسه يحتوي URL مضمّن، نطلّعه
   const embedded = firstHttpUrlFromText(input);
   if (embedded) input = embedded;
 
-  // حاول نحلّل كـ URL
+  input = safeDecode(input);
+
+  // التقاط q= أو continue= من روابط تحويل جوجل
   try {
     const u = new URL(input);
+    const q = u.searchParams.get("q") || u.searchParams.get("continue");
+    if (q && /^https?:\/\//i.test(q)) return q;
+  } catch {}
 
-    // لو هو google redirect بأنواعه
-    const isGoogle = /\.google\./.test(u.hostname);
-    const isRedirectPath = /^\/(url|imgres|u|aclk)/.test(u.pathname);
-
-    if (isGoogle && isRedirectPath) {
-      // أولويّة لاستخراج الهدف
-      const candKeys = ["q", "url", "imgrefurl"];
-      for (const k of candKeys) {
-        const v = u.searchParams.get(k);
-        if (v) {
-          const decoded = safeDecode(v);
-          const out = firstHttpUrlFromText(decoded) || decoded;
-          if (/^https?:\/\//i.test(out)) return out.trim();
-        }
-      }
-      // أحيانًا بتيجي القيم ضمن باراميترات أخرى
-      const any = safeDecode(u.search.replace(/^\?/, ""));
-      const fallback = firstHttpUrlFromText(any);
-      if (fallback) return fallback.trim();
-      return input.trim();
-    }
-
-    // حالات google/search?q=<رابط-حرفيًا>
-    if (isGoogle && u.pathname.startsWith("/search")) {
-      const q = u.searchParams.get("q");
-      if (q) {
-        const decoded = safeDecode(q);
-        if (/^https?:\/\//i.test(decoded)) return decoded.trim();
-      }
-    }
-
-    // Facebook/Instagram redirect (احتياط)
-    if (/^l\.(facebook|instagram)\.com$/i.test(u.hostname)) {
-      const cand = u.searchParams.get("u") || u.searchParams.get("url");
-      if (cand) return safeDecode(cand).trim();
-    }
-
-    // إن لم يكن Redirect معروف: نظّف باراميترات التتبّع فقط
-    const trackParams = [
-      "utm_source","utm_medium","utm_campaign","utm_term","utm_content",
-      "fbclid","gclid","mc_cid","mc_eid","igsh","si","ved","usg","sca_esv"
-    ];
-    trackParams.forEach((p) => u.searchParams.delete(p));
-    return u.toString().trim();
-  } catch {
-    // لو ما قدر يبارس، رجّع أول URL إن وُجد
-    const rescue = firstHttpUrlFromText(input);
-    return (rescue || input).trim();
-  }
+  return input;
 }
 
-// يحاول استخراج ID من كل الأنماط الشائعة
-// يحاول استخراج ID من كل الأنماط الشائعة (مع دعم /embed/ و nocookie)
-export function toYouTubeId(input0 = "") {
-  if (!input0) return "";
+/* ========== استخراج الـ ID ========== */
+/**
+ * يحاول استخراج YouTube Video ID من:
+ * - watch?v=…
+ * - youtu.be/…
+ * - shorts/…
+ * - أو إن كان النص أصلاً ID صالح
+ */
+export function toYouTubeId(urlOrId = "") {
+  if (!urlOrId) return "";
+  const raw = cleanYouTubeUrl(urlOrId).trim();
 
-  const direct = String(input0).trim();
-  if (/^[a-zA-Z0-9_-]{10,15}$/.test(direct)) return direct;
+  // إذا كان فعلاً ID
+  if (/^[a-zA-Z0-9_-]{10,15}$/.test(raw)) return raw;
 
-  const input = cleanYouTubeUrl(direct);
-
-  // 1) Regex سريع – أضفنا /embed/
-  const quick = input.match(
-    /[?&]v=([^&#]+)|youtu\.be\/([^?#/]+)|shorts\/([^?#/]+)|\/vi\/([^/]+)\/|\/embed\/([^/?#]+)/i
-  );
-  if (quick) return quick[1] || quick[2] || quick[3] || quick[4] || quick[5] || "";
-
-  // 2) URL parsing
+  // حاول كـ URL
   try {
-    const u = new URL(input);
-    const host = u.hostname || "";
-    const p = u.pathname || "";
+    const u = new URL(raw);
 
-    // دعم youtube-nocookie.com أيضًا
-    if (host.includes("youtu.be")) return p.split("/")[1] || "";
+    // youtu.be/<id>
+    if (u.hostname.includes("youtu.be")) {
+      const id = u.pathname.split("/")[1] || "";
+      if (id) return id;
+    }
 
-    if (p.startsWith("/shorts/")) return p.split("/")[2] || p.split("/")[1] || "";
+    // /shorts/<id>
+    if (u.pathname.startsWith("/shorts/")) {
+      const id = u.pathname.split("/")[2] || "";
+      if (id) return id;
+    }
 
-    if (p.startsWith("/embed/")) return p.split("/")[2] || ""; // ← جديد
-
+    // watch?v=<id>
     const v = u.searchParams.get("v");
     if (v) return v;
 
-    const m2 = p.match(/\/vi\/([^/]+)\//);
-    if (m2?.[1]) return m2[1];
-
-    return "";
+    // محاولة أخيرة من المسار
+    const m2 = u.pathname.match(/\/embed\/([^/?#]+)/);
+    if (m2 && m2[1]) return m2[1];
   } catch {
-    return "";
+    // لو مش URL صالح، جرّب RegExp مباشرة
+    const m = raw.match(/[?&]v=([^&#]+)|youtu\.be\/([^?#/]+)|shorts\/([^?#/]+)/);
+    if (m) return m[1] || m[2] || m[3] || "";
   }
+
+  return "";
 }
 
+/* ========== بناء رابط Embed آمن لكروم ========== */
+/**
+ * مبدئيًا نستخدم youtube.com بدل youtube-nocookie.com
+ * لتفادي ERR_TOO_MANY_REDIRECTS على Chrome.
+ */
+export function buildEmbedUrlSafe(id, opts = {}) {
+  const {
+    autoplay = 0,        // 0 أو 1
+    modest = 1,          // 1 لتخفيف الب branding
+    playsinline = 1,     // 1 لتشغيل داخل الصفحة على الموبايل
+    iv_load_policy = 3,  // إخفاء annotations قدر الإمكان
+    rel = 0,             // 0 منع اقتراحات قنوات خارجية قدر الإمكان
+  } = opts;
 
-// يبني رابط embed نظيف (nocookie + params آمنة)
-export function buildEmbedUrl(id) {
   if (!id) return "";
-  const base = `https://www.youtube-nocookie.com/embed/${id}`;
+
+  const base = "https://www.youtube.com/embed/";
   const params = new URLSearchParams({
-    rel: "0",
-    modestbranding: "1",
-    playsinline: "1",
-    iv_load_policy: "3",
-    fs: "1",
+    rel: String(rel),
+    modestbranding: String(modest),
+    playsinline: String(playsinline),
+    iv_load_policy: String(iv_load_policy),
   });
-  return `${base}?${params.toString()}`;
+
+  if (autoplay) params.set("autoplay", "1");
+
+  return `${base}${id}?${params.toString()}`;
 }
+
+/* توافق خلفي: أي استيراد قديم لـ buildEmbedUrl سيعمل تلقائيًا */
+export const buildEmbedUrl = buildEmbedUrlSafe;

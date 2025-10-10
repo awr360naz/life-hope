@@ -36,10 +36,46 @@ function toYouTubeId(urlOrId = "") {
   }
 }
 
-function ytEmbed(id, { autoplay = true } = {}) {
+function ytEmbed(idOrUrl, { autoplay = true } = {}) {
+  if (!idOrUrl) return "";
+
+  // تنظيف مبدئي: إزالة مسافات/رموز مشاركة جديدة
+  idOrUrl = String(idOrUrl).trim()
+    .replace(/^<|>$/g, "")       // أحيانًا تيجي بين <>
+    .replace(/&si=[^&]+/g, "")   // بارامتر share الجديد من يوتيوب
+    .replace(/&pp=[^&]+/g, "")   // بارامتر share الجديد
+    .replace(/[?&]feature=share/g, "");
+
+  // استخراج الـID من أي شكل رابط
+  let id = "";
+  if (/^[a-zA-Z0-9_-]{10,15}$/.test(idOrUrl)) {
+    id = idOrUrl;
+  } else {
+    try {
+      const u = new URL(idOrUrl);
+      if (u.hostname.includes("youtu.be")) {
+        id = (u.pathname.split("/")[1] || "").trim();
+      } else if (u.pathname.startsWith("/shorts/")) {
+        id = (u.pathname.split("/")[2] || "").trim();
+      } else {
+        id = (u.searchParams.get("v") || "").trim();
+      }
+    } catch {
+      const m = idOrUrl.match(/[?&]v=([^&#]+)|youtu\.be\/([^?#/]+)|shorts\/([^?#/]+)/);
+      id = m ? (m[1] || m[2] || m[3]) : "";
+    }
+  }
+
+  if (!id) return "";
+
   const base = `https://www.youtube.com/embed/${id}`;
-  const common = `playsinline=1&modestbranding=1&rel=0&iv_load_policy=3&fs=1`;
-  const auto = autoplay ? `&autoplay=1` : ``; // موبايل: سيتم تمرير false
+  const origin = (() => {
+    try { return encodeURIComponent(window.location.origin); } catch { return ""; }
+  })();
+
+  const common = `playsinline=1&modestbranding=1&rel=0&iv_load_policy=3&fs=1${origin ? `&origin=${origin}` : ""}`;
+  const auto = autoplay ? `&autoplay=1` : ``;
+
   return `${base}?${common}${auto}`;
 }
 

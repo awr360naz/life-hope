@@ -13,10 +13,7 @@ export default function Header() {
     e.preventDefault();
     const q = query.trim();
     if (!q) return;
-    // روح على صفحة النتائج
     navigate(`/search?q=${encodeURIComponent(q)}`);
-    // (اختياري) فضّي الحقل بعد الانتقال
-    // setQuery("");
   };
 
   return (
@@ -51,7 +48,7 @@ export default function Header() {
           <img src={LiveButtonImg} alt="البث المباشر" />
         </Link>
 
-        {/* يدفع البحث للطرف الشمالي */}
+        {/* مسافة مرنة تدفع اليسار/الشمال */}
         <div className="spacer" />
 
         {/* البحث */}
@@ -65,36 +62,34 @@ export default function Header() {
             onChange={(e) => setQuery(e.target.value)}
             aria-label="ابحث في الموقع"
           />
-         <button
-  type="submit"
-  style={{
-    border: "none",
-    background: "transparent",
-    cursor: "pointer",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 0
-  }}
-  aria-label="ابحث"
->
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="20"
-    height="20"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="black"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <circle cx="11" cy="11" r="8" />
-    <line x1="21" y1="21" x2="16.65" y2="16.65" />
-  </svg>
-</button>
-
-
+          <button
+            type="submit"
+            style={{
+              border: "none",
+              background: "transparent",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: 0
+            }}
+            aria-label="ابحث"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="black"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+          </button>
         </form>
       </div>
 

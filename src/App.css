@@ -56,3 +56,10 @@ html, body, #root {
   }
 }
 
+html, body {
+  scroll-padding-top: 0 !important;  /* لو كنت مستخدمها لتعويض الهيدر */
+}
+
+:target {
+  scroll-margin-top: 0 !important;   /* يمنع نزلة تلقائية لرؤوس الأقسام */
+}

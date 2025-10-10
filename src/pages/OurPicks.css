@@ -155,8 +155,8 @@
   }
 
   /* نسب العرض والارتفاع تبقى واضحة مثل الديسكتوب */
-  .ourpicks-card--short .ourpicks-box { aspect-ratio: 9 / 16; }
-  .ourpicks-card--video .ourpicks-box { aspect-ratio: 16 / 9; }
+  .ourpicks-card--short .ourpicks-box { aspect-ratio: 9 / 14; }
+  .ourpicks-card--video .ourpicks-box { aspect-ratio: 16 / 13; }
   .ourpicks-card--image .ourpicks-box { aspect-ratio: 16 / 5; }
 
   /* تأكد من تعبئة الإطارات كامل المساحة */
@@ -185,4 +185,60 @@
 /* اختياري: في وضع العرض (Landscape) خفّف الفجوات قليلاً */
 @media (max-width: 992px) and (orientation: landscape) {
   .our-picks__grid { --gap: 6px; }
+}
+/* الإطار نفسه – نفس ستايل الفيديو */
+.ourpicks-iframe-wrap{
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;     /* للفيديو العادي */
+  border-radius: 12px;      /* نفس رادياس الكرت */
+  overflow: hidden;         /* مهم لقص الصورة */
+  background: #000;         /* يمنع ظهور فراغات */
+}
+
+/* الشورت نخليه 9:16 */
+.ourpicks-card--short .ourpicks-iframe-wrap{
+  aspect-ratio: 9 / 16;
+}
+
+/* خلّي الزر والصورة والـiframe يملوا الإطار 1:1 */
+.ourpicks-thumbbtn,
+.ourpicks-iframe-wrap iframe{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+/* الصورة تغطي بدون تمدّد غريب */
+.ourpicks-thumbbtn img{
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;        /* السر هنا */
+}
+
+/* لو بدك التخريم يختفي تمامًا، خبّي أيقونة التشغيل */
+.ourpicks-play{ display: none; }
+
+/* تأكد إن iframe بدون إطار */
+.ourpicks-iframe-wrap iframe{ border: 0; }
+.ourpicks-iframe-wrap{ position:relative; width:100%; aspect-ratio:16/9; border-radius:12px; overflow:hidden; background:#000; }
+.ourpicks-card--short .ourpicks-iframe-wrap{ aspect-ratio:9/16; }
+.ourpicks-iframe-wrap iframe{ position:absolute; inset:0; width:100%; height:100%; border:0; display:block; }
+
+.ourpicks-thumbbtn{ position:absolute; inset:0; width:100%; height:100%; border:0; padding:0; background:transparent; cursor:pointer; }
+.ourpicks-thumbbtn img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+.ourpicks-help{ position:absolute; bottom:8px; inset-inline:8px; display:flex; justify-content:flex-end; }
+.ourpicks-help-btn{ background:rgba(0,0,0,.6); color:#fff; border:0; border-radius:8px; padding:8px 10px; cursor:pointer; }
+
+.ourpicks-fallback-actions{ position:absolute; bottom:8px; right:8px; display:flex; gap:8px; }
+.ourpicks-retry, .ourpicks-open{
+  background:rgba(0,0,0,.6); color:#fff; text-decoration:none; border:0; border-radius:8px; padding:8px 10px; cursor:pointer;
 }

@@ -1,7 +1,8 @@
+// src/components/ShortSegmentsCarousel.jsx
 import React, { useEffect, useRef, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import "./ShortSegmentsCarousel.css";
-import ResilientThumb from "./ResilientThumb"; // ← عدّل المسار إذا لزم
+import ResilientThumb from "./ResilientThumb";
 
 // === نفس الـ helpers تبع صفحة الشورتس ===============================
 function toYouTubeId(urlOrId = "") {
@@ -23,7 +24,7 @@ function toYouTubeId(urlOrId = "") {
 function ytEmbed(id, { autoplay = true } = {}) {
   const base = `https://www.youtube-nocookie.com/embed/${id}`;
   const common = `playsinline=1&modestbranding=1&rel=0&iv_load_policy=3&fs=1`;
-   const auto = autoplay ? `&autoplay=1` : ``;
+  const auto = autoplay ? `&autoplay=1` : ``;
   return `${base}?${common}${auto}`;
 }
 
@@ -197,7 +198,10 @@ export default function ShortSegmentsCarousel({
       {/* ===== مودال مطابق لصفحة الشورتس ===== */}
       {player.open && (
         <div className="shortseg-modal" role="dialog" aria-modal="true">
-          <div className="shortseg-backdrop" onClick={() => setPlayer({ open: false, ytid: "", title: "" })} />
+          <div
+            className="shortseg-backdrop"
+            onClick={() => setPlayer({ open: false, ytid: "", title: "" })}
+          />
           <div className="shortseg-modal-content">
             <button
               className="shortseg-close"

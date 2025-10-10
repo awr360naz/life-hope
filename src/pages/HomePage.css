@@ -120,11 +120,12 @@ html, body { height: 100%; }
 /* =========================
    7) الإطار 2: برنامج اليوم
    ========================= */
-.schedule-frame{
+.schedule-frame {
   position: absolute;
-  top: 0; left: 613px;    /* 511×1.2 ≈ 613 */
-  width: 187px;           /* 156×1.2 ≈ 187 */
-  height: 330px;          /* 275×1.2 */
+  top: 0;
+  left: 613px; /* 511×1.2 ≈ 613 */
+  width: 187px; /* 156×1.2 ≈ 187 */
+  height: 330px; /* 275×1.2 */
   border: 1px solid #000;
   border-radius: 6px;
   background: transparent;
@@ -132,35 +133,57 @@ html, body { height: 100%; }
   flex-direction: column;
   box-sizing: border-box;
 }
-.schedule-title{
+
+.schedule-title {
   font-weight: 700;
   font-size: 14px;
   color: #000;
   text-decoration: underline;
 }
-.schedule-viewport{
+
+.schedule-viewport {
   flex: 1;
-  overflow: hidden;       /* يُلغى بالموبايل ليصير عمودي */
+  overflow: hidden; /* يُلغى بالموبايل ليصير عمودي */
   color: #000;
 }
-.schedule-list{
+
+.schedule-list {
   list-style: none;
   margin: 0;
   padding: 7px 10px;
   font-weight: 600;
   font-size: 11px;
-  line-height: 24px;      /* يساوي ROW_H بالـ JS */
+  line-height: 24px; /* يساوي ROW_H بالـ JS */
   text-align: right;
   will-change: transform;
   transition: transform 0.5s linear; /* سرعة حركة كل خطوة */
 }
-.schedule-list.no-anim{ transition: none !important; }
-.schedule-row{
+
+.schedule-list.no-anim {
+  transition: none !important;
+}
+
+.schedule-row {
   display: flex;
   justify-content: space-between;
-  height: 24px;           /* يساوي line-height */
+  height: 24px; /* يساوي line-height */
 }
-.row-time{ min-width: 4.2ch; }
+
+.row-time {
+  min-width: 4.2ch;
+}
+
+/* 🟩 مركزية "الآن على الهواء" داخل الإطار */
+.schedule-frame .mini-schedule-widget {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+
+
 
 /* =========================
    8) الإطار 3: تأمل هذا الأسبوع
@@ -365,33 +388,39 @@ main.homepage-rtl > section.shortsegs-section .shortsegs-arrow.next { left:  6px
     padding: 0 2px !important;
   }
 
-  .live-frame .live-box{
-    position: relative !important;
-    width: 100% !important;
-    aspect-ratio:16 / 9 !important;
-    overflow: hidden !important;
-    border-radius: 8px !important;
-    display: grid !important;
-    place-items: center !important;
-    padding-top: 10px !important;
-    padding-bottom: 10px !important;
-  }
+.live-frame .live-box{
+  position: relative !important;   /* بدل center */
+  width: 100% !important;
+  aspect-ratio:16 / 9 !important;
+  overflow: hidden !important;
+  border-radius: 8px !important;
+  display: grid !important;
+  place-items: center !important;
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+}
 
-  .live-frame .live-box iframe,
-  .live-frame iframe{
-    position: absolute !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) scale(0.7) !important;
-    transform-origin: center center !important;
-    width: 133.33% !important;
-    border: 0 !important;
-    display: block !important;
-    -webkit-user-drag: none !important;
-    user-select: none !important;
-    touch-action: pan-y !important;  
-    object-fit: contain !important;  
-  }
+
+.live-frame .live-box iframe,
+.live-frame iframe{
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) scale(0.7) !important; /* زي ما عندك */
+  transform-origin: center center !important;
+  width: 133.33% !important;      /* زي ما عندك */
+  height: auto !important;         /* مهم */
+  right: auto !important;          /* يمنع سلوك غريب ببعض الأجهزة */
+  bottom: auto !important;         /* يمنع النزول لتحت */
+  border: 0 !important;
+  display: block !important;
+  -webkit-user-drag: none !important;
+  user-select: none !important;
+  touch-action: pan-y !important;
+  object-fit: contain !important;
+}
+
+ 
 
   .text-frame .image-4x5,
   .text-frame .image-4x5 img,
@@ -455,32 +484,29 @@ main.homepage-rtl > section.shortsegs-section .shortsegs-arrow.next { left:  6px
 
 
 /* موبايل بالعرض (Landscape فقط) */
-@media (max-width: 1024px) and (orientation: landscape) {
-
-  /* صندوق اللايف بدون حواف علوية/سفلية + توسيط داخلي */
+@media (max-width: 1024px) and (orientation: landscape){
   .live-frame .live-box{
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    aspect-ratio: 16 / 9 !important;
     position: relative !important;
+    aspect-ratio: 16 / 9 !important;
     display: grid !important;
-    place-items: center !important; /* يوسّط أفقي + عمودي */
+    place-items: center !important;
     overflow: hidden !important;
+    padding: 0 !important;
   }
-
-  /* الإطار نفسه يملأ الصندوق ويتوسّط تماماً */
   .live-frame .live-box iframe,
   .live-frame iframe{
     position: absolute !important;
-    top: 65% !important;
+    top: 50% !important;           /* بدل 65% */
     left: 50% !important;
-    transform: translate(-50%, -50%) !important; /* توسيط حقيقي */
+    transform: translate(-50%, -50%) scale(0.7) !important;  /* نفس تبعك */
     transform-origin: center center !important;
-
-    width: 100% !important;
-    height: 100% !important;
+    width: 133.33% !important;
+    height: auto !important;
+    right: auto !important;
+    bottom: auto !important;
     border: 0 !important;
     display: block !important;
-    object-fit: contain !important; /* يظل كامل بدون قص */
+    object-fit: contain !important;
   }
 }
+

@@ -12,8 +12,12 @@ import categoriesRouter from "./routes/categories.js";
 import path from "node:path";
 import { fileURLToPath } from "url";
 import ourPicksRouter from "./routes/ourPicks.js";
+import programsTodayRouter from "./routes/programsToday.routes.js";
+
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
 
 
 
@@ -32,6 +36,15 @@ app.use(
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
+// === إصلاح اختفاء فيديوهات YouTube في Chrome ===
+app.use((req, res, next) => {
+  // السماح بتضمين iframes من youtube.com بدون حظر الكوكيز
+  res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+  res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
+  res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
+  next();
+});
+
 
 
 
@@ -89,6 +102,11 @@ app.use(categoriesRouter);
 app.use(shortSegmentsRouter);
 app.use("/api/content/our-picks", ourPicksRouter);
 
+// ✅ ثبّت المسار الصح لبرنامج اليوم/الأسبوع:
+app.use("/api/content/programs", programsTodayRouter);
+
+// (اختياري) alias لو في كود قديم بينادي /api/programs/...
+app.use("/api/programs", programsTodayRouter);
 /**
  * Simple Search endpoint
  * GET /api/content/search?q=كلمة&limit=20&offset=0
