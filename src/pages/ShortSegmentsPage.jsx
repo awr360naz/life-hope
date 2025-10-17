@@ -2,6 +2,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import "./ShortSegmentsPage.css";
 import ResilientThumb from "../components/ResilientThumb";
+import ShortsegSafePlayerModal from "../components/ShortsegSafePlayerModal";
+
 
 // ===================== إعدادات عامة =====================
 const PAGE_SIZE = 12;
@@ -20,6 +22,37 @@ function uniqBy(arr, keyFn) {
 }
 
 // ===================== مساعدات يوتيوب =====================
+function ResultCard({ item }) {
+  switch (item.type) {
+    case "article":
+    case "program":
+      return (
+        <div className="res-card">
+          {item.cover_url && <img src={item.cover_url} alt={item.title} />}
+          <h4 className="res-title">{item.title}</h4>
+          <p className="res-snippet">{item.snippet}</p>
+        </div>
+      );
+
+    case "short_segment":
+      return (
+        <div className="res-card shortseg">
+          {item.cover_url && <img src={item.cover_url} alt={item.title} />}
+          <h4 className="res-title">{item.title}</h4>
+          {/* snippet فاضي حسب طلبك (بحث عنوان فقط) */}
+          {item.video_url && (
+            <button className="res-play" onClick={() => window.open(item.video_url, "_blank")}>
+              ▶ تشغيل
+            </button>
+          )}
+        </div>
+      );
+
+    default:
+      return null;
+  }
+}
+
 function toYouTubeId(urlOrId = "") {
   if (!urlOrId) return "";
   if (/^[a-zA-Z0-9_-]{10,15}$/.test(urlOrId)) return urlOrId;
@@ -39,14 +72,12 @@ function toYouTubeId(urlOrId = "") {
 function ytEmbed(idOrUrl, { autoplay = true } = {}) {
   if (!idOrUrl) return "";
 
-  // تنظيف مبدئي: إزالة مسافات/رموز مشاركة جديدة
   idOrUrl = String(idOrUrl).trim()
-    .replace(/^<|>$/g, "")       // أحيانًا تيجي بين <>
-    .replace(/&si=[^&]+/g, "")   // بارامتر share الجديد من يوتيوب
-    .replace(/&pp=[^&]+/g, "")   // بارامتر share الجديد
+    .replace(/^<|>$/g, "")
+    .replace(/&si=[^&]+/g, "")
+    .replace(/&pp=[^&]+/g, "")
     .replace(/[?&]feature=share/g, "");
 
-  // استخراج الـID من أي شكل رابط
   let id = "";
   if (/^[a-zA-Z0-9_-]{10,15}$/.test(idOrUrl)) {
     id = idOrUrl;
@@ -86,10 +117,9 @@ export default function ShortSegmentsPage() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
-  const [player, setPlayer] = useState({ open: false, ytid: "" });
+  const [player, setPlayer] = useState({ open: false, item: null }); // ← نخزن العنصر كاملًا
   const [page, setPage] = useState(1);
-  const shownLenRef = React.useRef(0);   // طول ما هو معروض حالياً — لمنع “التقلّص”
-
+  const shownLenRef = React.useRef(0);
 
   useEffect(() => {
     let alive = true;
@@ -103,15 +133,12 @@ export default function ShortSegmentsPage() {
       return Array.isArray(data?.items) ? data.items : (Array.isArray(data) ? data : []);
     };
 
-    // جلب مرن: يجرّب مصدرين + عدة محاولات + دمج وتصفية + حدّ أعلى 48
     const fetchResilient = async () => {
       const cb = Date.now();
       const sources = [
         `/api/content/short-segments?limit=200&_cb=${cb}`,
         `/api/short-segments?limit=200&_cb=${cb}`,
       ];
-
-      // محاولات مع backoff
       const attempts = [200, 600, 1200, 2000];
       let best = [];
 
@@ -125,7 +152,6 @@ export default function ShortSegmentsPage() {
             if (r.status === "fulfilled" && Array.isArray(r.value)) merged = merged.concat(r.value);
           }
 
-          // تطبيع، استخراج _ytid، وتجاهل العناصر الناقصة
           merged = merged
             .map((it) => {
               const id =
@@ -135,41 +161,32 @@ export default function ShortSegmentsPage() {
             })
             .filter(Boolean);
 
-          // إزالة التكرارات حسب _ytid
           merged = uniqBy(merged, (x) => x._ytid);
 
-          // ترتيب أحدث أولاً
           merged.sort((a, b) => {
             const ta = new Date(a.published_at || a.created_at || 0).getTime() || 0;
             const tb = new Date(b.published_at || b.created_at || 0).getTime() || 0;
             return tb - ta;
           });
 
-          // حدّ أقصى 48
           merged = merged.slice(0, MAX_PAGES * PAGE_SIZE);
 
-          // إن كانت النتيجة كبيرة بما يكفي نعيدها مباشرة
-          if (merged.length >= 36) { // “نتيجة محترمة”
+          if (merged.length >= 36) {
             return merged;
           } else if (merged.length > best.length) {
-            // احتفظ بأفضل نتيجة مؤقتًا
             best = merged;
           }
-        } catch {
-          // تجاهل، سنحاول مرة أخرى
-        }
-
+        } catch {}
         await sleep(attempts[i]);
       }
 
-      return best; // قد تكون 12/24/…، سيُحسم لاحقًا قبل الاستبدال بالكاش
+      return best;
     };
 
     (async () => {
       setLoading(true);
       setErr("");
 
-      // 1) اعرض فورًا من الكاش لو موجود (تجربة ثابتة للمستخدم)
       try {
         const cached = JSON.parse(localStorage.getItem(LS_KEY) || "[]");
         if (Array.isArray(cached) && cached.length) {
@@ -178,12 +195,11 @@ export default function ShortSegmentsPage() {
         }
       } catch {}
 
-      // 2) حدّث بهدوء بنتيجة أحدث، لكن لا تستبدل لو كانت ضعيفة
       try {
         const fresh = await fetchResilient();
         if (!alive) return;
 
-        if (fresh.length >= 24) { // عتبة القبول للاستبدال
+        if (fresh.length >= 24) {
           setItems(fresh);
           localStorage.setItem(LS_KEY, JSON.stringify(fresh));
           setErr("");
@@ -203,7 +219,6 @@ export default function ShortSegmentsPage() {
     return () => { alive = false; ac.abort(); };
   }, []);
 
-  // قائمة معرّفة بـ _ytid فقط (من items النهائية)
   const normalized = useMemo(
     () =>
       items
@@ -217,29 +232,24 @@ export default function ShortSegmentsPage() {
     [items]
   );
 
-  // السقف الكلي (بحد أقصى 48)
-const totalCap = Math.min(normalized.length, MAX_PAGES * PAGE_SIZE);
-// ثابت 4 أزرار — والـno-shrink سيمنع تقلص المعروض للأقل
-const totalPages = MAX_PAGES;
+  const totalCap = Math.min(normalized.length, MAX_PAGES * PAGE_SIZE);
+  const totalPages = MAX_PAGES;
 
-
-  // تصحيح الصفحة لو خرجت عن النطاق
   useEffect(() => {
     if (page > totalPages) setPage(totalPages);
     if (page < 1) setPage(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [totalPages]);
 
-  // عناصر الصفحة الحالية (12 عنصر)
   const start = (page - 1) * PAGE_SIZE;
   const end = start + PAGE_SIZE;
   const paginatedItems = normalized.slice(start, end);
 
-  const onCardClick = (it) => setPlayer({ open: true, ytid: it._ytid });
+  const onCardClick = (it) => setPlayer({ open: true, item: it }); // ← افتح بالمودال الآمن
 
   // إغلاق بالمفتاح ESC
   useEffect(() => {
-    const onKey = (e) => e.key === "Escape" && setPlayer({ open: false, ytid: "" });
+    const onKey = (e) => e.key === "Escape" && setPlayer({ open: false, item: null });
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
@@ -310,31 +320,13 @@ const totalPages = MAX_PAGES;
         </>
       )}
 
-     {player.open && (
-  <div className="shortseg-modal" role="dialog" aria-modal="true">
-    <div className="shortseg-backdrop" onClick={() => setPlayer({ open: false, ytid: "" })} />
-    <div className="shortseg-modal-content">
-      <button
-        className="shortseg-close"
-        onClick={() => setPlayer({ open: false, ytid: "" })}
-        aria-label="إغلاق"
-        type="button"
-      >
-        ✕
-      </button>
-      <div className="shortseg-iframe-wrap">
-        <iframe
-          src={ytEmbed(player.ytid, { autoplay: true })}
-          title="Short Segment"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          referrerPolicy="strict-origin-when-cross-origin"
-          allowFullScreen
-        />
-      </div>
-    </div>
-  </div>
-)}
-
+      {/* === المودال الآمن بصورة fallback وزر تشغيل أحمر === */}
+      <ShortsegSafePlayerModal
+        open={!!player.open}
+        item={player.item}
+        title={player.item?.title}
+        onClose={() => setPlayer({ open: false, item: null })}
+      />
     </div>
   );
 }

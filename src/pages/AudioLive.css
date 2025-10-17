@@ -1,50 +1,87 @@
-/* الصفحة كاملة */
-.mp3-page {
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;    
-  align-items: center;        
-background: linear-gradient(180deg, #FFFFFF 0%, #F6F3EE 20%);
-  padding: 2rem 0;
-  box-sizing: border-box;
-  overflow-x: hidden; 
+/* Cairo — الاستيراد آمن، نطبّق الخط فقط داخل .mp3-page */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap');
 
+/* 👈 كل شيء داخل الصفحة فقط */
+.mp3-page,
+.mp3-page * { box-sizing: border-box; }
+
+.mp3-page{
+  font-family: "Cairo", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  min-height:100vh;
+  background:linear-gradient(180deg,#fff 0%,#f6f3ee 20%);
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;   /* الإطار فوق */
+  padding:24px 12px;
 }
 
 /* الحاوية */
-.mp3-container {
-  width: min(900px, 80%);
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5rem;
-  box-sizing: border-box;
+.mp3-page .mp3-container{
+  width:min(900px, 92vw);
+  margin:0 auto;            /* بالنص */
 }
 
-/* غلاف البث */
-.mp3-audio {
-  width: 100%;
-  overflow: hidden; /* يمنع أي بروز */
+/* الإطار */
+.mp3-page .audio-card{
+  border:1px solid #ccc;
+  border-radius:10px;
+  background:transparent;
+  overflow:hidden;
+  box-shadow:0 2px 6px rgba(0,0,0,0.05);
 }
 
-/* البث */
-.mp3-iframe {
-  width: 100%;        /* دايمًا بعرض الحاوية */
-  max-width: 100%;    /* ما يوسعها */
-  height: 280px;
-  border: none;
-  display: block;
-  border-radius: 6px;
-
+/* العنوان داخل الكرت فقط (ما يلمس منيوك) */
+.mp3-page .audio-header{
+  font-weight:800;
+  color:#333;
+  font-size:18px;
+  padding:10px 14px;
+  border-bottom:1px solid #e3ded7;
+  text-align:right;
 }
 
-/* الصورة */
-.mp3-ad {
-  width: 100%;
-  max-width: 100%;      /* ما تتعدى عرض الحاوية */
-  height: 280px;
-  object-fit: cover;
-  border-radius: 8px;
-  display: block;
+/* الصورة: كاملة بدون قص على كل الأجهزة */
+.mp3-page .audio-image-wrap{ padding:10px 14px 6px; }
+.mp3-page .audio-image{
+  width:100%;
+  height:auto;          /* ← يمنع القص */
+  display:block;
+  border-radius:8px;
+  /* إذا بدّك ارتفاع ثابت بلا قص:
+     height:260px; object-fit:contain; background:#fff; */
+}
+
+/* السطر بين الصورة والمشغّل */
+.mp3-page .between-note{
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  color:#1f1f1f; padding:6px 14px 2px;
+}
+.mp3-page .between-note .note-text{
+  font-weight:800;
+  font-size:20px;       /* أكبر كما طلبت */
+}
+.mp3-page .between-note .arrow{
+  font-size:22px; line-height:1;
+}
+
+/* المشغّل */
+.mp3-page .audio-player-wrap{ padding:6px 14px 14px; }
+.mp3-page .audio-iframe{
+  width:100%;
+  height:120px;
+  border:0;
+  border-radius:6px;
+  background:transparent;
+}
+
+/* استجابة */
+@media (max-width: 768px){
+  .mp3-page .between-note .note-text{ font-size:18px; }
+  .mp3-page .between-note .arrow{ font-size:20px; }
+  .mp3-page .audio-iframe{ height:130px; }
+}
+
+@media (max-width: 900px) and (orientation: landscape){
+  .mp3-page{ padding:16px 10px; }
+  .mp3-page .audio-iframe{ height:110px; }
 }

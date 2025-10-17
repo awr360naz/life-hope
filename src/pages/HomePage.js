@@ -102,7 +102,7 @@ export default function HomePage() {
     return fmt.format(new Date()); // مثل: 20/08/2025
   }, []);
 
-  // ===== برنامج اليوم =====
+   // ===== برنامج اليوم =====
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const [items, setItems] = useState([]);
@@ -153,7 +153,8 @@ export default function HomePage() {
     }
   };
 
-  const LIVE_SRC = "https://closeradio.tv/awrara/";
+
+  const LIVE_SRC = "https://closeradio.tv/awrara/player.htm";
 
   // نسخة مكررة من العناصر لعمل لوب سلس
   const items2 = items.length ? [...items, ...items] : [];
@@ -175,21 +176,22 @@ export default function HomePage() {
         </div>
          
         {/* ===== الإطار 1: البث ===== */}
-        <section className="live-frame">
-          
-          <div className="live-box">
-            
-            <iframe
-            
-              className="live-iframe"
-              src={LIVE_SRC}
-              scrolling="no"
-              title="البث المباشر"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen
-            />
-          </div>
-        </section>
+ <section className="live-frame">
+  <div className="live-box">
+    {/* غلاف بنسبة 16:9 داخل الإطار ليظهر كامل بدون قص ويكون أصغر بشوي من الإطار */}
+    <div className="livebox-aspect">
+      <iframe
+        className="live-iframe"
+        src={LIVE_SRC}
+        title="البث المباشر"
+        scrolling="no"
+        referrerPolicy="no-referrer"
+        allow="autoplay; encrypted-media; fullscreen; picture-in-picture; web-share"
+        allowFullScreen
+      />
+    </div>
+  </div>
+</section>
 
         {/* ===== الإطار 2: برنامج اليوم ===== */}
 {/* ===== الإطار 2: برنامج اليوم ===== */}
@@ -219,7 +221,7 @@ export default function HomePage() {
 <br></br>
 
    <ProgramsCarousel title="برامجنا" />
-   <br></br><br></br>
+   <br></br>
  
       <ShortSegmentsCarousel
   title="فقرات قصيرة"
@@ -230,7 +232,7 @@ export default function HomePage() {
   limit={48}
 />
   <OurPicks
-       
+       title="فقرات قصيرة"
       />
 
 

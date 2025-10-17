@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import "./ShortSegmentsCarousel.css";
 import ResilientThumb from "./ResilientThumb";
+import ShortsegSafePlayerModal from "./ShortsegSafePlayerModal";
 
 // === نفس الـ helpers تبع صفحة الشورتس ===============================
 function toYouTubeId(urlOrId = "") {
@@ -19,13 +20,6 @@ function toYouTubeId(urlOrId = "") {
   } catch {
     return "";
   }
-}
-
-function ytEmbed(id, { autoplay = true } = {}) {
-  const base = `https://www.youtube-nocookie.com/embed/${id}`;
-  const common = `playsinline=1&modestbranding=1&rel=0&iv_load_policy=3&fs=1`;
-  const auto = autoplay ? `&autoplay=1` : ``;
-  return `${base}?${common}${auto}`;
 }
 
 function useResponsivePerView(defaultPerView = 4) {
@@ -57,8 +51,8 @@ export default function ShortSegmentsCarousel({
   const [err, setErr] = useState("");
   const [index, setIndex] = useState(0);
 
-  // مودال المُشغِّل
-  const [player, setPlayer] = useState({ open: false, ytid: "", title: "" });
+  // مودال المُشغِّل (نخزّن العنصر كاملًا)
+  const [player, setPlayer] = useState({ open: false, item: null });
 
   const visible = useResponsivePerView(perView);
   const trackRef = useRef(null);
@@ -130,7 +124,7 @@ export default function ShortSegmentsCarousel({
     setIndex(clamped);
   };
 
-  const onCardClick = (it) => setPlayer({ open: true, ytid: it._ytid, title: it._title });
+  const onCardClick = (it) => setPlayer({ open: true, item: it });
 
   return (
     // نستخدم نفس حاوية “برامجنا” حرفيًا
@@ -195,34 +189,13 @@ export default function ShortSegmentsCarousel({
         )}
       </div>
 
-      {/* ===== مودال مطابق لصفحة الشورتس ===== */}
-      {player.open && (
-        <div className="shortseg-modal" role="dialog" aria-modal="true">
-          <div
-            className="shortseg-backdrop"
-            onClick={() => setPlayer({ open: false, ytid: "", title: "" })}
-          />
-          <div className="shortseg-modal-content">
-            <button
-              className="shortseg-close"
-              onClick={() => setPlayer({ open: false, ytid: "", title: "" })}
-              aria-label="إغلاق"
-              type="button"
-            >
-              ✕
-            </button>
-            <div className="shortseg-iframe-wrap">
-              <iframe
-                src={ytEmbed(player.ytid, { autoplay: true })}
-                title={player.title || "Short Segment"}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerPolicy="strict-origin-when-cross-origin"
-                allowFullScreen
-              />
-            </div>
-          </div>
-        </div>
-      )}
+      {/* ===== مودال آمن مع fallback للصورة + زر Play ===== */}
+      <ShortsegSafePlayerModal
+        open={!!player.open}
+        item={player.item}
+        title={player.item?._title}
+        onClose={() => setPlayer({ open: false, item: undefined })}
+      />
     </section>
   );
 }

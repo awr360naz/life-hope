@@ -156,7 +156,7 @@
   min-height: 160px;   
   background:transparent;
   border-radius: 8px;
-  box-shadow: none;
+  box-shadow: none ;
   overflow: hidden;
   scroll-snap-align: start;
 }
@@ -297,4 +297,35 @@
 .programs-section .programs-header {
   display: flex;
   align-items: center;
+}
+/* ===== موبايل: بدون أسهم، سحب باللمس فقط ===== */
+@media (max-width: 768px) {
+  /* أخفي أزرار التالي/السابق */
+  .programs-section .nav-btn {
+    display: none !important;
+    pointer-events: none !important;
+  }
+
+  /* فعّل سحب أفقي سلس + عطّل الارتداد */
+
+
+  /* إخفاء سكرول بار */
+  .programs-section .carousel-track::-webkit-scrollbar { display: none; }
+  .programs-section .carousel-track { scrollbar-width: none; }
+
+  /* حواف ومسافات لطيفة على الموبايل */
+  .programs-section .carousel-track {
+    --edge: 10px;
+    --gap: 10px;
+    padding-inline: var(--edge);
+    gap: var(--gap);
+  }
+
+  /* نفس حجم الكرت اللي كنتِ معتمدتُه للموبايل */
+  .programs-section .program-card,
+  .programs-section .skeleton-card {
+    flex: 0 0 180px;
+    max-width: 180px;
+    min-height: 130px;
+  }
 }

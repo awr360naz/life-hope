@@ -1,0 +1,92 @@
+.shortsegmodal-backdrop{
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.65);
+  display: grid; place-items: center;
+  z-index: 9999;
+}
+
+.shortsegmodal-content{
+  position: relative;
+  width: min(92vw, 900px);
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.35);
+}
+
+.shortsegmodal-frame, .shortsegmodal-frame iframe{
+  width: 100%; height: 100%; display: block; border: 0;
+}
+
+.shortsegmodal-fallback{
+  position: relative;
+  width: 100%; height: 100%;
+  display: block; text-decoration: none;
+  background: #000;
+}
+
+.shortsegmodal-thumb{
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  filter: brightness(0.9);
+}
+
+.shortsegmodal-play {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  width: 86px;
+  height: 60px;
+  background: rgba(255, 0, 0, 0.85);
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.3);
+  transition: transform 0.2s, background 0.2s;
+  display: grid;
+  place-items: center;
+}
+
+.shortsegmodal-play::before {
+  content: "";
+  width: 0;
+  height: 0;
+  border-left: 20px solid white;
+  border-top: 13px solid transparent;
+  border-bottom: 13px solid transparent;
+  margin-left: 4px;
+}
+
+.shortsegmodal-play:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+  background: rgba(255, 0, 0, 0.95);
+}
+
+/* === تصغير الزر على الموبايل === */
+@media (max-width: 768px) {
+  .shortsegmodal-play {
+    width: 54px;
+    height: 34px;
+    border-radius: 10px;
+  }
+  .shortsegmodal-play::before {
+    border-left: 15px solid white;
+    border-top: 9px solid transparent;
+    border-bottom: 9px solid transparent;
+    margin-left: 3px;
+  }
+}
+
+
+.shortsegmodal-tip{
+  position: absolute; right: 12px; bottom: 10px;
+  background: rgba(0,0,0,0.6);
+  color: #fff; font-size: 12px; padding: 6px 8px; border-radius: 8px;
+}
+
+.shortsegmodal-close{
+  position: absolute; top: 6px; left: 6px;
+  width: 36px; height: 36px;
+  border: 0; border-radius: 50%;
+  background: rgba(255,255,255,0.9);
+  cursor: pointer; font-size: 18px; line-height: 1;
+  display: grid; place-items: center;
+}

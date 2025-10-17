@@ -1,8 +1,7 @@
-// components/ShortsegPlayerModal.jsx
 import React, { useEffect, useRef, useState } from "react";
 import { toYouTubeIdSafe } from "../utils/toYouTubeIdSafe";
 
-let ytApiLoading = null; // لضمان تحميل سكربت YT مرّة واحدة
+let ytApiLoading = null;
 
 function loadYouTubeAPI() {
   if (window.YT?.Player) return Promise.resolve();
@@ -20,14 +19,14 @@ function loadYouTubeAPI() {
 export default function ShortsegPlayerModal({
   item,
   onClose,
-  autoplay = false, // إذا بدّك تمنع التشغيل التلقائي خلّيها false
+  autoplay = false,
 }) {
   const videoId = toYouTubeIdSafe(
     item?._videoId || item?.video || item?.video_url || item?.url || item?._ytid || ""
   );
   const containerRef = useRef(null);
   const playerRef = useRef(null);
-  const [phase, setPhase] = useState("try-nocookie"); // try-nocookie → try-regular → redirect
+  const [phase, setPhase] = useState("try-nocookie");
   const [thumbUrl] = useState(() =>
     videoId ? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg` : ""
   );
@@ -37,7 +36,6 @@ export default function ShortsegPlayerModal({
     if (!videoId) return;
     let cancelled = false;
     let timer1 = null;
-    let timer2 = null;
 
     (async () => {
       await loadYouTubeAPI();
@@ -45,7 +43,6 @@ export default function ShortsegPlayerModal({
 
       const buildPlayer = (host) => {
         if (!containerRef.current) return;
-        // نظّف القديم
         containerRef.current.innerHTML = "";
         const div = document.createElement("div");
         div.id = `yt-player-${videoId}-${host}`;
@@ -63,24 +60,18 @@ export default function ShortsegPlayerModal({
             modestbranding: 1,
             origin: window.location.origin,
             enablejsapi: 1,
-            // للـ Shorts أو العادي؛ الواجهة نفسها
           },
           host,
           events: {
             onReady: () => {
               if (cancelled) return;
-              // اعتبرناها نجح التحميل
               clearTimeout(timer1);
-              clearTimeout(timer2);
               setPhase("ready");
               if (autoplay) {
-                try {
-                  playerRef.current?.playVideo?.();
-                } catch {}
+                try { playerRef.current?.playVideo?.(); } catch {}
               }
             },
             onError: () => {
-              // جرّب المرحلة التالية بسرعة
               if (phase === "try-nocookie") {
                 setPhase("try-regular");
               } else {
@@ -91,29 +82,24 @@ export default function ShortsegPlayerModal({
         });
       };
 
-      // 1) جرّب nocookie
       setPhase("try-nocookie");
       buildPlayer("https://www.youtube-nocookie.com");
 
-      // إذا ما صار onReady خلال 3.5 ثواني → جرّب regular
+      // مهلة أطول قبل التجربة الثانية
       timer1 = setTimeout(() => {
         if (cancelled || phase !== "try-nocookie") return;
         setPhase("try-regular");
-      }, 3500);
+      }, 6000);
     })();
 
     return () => {
       cancelled = true;
       clearTimeout(timer1);
-      clearTimeout(timer2);
-      try {
-        playerRef.current?.destroy?.();
-      } catch {}
+      try { playerRef.current?.destroy?.(); } catch {}
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [videoId]);
 
-  // مرحلة التجربة الثانية (youtube.com)
   useEffect(() => {
     if (!videoId) return;
     if (phase !== "try-regular") return;
@@ -149,9 +135,7 @@ export default function ShortsegPlayerModal({
             clearTimeout(timer);
             setPhase("ready");
             if (autoplay) {
-              try {
-                playerRef.current?.playVideo?.();
-              } catch {}
+              try { playerRef.current?.playVideo?.(); } catch {}
             }
           },
           onError: () => {
@@ -163,12 +147,12 @@ export default function ShortsegPlayerModal({
 
     build();
 
-    // إذا ما جهز خلال 2.5 ثانية إضافية → حوِّل تلقائيًا
+    // مهلة أطول قبل التحويل الخارجي
     timer = setTimeout(() => {
       if (!cancelled && phase === "try-regular") {
         setPhase("redirect");
       }
-    }, 2500);
+    }, 4000);
 
     return () => {
       cancelled = true;
@@ -177,14 +161,9 @@ export default function ShortsegPlayerModal({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, videoId]);
 
-  // التحويل التلقائي
   useEffect(() => {
     if (phase !== "redirect" || !redirectUrl) return;
-    // افتح في تبويب جديد وحط صورة كرابط احتياطي
-    const w = window.open(redirectUrl, "_blank", "noopener,noreferrer");
-    if (!w) {
-      // لو المتصفح منع، بنخلّي المستخدم يكبس على الصورة
-    }
+    try { window.open(redirectUrl, "_blank", "noopener,noreferrer"); } catch {}
   }, [phase, redirectUrl]);
 
   return (

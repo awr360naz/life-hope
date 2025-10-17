@@ -181,6 +181,14 @@ html, body { height: 100%; }
   transform: translate(-50%, -50%);
   z-index: 2;
 }
+.schedule-row span {
+  display: inline-block;
+  max-width: 90px;       /* ← عرض أقصى ضمن الإطار */
+  white-space: nowrap;   /* يمنع كسر السطر */
+  overflow: hidden;      /* يخفي الزيادة */
+  text-overflow: ellipsis; /* يضيف ... بالنهاية */
+}
+
 
 
 
@@ -342,10 +350,7 @@ main.homepage-rtl > section.shortsegs-section .shortsegs-track {
 main.homepage-rtl > section.shortsegs-section .shortsegs-arrow.prev { right: 6px !important; }
 main.homepage-rtl > section.shortsegs-section .shortsegs-arrow.next { left:  6px !important; }
 
-/* =========================
-   10) نسخة الموبايل — بدون أي تأثير على الديسكتوب
-   ========================= */
-/* نسخة الموبايل (عمودي + عرض) */
+
 @media (max-width: 768px), (max-width: 1024px) and (orientation: landscape) {
 
   html, body { overflow-x: hidden; }
@@ -510,3 +515,127 @@ main.homepage-rtl > section.shortsegs-section .shortsegs-arrow.next { left:  6px
   }
 }
 
+/* ====== تعديل بسيط على صندوق البث (بدون المساس بموقعه وأبعاده الديسكتوب) ====== */
+.live-frame .live-box{
+  position: relative;
+  /* أصغر بشوي من الإطار: */
+  padding: 8px;                 /* ← يترك حافة داخلية بسيطة */
+  height: calc(100% - 0px);
+  display: grid;
+  place-items: center;
+  border-radius: 0 0 6px 6px;   /* نفس الحفاف السفلي القديم */
+  background: transparent;      /* إطارك الخارجي هو الشفاف */
+  overflow: hidden;
+}
+
+/* غلاف بنسبة 16:9 بداخل الإطار ليظهر كامل بلا قص */
+.live-frame .livebox-aspect{
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: 100%;
+  border-radius: 8px;           /* أطراف ناعمة للغلاف الداخلي */
+  overflow: hidden;
+  background: #000;             /* لو المصدر فيه letterboxing */
+  display: block;
+}
+
+/* الـ iframe يملأ الغلاف 16:9 تمامًا */
+.live-frame .livebox-aspect > iframe,
+.live-frame .live-iframe{
+  position: static !important;
+  inset: auto !important;
+  width: 100% !important;
+  height: 100% !important;
+  border: 0 !important;
+  display: block !important;
+  transform: none !important;       /* إلغاء أي زوم قديم */
+  object-fit: cover !important;     /* يبقى 16:9 داخل الغلاف */
+}
+
+/* ===================== الموبايل (واللاندسكيب المتوسط) ===================== */
+/* نستخدم نفس الغلاف 16:9 ونلغي قواعد الزوم القديمة */
+@media (max-width: 768px), (max-width: 1024px) and (orientation: landscape) {
+  .live-frame{
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    border-radius: 8px !important;
+  }
+
+  .live-topline{
+    position: static !important;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: row-reverse !important;
+    justify-content: space-between !important;
+    align-items: baseline !important;
+    gap: 8px !important;
+    margin-bottom: 6px !important;
+    padding: 0 2px !important;
+  }
+
+  .live-frame .live-box{
+    padding: 0 !important;          
+    display: block !important;
+    height: auto !important;
+  }
+
+  .live-frame .livebox-aspect{
+    width: 100% !important;
+    aspect-ratio: 16 / 9 !important;
+    max-height: none !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
+    background: #000 !important;
+    
+  }
+
+  .live-frame .livebox-aspect > iframe,
+  .live-frame .live-iframe{
+    position: static !important;
+    width: 100% !important;
+    height: 100% !important;
+    transform: none !important;     
+    object-fit: cover !important;
+  }
+
+  .live-frame .live-box iframe,
+  .live-frame iframe{
+    right: auto !important;
+    bottom: auto !important;
+  }
+}
+
+/* مسافة داخلية موحّدة من كل الجهات على الموبايل */
+@media (max-width: 768px), (max-width: 1024px) and (orientation: landscape) {
+  :root { --live-inset: 8px; }
+
+  .live-frame .live-box {
+    padding: 0 !important;
+    overflow: visible !important; /* ← نسمح بالهوامش تظهر فعلياً */
+  }
+
+  .live-frame .livebox-aspect {
+    width: calc(100% - (var(--live-inset) * 2)) !important;
+    aspect-ratio: 16 / 9 !important;
+
+    /* تباعد موحد فعلي من كل الجهات */
+    margin-top: var(--live-inset) !important;
+    margin-right: var(--live-inset) !important;
+    margin-bottom: var(--live-inset) !important;
+    margin-left: var(--live-inset) !important;
+
+    border-radius: 8px !important;
+    background: #000 !important;
+    overflow: hidden !important;
+    transform: none !important;
+  }
+
+  .live-frame .livebox-aspect > iframe {
+    width: 100% !important;
+    height: 100% !important;
+    border: 0 !important;
+    display: block !important;
+    object-fit: cover !important;
+  }
+}
