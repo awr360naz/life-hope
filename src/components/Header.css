@@ -272,3 +272,14 @@
   .logo { max-width: 100px; }
   .logo-mark { font-size: 1.35rem; }
 }
+/* === روابط فرعية لاختبر معلوماتك === */
+.drawer-sub-links {
+  margin-right: 14px; /* مسافة بسيطة لتمييز التفرع بالـ RTL */
+  display: flex;
+  flex-direction: column;
+}
+
+.drawer-sub-links .sub-link {
+  font-size: 0.95em;
+  opacity: 0.9;
+}

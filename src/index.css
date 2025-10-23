@@ -12,3 +12,25 @@ body {
   background-repeat: no-repeat;   /* ما يكرر التدرج */
   background-size: cover;         /* يغطي الشاشة كلها */
 }
+/* استيراد خط Cairo من Google Fonts — ضع هذا في أعلى ملف CSS العام */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
+
+/* افتراضياً: ضع الـ section الي فيه "اختبر معلوماتك" بعنصر له id أو class */
+#quiz-section, .quiz-section {
+  font-family: "Cairo", "Noto Naskh Arabic", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  /* تحسينات اختيارية */
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  direction: rtl; /* لو القسم محتوى عربي وتريد تأكيد الـ RTL */
+}
+
+/* اجعل كل النصوص داخل القسم ترث الخط */
+#quiz-section * , .quiz-section * {
+  font-family: inherit;
+}
+
+/* أمثلة صغيرة لتعديل الأوزان والأحجام داخل الاختبار */
+#quiz-section h1, .quiz-section h1 { font-weight: 700; }
+#quiz-section h2, .quiz-section h2 { font-weight: 600; }
+#quiz-section p, .quiz-section p { font-weight: 400; font-size: 16px; }

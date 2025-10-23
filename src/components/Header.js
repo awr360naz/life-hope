@@ -41,6 +41,7 @@ export default function Header() {
           <Link to="/articles" className="nav-link">مقالات</Link>
           <Link to="/programs" className="nav-link">برامجنا</Link>
           <Link to="/about" className="nav-link">قصتنا</Link>
+          
         </nav>
 
         {/* زر البث (صورة) */}
@@ -93,15 +94,26 @@ export default function Header() {
         </form>
       </div>
 
+
       {/* أوف-كانفاس (موبايل) */}
       <div className={`drawer ${open ? "drawer--open" : ""}`} onClick={() => setOpen(false)}>
         <nav className="drawer-panel" onClick={(e)=>e.stopPropagation()}>
           <Link to="/" className="drawer-link" onClick={()=>setOpen(false)}>الصفحه الرئيسية</Link>
           <Link to="/articles" className="drawer-link" onClick={()=>setOpen(false)}>مقالات</Link>
           <Link to="/programs" className="drawer-link" onClick={()=>setOpen(false)}>برامجنا</Link>
+                   {/* اختبر معلوماتك + التصنيفات الفرعية */}
+<Link to="/quiz" className="drawer-link" onClick={()=>setOpen(false)}>اختبر معلوماتك</Link>
+<div className="drawer-sub-links">
+  <Link to="/quizzes/christian" className="drawer-link sub-link" onClick={()=>setOpen(false)}>اختبارات مسيحيّة</Link>
+  <Link to="/quizzes/health" className="drawer-link sub-link" onClick={()=>setOpen(false)}>اختبارات صحّية</Link>
+</div>
           <Link to="/about" className="drawer-link" onClick={()=>setOpen(false)}>قصتنا</Link>
           <Link to="/contact" className="drawer-link" onClick={()=>setOpen(false)}>تواصل معنا</Link>
           <Link to="/prayer-request" className="drawer-link" onClick={()=>setOpen(false)}>اطلب صلاة</Link>
+
+
+
+          
           <Link to="/live" className="drawer-live" onClick={()=>setOpen(false)}>البث المباشر</Link>
           <Link to="/AudioLive" className="drawer-live" onClick={()=>setOpen(false)}>البث المباشر الصوتي</Link>
         </nav>

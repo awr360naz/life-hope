@@ -13,6 +13,7 @@ import path from "node:path";
 import { fileURLToPath } from "url";
 import ourPicksRouter from "./routes/ourPicks.js";
 import programsTodayRouter from "./routes/programsToday.routes.js";
+import quizzesRouter from "./routes/quizzes.js";
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -101,6 +102,7 @@ app.use(articlesRouter);
 app.use(categoriesRouter);
 app.use(shortSegmentsRouter);
 app.use("/api/content/our-picks", ourPicksRouter);
+app.use("/api/content/quizzes", quizzesRouter);
 
 // ✅ ثبّت المسار الصح لبرنامج اليوم/الأسبوع:
 app.use("/api/content/programs", programsTodayRouter);

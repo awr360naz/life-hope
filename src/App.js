@@ -21,6 +21,10 @@ import SearchPage from './pages/SearchPage';
 import AboutPage from './pages/AboutPage';
 import ArticlesCategoriesPage from "./pages/ArticlesCategoriesPage.jsx";
 import CategoryArticlesPage from "./pages/CategoryArticlesPage.jsx";
+import QuizCategoryPage from "./pages/QuizCategory";
+
+import { QuizIndex } from "./pages/QuizIndex";
+import { QuizPage } from "./pages/QuizPage";
 
 /* 1) عطّل استرجاع التمرير من المتصفّح */
 function UseManualScrollRestoration() {
@@ -109,6 +113,10 @@ export default function App() {
             <Route path="/about" element={<AboutPage />} />
             <Route path="/articles" element={<ArticlesCategoriesPage />} />
             <Route path="/articles/category/:name" element={<CategoryArticlesPage />} />
+            <Route path="/quiz" element={<QuizIndex />} />
+<Route path="/quiz/:slug" element={<QuizPage />} />
+<Route path="/quizzes/health" element={<QuizCategoryPage category="health" />} />
+<Route path="/quizzes/christian" element={<QuizCategoryPage category="christian" />} />
           </Routes>
         </main>
         <Footer />

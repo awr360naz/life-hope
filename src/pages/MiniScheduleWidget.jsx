@@ -283,7 +283,7 @@ export default function MiniScheduleWidget({ className = "", paused = false }) {
           </div>
           <div className="next-line">
             <span className="next-label">التالي:</span>{" "}
-            <span className="next-text">{next?.title ? `${next.title} — ${next.time}` : "—"}</span>
+            <span className="next-text">{next?.title ? `${next.title} : ${next.time}` : "—"}</span>
           </div>
         </div>
       </div>
