@@ -9,6 +9,8 @@ import { Link } from "react-router-dom";
 import ThirdFrame from "./ThirdFrame"; 
 import OurPicks from "./OurPicks";
 import MiniScheduleWidget from "./MiniScheduleWidget";
+import GifNotice from "../components/GifNotice";
+import angel from "../assets/angel.gif";
 
 
 
@@ -233,6 +235,13 @@ export default function HomePage() {
 />
   <OurPicks
        title="فقرات قصيرة"
+      />
+       <GifNotice
+        gifSrc="https://img1.picmix.com/output/stamp/normal/6/2/7/1/591726_b3d37.gif"
+        text="ثُمَّ رَأَيْتُ مَلاَكًا آخَرَ طَائِرًا فِي وَسَطِ السَّمَاءِ مَعَهُ بِشَارَةٌ أَبَدِيَّةٌ..."
+        viewAllHref="/gif-highlight"
+        delayMs={2000}     
+        durationMs={10000}  
       />
 
 
