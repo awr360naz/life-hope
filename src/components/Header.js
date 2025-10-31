@@ -33,7 +33,7 @@ export default function Header() {
 
         {/* الشعار */}
         <Link to="/" className="logo" aria-label="الانتقال للصفحة الرئيسية">
-          <span className="logo-mark">الحَياة والأمْل</span>
+          <span className="logo-mark">صوت الحَياة والأمْل</span>
         </Link>
 
         {/* الروابط */}
@@ -41,6 +41,8 @@ export default function Header() {
           <Link to="/articles" className="nav-link">مقالات</Link>
           <Link to="/programs" className="nav-link">برامجنا</Link>
           <Link to="/about" className="nav-link">قصتنا</Link>
+
+          
           
         </nav>
 
@@ -99,18 +101,20 @@ export default function Header() {
       <div className={`drawer ${open ? "drawer--open" : ""}`} onClick={() => setOpen(false)}>
         <nav className="drawer-panel" onClick={(e)=>e.stopPropagation()}>
           <Link to="/" className="drawer-link" onClick={()=>setOpen(false)}>الصفحه الرئيسية</Link>
+          <Link to="/about" className="drawer-link" onClick={()=>setOpen(false)}>قصتنا</Link>
           <Link to="/articles" className="drawer-link" onClick={()=>setOpen(false)}>مقالات</Link>
           <Link to="/programs" className="drawer-link" onClick={()=>setOpen(false)}>برامجنا</Link>
-                   {/* اختبر معلوماتك + التصنيفات الفرعية */}
+           <Link to="/AngelsPage" className="drawer-link" onClick={()=>setOpen(false)}>رسالة الملائكة الثلاث</Link>      
 <Link to="/quiz" className="drawer-link" onClick={()=>setOpen(false)}>اختبر معلوماتك</Link>
 <div className="drawer-sub-links">
   <Link to="/quizzes/christian" className="drawer-link sub-link" onClick={()=>setOpen(false)}>اختبارات مسيحيّة</Link>
   <Link to="/quizzes/health" className="drawer-link sub-link" onClick={()=>setOpen(false)}>اختبارات صحّية</Link>
 </div>
-          <Link to="/about" className="drawer-link" onClick={()=>setOpen(false)}>قصتنا</Link>
+          
           <Link to="/contact" className="drawer-link" onClick={()=>setOpen(false)}>تواصل معنا</Link>
           <Link to="/prayer-request" className="drawer-link" onClick={()=>setOpen(false)}>اطلب صلاة</Link>
-
+          <Link to="/ManagerSpeech" className="drawer-link" onClick={()=>setOpen(false)}>كلمة المدير</Link>
+<Link to="/sabbath-lessons" className="drawer-link" onClick={()=>setOpen(false)}>دروس السبت</Link>
 
 
           

@@ -1,0 +1,91 @@
+/* === Sabbath Week Page === */
+
+.sabbath-wrap {
+  direction: rtl;
+  max-width: 1100px;
+  margin-inline: auto;
+  padding: 14px;
+  font-family: Cairo, system-ui, sans-serif;
+}
+
+.sabbath-hero {
+  text-align: center;
+  margin: 8px 0 18px;
+}
+
+.sabbath-hero h1 {
+  font-size: 28px;
+  font-weight: 800;
+  margin: 6px 0;
+}
+
+/* === Loading === */
+.sabbath-loading {
+  text-align: center;
+  padding: 22px;
+  opacity: 0.75;
+  font-size: 16px;
+}
+
+/* === Grid & Cards === */
+.sabbath-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.sabbath-card {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sabbath-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+
+.sabbath-card__media {
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #f3f3f3;
+}
+
+.sabbath-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.sabbath-card__body {
+  padding: 10px 12px;
+}
+
+.sabbath-card__title {
+  font-size: 16px;
+  font-weight: 800;
+  margin: 2px 0 4px;
+  color: #111;
+}
+
+.sabbath-card__subtitle {
+  font-size: 13px;
+  color: #444;
+}
+
+/* === Mobile === */
+@media (max-width: 640px) {
+  .sabbath-card__title {
+    font-size: 15px;
+  }
+
+  .sabbath-card__subtitle {
+    font-size: 12px;
+  }
+}

@@ -1,0 +1,268 @@
+/* === Sabbath Lessons (RTL) — أساسيات مشتركة === */
+.sabbath-wrap {
+  direction: rtl;
+  max-width: 1100px;
+  margin-inline: auto;
+  padding: 14px;
+  font-family: Cairo, system-ui, sans-serif;
+}
+
+.sabbath-hero {
+  text-align: center;
+  margin: 8px 0 18px;
+}
+
+.sabbath-hero h1 {
+  font-size: 28px;
+  font-weight: 800;
+  margin: 6px 0;
+}
+
+.sabbath-brief {
+  margin: 8px auto 16px;
+  max-width: 820px;
+}
+
+.sabbath-brief .one-line {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #222;
+}
+
+.linklike {
+  background: none;
+  border: none;
+  color: #0b62d6;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* === Item page === */
+.sabbath-banner {
+  position: relative;
+  max-width: 800px;
+  margin: 0 auto;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.sabbath-banner img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  display: block;
+}
+
+/* النص داخل الصورة */
+.sabbath-banner-text {
+  position: absolute;
+  bottom: 12px;
+  right: 16px;
+  color: #fff;
+  text-align: right;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
+}
+
+.sabbath-banner-text .si-subtitle {
+  font-size: 15px;
+  color: #f0f0f0;
+  margin-bottom: 2px;
+}
+
+.sabbath-banner-text .si-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+}
+
+.sabbath-item-head {
+  margin-top: 12px;
+}
+
+.si-subtitle {
+  text-align: right;
+  color: #444;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.si-title {
+  font-size: 24px;
+  font-weight: 800;
+  margin: 0 0 10px;
+  text-align: right;
+}
+
+.sabbath-item-body {
+  max-width: 820px;
+  margin-inline: auto;
+}
+
+.si-content {
+  font-size: 18px;
+  line-height: 2.1;
+  color: #111;
+  text-align: center;
+  margin: 18px auto;
+  max-width: 900px;
+}
+
+/* الملاحظات */
+.si-notes {
+  margin: 16px 0 8px;
+}
+
+.si-notes label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.si-notes textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+/* التنقّل */
+.si-nav {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  align-items: center;
+  margin: 14px 0 8px;
+}
+
+.si-nav-right {
+  text-align: right;
+}
+
+.si-nav-left {
+  text-align: left;
+}
+
+.btn {
+  background: #111;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 16px;
+  cursor: pointer;
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* ==== Popup window – نفس الشكل الأنيق ==== */
+.sabbath-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(6px);
+  animation: fadein 0.25s ease;
+  direction: rtl;
+}
+
+.sabbath-modal__card {
+  position: relative;
+  background: #fffdf9;
+  border-radius: 22px;
+  padding: 32px 36px;
+  max-width: 480px;
+  width: 90%;
+  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.25);
+  animation: pop 0.25s ease;
+  font-family: "Cairo", system-ui, sans-serif;
+  text-align: center;
+}
+
+.modal-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #b88933;
+  margin-bottom: 12px;
+  letter-spacing: 0.3px;
+}
+
+.modal-body p {
+  font-size: 18px;
+  color: #222;
+  line-height: 1.8;
+  margin: 0;
+}
+
+.sabbath-modal__close {
+  position: absolute;
+  top: 10px;
+  left: 14px;
+  font-size: 26px;
+  background: none;
+  border: none;
+  color: #b88933;
+  opacity: 0.75;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.sabbath-modal__close:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* كلمة البوب-أب — مكبّرة */
+.inline-pop {
+  background: none;
+  border: none;
+  color: #b88933;
+  font-weight: 700;
+  font-size: 19px;
+  cursor: pointer;
+  padding: 0 2px;
+  transition: color 0.2s, transform 0.2s;
+}
+
+.inline-pop:hover {
+  color: #000;
+  transform: scale(1.03);
+}
+
+/* مفاتيح الحركة */
+@keyframes fadein {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes pop {
+  from { transform: scale(0.92); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* موبايل */
+@media (max-width: 640px) {
+  .sabbath-banner {
+    max-width: 95%;
+  }
+  .sabbath-banner-text .si-title {
+    font-size: 20px;
+  }
+  .sabbath-banner-text .si-subtitle {
+    font-size: 13px;
+  }
+  .si-title {
+    font-size: 21px;
+  }
+  .si-content {
+    font-size: 17px;
+  }
+}

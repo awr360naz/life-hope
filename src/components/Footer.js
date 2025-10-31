@@ -14,11 +14,12 @@ const Footer = () => {
           {/* العمود اليمين */}
           <div className="footer-right-stack">
             {/* العنوان */}
-            <span className="logo-mark">الحَياة والأمْل</span>
+            <span className="logo-mark">صوت الحَياة والأمْل</span>
 
             {/* النص التعريفي */}
             <p className="footer-tagline" dir='rt1'>
-             مؤسسة إذاعية مسيحية تبشيرية، تابعة لمؤسسة <span dir="ltr">AWR</span> العالمية، وتبث للعالم العربي
+            <span dir="rtl">اذاعة مسيحية تبشيرية باللغة العربية تابعة لاذاعة AWR360 العالمية</span>
+    
 </p><br></br>
 
               <p className='footer-text'>

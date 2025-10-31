@@ -1,0 +1,69 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap');
+
+.threeangels {
+  direction: rtl;
+  color: #000;
+  font-family: "Cairo", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  padding: 20px 14px 40px;
+  margin-inline: auto;
+  max-width: 900px;
+  line-height: 1.9;
+  background: transparent;
+}
+
+/* العنوان الرئيسي */
+.ta-hero {
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.ta-title {
+  font-size: clamp(24px, 5vw, 34px);
+  font-weight: 800;
+  margin: 6px 0 12px;
+}
+
+/* GIF */
+.ta-gif {
+  width: clamp(260px, 54vw, 460px);
+  height: auto;
+  display: block;
+  margin: 0 auto 12px;
+  border-radius: 14px;
+}
+
+/* Subtitle */
+.ta-subtitle {
+  text-align: right;
+  font-weight: 700;
+  font-size: clamp(17px, 3.8vw, 22px);
+  margin: 0 0 6px;
+}
+
+/* النص */
+.ta-section {
+  margin: 14px 0;
+}
+
+.ta-paragraph {
+  margin: 10px 0 12px;
+  text-align: start;
+  font-size: clamp(16px, 3vw, 18px);
+}
+
+.ta-paragraph strong {
+  font-weight: 700;
+}
+
+.ta-emph {
+  font-weight: 800;
+  margin-top: 6px;
+}
+
+/* العناوين الداخلية */
+.ta-h3 {
+  font-size: clamp(17px, 3.4vw, 20px);
+  font-weight: 800;
+  margin: 18px 0 6px;
+  text-align: start;
+}

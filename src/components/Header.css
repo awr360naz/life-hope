@@ -59,7 +59,7 @@
 .logo-mark {
   font-family: "AraHamah1964", sans-serif;
   font-weight: 700;
-  font-size: 3rem;
+  font-size: 2rem;
   line-height: 1;
   color: #000;
 }
@@ -225,7 +225,7 @@
     flex-shrink: 0;
   }
   .logo-mark {
-    font-size: 1.6rem; /* كان 1.7rem */
+    font-size: 1.3rem; /* كان 1.7rem */
     line-height: 1;
     white-space: nowrap;
     overflow: hidden;

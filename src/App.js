@@ -22,10 +22,15 @@ import AboutPage from './pages/AboutPage';
 import ArticlesCategoriesPage from "./pages/ArticlesCategoriesPage.jsx";
 import CategoryArticlesPage from "./pages/CategoryArticlesPage.jsx";
 import QuizCategoryPage from "./pages/QuizCategory";
+import AngelsPage from "./pages/AngelsPage";
+import ManagerSpeech from "./pages/ManagerSpeech";
 
 import { QuizIndex } from "./pages/QuizIndex";
 import { QuizPage } from "./pages/QuizPage";
-
+import SabbathLessonsIndex from "./pages/SabbathLessonsIndex";
+import SabbathLessonPage from "./pages/SabbathLessonPage";
+import SabbathWeekPage from "./pages/SabbathWeekPage";
+import SabbathItemPage from "./pages/SabbathItemPage";
 /* 1) عطّل استرجاع التمرير من المتصفّح */
 function UseManualScrollRestoration() {
   useEffect(() => {
@@ -117,7 +122,15 @@ export default function App() {
 <Route path="/quiz/:slug" element={<QuizPage />} />
 <Route path="/quizzes/health" element={<QuizCategoryPage category="health" />} />
 <Route path="/quizzes/christian" element={<QuizCategoryPage category="christian" />} />
+<Route path="/AngelsPage" element={<AngelsPage />} />
+<Route path="/ManagerSpeech" element={<ManagerSpeech />} />
+<Route path="/sabbath-lessons" element={<SabbathLessonsIndex />} />
+<Route path="/sabbath-lessons/:lessonSlug" element={<SabbathLessonPage />} />
+<Route path="/sabbath-weeks/:weekSlug" element={<SabbathWeekPage />} />
+<Route path="/sabbath-items/:itemSlug" element={<SabbathItemPage />} />
+
           </Routes>
+          
         </main>
         <Footer />
       </div>

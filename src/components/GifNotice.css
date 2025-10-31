@@ -31,7 +31,6 @@
   flex-direction: column;
   text-align: center;
 }
-
 @keyframes gifnotice-pop {
   from { opacity: 0; transform: translateY(8px) scale(.98); }
   to   { opacity: 1; transform: translateY(0)    scale(1); }
@@ -40,7 +39,8 @@
 .gifnotice-close {
   position: absolute;
   top: 6px;
-  inset-inline-start: 6px; /* RTL */
+  inset-inline-start: 6px;
+  z-index: 10; /* ✅ فوق الفيديو وكل شيء */
   width: 32px;
   height: 32px;
   border: none;
@@ -49,23 +49,26 @@
   line-height: 1;
   background: rgba(0,0,0,.06);
   cursor: pointer;
-  color: black;
+  color: rgb(251, 3, 3);
 }
 .gifnotice-close:hover { background: rgba(0,0,0,.12); }
+
 
 .gifnotice-media {
   width: 100%;
   aspect-ratio: 16 / 9;
   background: #f4f4f4;
   overflow: hidden;
+  border-radius: 0;           /* خليه صفر لأن الكرت نفسه فيه radius */
 }
-.gifnotice-media img {
+.gifnotice-media img,
+.gifnotice-media video {
   width: 100%;
   height: 100%;
-  object-fit: cover;       /* يضمن عدم تشويه الـ GIF */
-  object-position: center;
+  object-fit: contain;        /* ✅ يظهر المحتوى كامل بدون قص */
   display: block;
 }
+
 
 .gifnotice-text {
   padding: 12px 14px 4px;
@@ -87,9 +90,20 @@
   font-weight: 600;
 }
 .gifnotice-viewall:hover { filter: brightness(.95); }
+.gifnotice-media video,
+.gifnotice-media img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 70vh; /* يمنع التمدد الزايد */
+  object-fit: contain; /* ✅ يخلي كل الفيديو ظاهر بدون قصّ */
+  border-radius: 14px;
+  margin: 0 auto;
+}
 
-/* ديسكتوب */
-@media (min-width: 768px) {
+
+@media (min-width: 350px) {
   :root { --gifnotice-maxw: 420px; }
-  .gifnotice-text { font-size: 16px; }
+  .gifnotice-text { font-size: 14px; }
+  
 }
