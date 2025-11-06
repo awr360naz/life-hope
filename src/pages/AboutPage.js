@@ -1,8 +1,12 @@
 // src/pages/AboutPage.jsx
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import "./AboutPage.css";
 import team from "../assets/team.png";
 
 export default function AboutPage() {
+    useEffect(() => {
+      document.title = "AWR360ARABIC – قصتنا";
+    }, []);
   return (
     <section className="about-page" dir="rtl">
       <h1 className="about-title">إذاعة صوت الحياة والأمل</h1>

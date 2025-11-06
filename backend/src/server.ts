@@ -444,21 +444,30 @@ const ARTICLES_TABLE = process.env.ARTICLES_TABLE || "articles";
    ========================= */
 app.get("/api/content/programs", async (req, res) => {
   try {
-    const limit = Math.min(parseInt(String(req.query.limit || "24"), 10) || 24, 50);
+    const limit = Math.min(
+      parseInt(String(req.query.limit || "24"), 10) || 24,
+      50
+    );
+
     const supabase = getSupabase();
 
     const { data, error } = await supabase
       .from(PROGRAMS_CATALOG_TABLE)
-      .select("id, title, content, cover_url, updated_at")
+      .select("id, title, content, cover_url, sort_order, updated_at")
       .eq("published", true)
+      // ✅ أولًا: حسب sort_order، والـ NULLs ييجوا بالآخر
+      .order("sort_order", { ascending: true, nullsFirst: false })
+      // ✅ ثانيًا: لو نفس sort_order، يرتّب بالأحدث أولًا
       .order("updated_at", { ascending: false })
       .limit(limit);
 
     if (error) throw error;
 
     res.json(data || []);
-  } catch (e: any) {
-    res.status(500).json({ error: e?.message || "Failed to fetch programs" });
+  } catch (e) {
+    res
+      .status(500)
+      .json({ error: e?.message || "Failed to fetch programs" });
   }
 });
 

@@ -34,22 +34,71 @@ export default function ProgramsPage() {
   const [windowState, setWindowState] = useState({ startRow: 0, endRow: 0 });
 
   /* جلب البيانات */
-  useEffect(() => {
-    (async () => {
+useEffect(() => {
+  setLoading(true);
+  setItems([]);
+
+  (async () => {
+    try {
+      const res = await fetch("/api/content/programs", {
+        headers: { Accept: "application/json" },
+      });
+
+      const text = await res.text();
+      let data = null;
       try {
-        const res = await fetch("/api/content/programs", { headers: { Accept: "application/json" } });
-        const text = await res.text();
-        let data = null; try { data = text ? JSON.parse(text) : null; } catch {}
-        if (!res.ok) throw new Error(data?.error || data?.message || text || `HTTP ${res.status}`);
-        const arr = Array.isArray(data?.programs) ? data.programs : Array.isArray(data) ? data : [];
-        setItems(arr.filter(Boolean));
-      } catch (e) {
-        setErr(e?.message || "خطأ غير معروف");
-      } finally {
-        setLoading(false);
+        data = text ? JSON.parse(text) : null;
+      } catch {}
+
+      if (!res.ok) {
+        throw new Error(
+          data?.error || data?.message || text || `HTTP ${res.status}`
+        );
       }
-    })();
-  }, []);
+
+      const arr = Array.isArray(data?.programs)
+        ? data.programs
+        : Array.isArray(data)
+        ? data
+        : [];
+
+      // 🔍 شوف شو جاي من السيرفر
+            // 🔍 شوف شو جاي من السيرفر
+      console.log(
+        "PROGRAMS FROM API:",
+        arr.map((p) => ({ id: p.id, sort_order: p.sort_order }))
+      );
+
+      // ✅ تنظيف + ترتيب:
+      const cleaned = arr
+        .filter(Boolean)
+        .map((p) => {
+          // حوّل sort_order لرقم، ولو فاضي/NULL خليه رقم كبير عشان يروح آخر اشي
+          let so = p.sort_order;
+          if (so === null || so === undefined || so === "") {
+            so = 999999; // يروح آخر القائمة
+          }
+          const num = Number(so);
+          return { ...p, sort_order: Number.isFinite(num) ? num : 999999 };
+        })
+        .sort((a, b) => a.sort_order - b.sort_order);
+
+      console.log(
+        "AFTER SORT:",
+        cleaned.map((p) => ({ id: p.id, sort_order: p.sort_order }))
+      );
+
+      setItems(cleaned);
+
+    } catch (e) {
+      setErr(e?.message || "خطأ غير معروف");
+    } finally {
+      setLoading(false);
+    }
+  })();
+}, []);
+
+
 
   /* أدوات مساعدة */
   const getPageScrollY = () =>

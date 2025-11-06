@@ -92,6 +92,9 @@ import ThreeAngelsmp4 from "../assets/ThreeAngels.mp4";
 */
 
 export default function HomePage() { 
+  useEffect(() => {
+    document.title = "AWR360ARABIC – الصفحة الرئيسية";
+  }, []);
   // تاريخ اليوم بأرقام إنجليزية (Asia/Jerusalem)
   const todayStr = useMemo(() => {
     const tz = "Asia/Jerusalem";

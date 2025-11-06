@@ -225,7 +225,7 @@
     flex-shrink: 0;
   }
   .logo-mark {
-    font-size: 1.3rem; /* كان 1.7rem */
+    font-size: 1.3rem; 
     line-height: 1;
     white-space: nowrap;
     overflow: hidden;

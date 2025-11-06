@@ -90,12 +90,62 @@ function ScrollToTopHard() {
 
   return null;
 }
+function TitleManager() {
+  const location = useLocation();
+
+  useEffect(() => {
+    let title = "AWR360ARABIC";
+
+    if (location.pathname === "/") {
+      title = "AWR360ARABIC – الصفحة الرئيسية";
+    } else if (location.pathname.startsWith("/programs")) {
+      title = "AWR360ARABIC – برامجنا";
+    } else if (location.pathname.startsWith("/articles")) {
+      title = "AWR360ARABIC – مقالات";
+    } else if (location.pathname.startsWith("/about")) {
+      title = "AWR360ARABIC – قصتنا";
+    } else if (location.pathname.startsWith("/vedio-audio-live")) {
+      title = "AWR360ARABIC – البث المباشر";
+    }else if (location.pathname.startsWith("/AngelsPage")) {
+      title = "AWR360ARABIC – رسالة الملائكة الثلاث";
+    }else if (location.pathname.startsWith("/quiz")) {
+      title = "AWR360ARABIC – اختبر معلوماتك";
+    }else if (location.pathname.startsWith("/contact")) {
+      title = "AWR360ARABIC – تواصل معنا";
+    } else if (location.pathname.startsWith("/prayer-request")) {
+      title = "AWR360ARABIC – اطلب صلاة";
+    }else if (location.pathname.startsWith("/ManagerSpeech")) {
+      title = "AWR360ARABIC – كلمة المدير";
+    }else if (location.pathname.startsWith("/sabbath-lessons")) {
+      title = "AWR360ARABIC – دروس السبت";
+    }else if (location.pathname.startsWith("/sabbath-weeks")) {
+      title = "AWR360ARABIC – دروس السبت";
+    }else if (location.pathname.startsWith("/sabbath-items")) {
+      title = "AWR360ARABIC – دروس السبت";
+    }else if (location.pathname.startsWith("/live")) {
+      title = "AWR360ARABIC – البث المباشر";
+    }else if (location.pathname.startsWith("/AudioLive")) {
+      title = "AWR360ARABIC – البث المباشر الصوتي";
+    }else if (location.pathname.startsWith("/shorts")) {
+      title = "AWR360ARABIC – فقرات قصيرة";
+    }
+
+
+
+
+    document.title = title;
+  }, [location.pathname]);
+
+  return null; // ما بترسم إشي
+}
+
 
 export default function App() {
   return (
     <Router>
       {/* حطّهم أول ما داخل الـ Router */}
       <UseManualScrollRestoration />
+      <TitleManager/>
       <ScrollToTopHard />
 
       <div className="app-shell">

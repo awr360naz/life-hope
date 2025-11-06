@@ -344,20 +344,7 @@ const handleShortCardClick = React.useCallback((e) => {
           </a>
         </div>
 
-        {/* Pager 1 | 2 | 3 */}
-        <div className="ourpicks-pager">
-          {[1, 2, 3].map((n) => (
-            <button
-              key={n}
-              type="button"
-              onClick={() => setPage(n)}
-              aria-label={`الصف ${n}`}
-              className={n === page ? "is-active" : ""}
-            >
-              {n}
-            </button>
-          ))}
-        </div>
+
       </div>
     </section>
   );
