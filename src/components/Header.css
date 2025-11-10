@@ -1,5 +1,5 @@
 /* =========================
-   HEADER — Desktop (النسخة القديمة)
+   HEADER — Desktop (النسخة الأصلية المعدّلة)
    ========================= */
 .header {
   align-items: center;
@@ -19,13 +19,14 @@
 .header-inner {
   padding-inline-start: 10%;
   padding-inline-end: 15%;
-  height: 64px;
+  height: 100px;
   display: flex;
   align-items: center;
   gap: 0.5rem;
   direction: rtl;
 }
 
+/* الهمبرغر */
 .hamburger {
   width: 23.5px;
   height: 17.5px;
@@ -48,22 +49,16 @@
 .hamburger.is-open span:nth-child(2) { opacity: 0; }
 .hamburger.is-open span:nth-child(3) { transform: translateY(-9px) rotate(-45deg); }
 
-.logo {
-  display: inline-flex;
-  align-items: center;
-  text-decoration: none;
+/* اللوجو فقط (بدون نص) */
+.header-logo {
+  height: 65px;
+  width: auto;
+  object-fit: contain;
+  margin-inline-start: 20px;
   flex-shrink: 0;
-  max-width: 180px;
-  height: auto;
-}
-.logo-mark {
-  font-family: "AraHamah1964", sans-serif;
-  font-weight: 700;
-  font-size: 2rem;
-  line-height: 1;
-  color: #000;
 }
 
+/* الروابط الرئيسية */
 .main-nav {
   display: inline-flex;
   align-items: center;
@@ -79,6 +74,7 @@
 }
 .nav-link:hover { color: #000; }
 
+/* زر البث المباشر */
 .live-btn {
   display: inline-flex;
   align-items: center;
@@ -106,13 +102,13 @@
   cursor: text;
 }
 .search-icon { font-size: 18px; color: #666; }
-.search-text { font-family: "Cairo", sans-serif; font-size: 16px; color: #999; }
 .search-input {
   border: none;
   background: transparent;
   outline: none;
   font-size: 16px;
   color: #000;
+  width: 100%;
 }
 .search-input::placeholder { color: #999; }
 
@@ -125,14 +121,14 @@
   pointer-events: none;
   transition: opacity 0.25s ease;
   z-index: 2000; /* فوق الهيدر */
-  direction: rtl; /* ترتيب عربي داخل المنيو */
+  direction: rtl;
 }
 .drawer--open { opacity: 1; pointer-events: auto; }
 
 .drawer-panel {
   position: absolute;
   top: 0;
-  right: 0; /* RTL */
+  right: 0;
   width: min(80vw, 320px);
   height: 100%;
   background: #fff;
@@ -171,87 +167,81 @@
   color: #c0162e;
 }
 
-/* إعادة تأكيد خطوط الهامبرغر */
-.hamburger span {
-  display: block;
-  width: 100%;
-  height: 2px;
-  border-radius: 2px;
-  background: #000;
-  transition: transform 0.25s ease, opacity 0.2s ease;
-}
-
 /* =========================
-   Mobile — New (≤ 992px)
+   Mobile — (≤ 992px)
+   ========================= */
+/* =========================
+   Mobile — (≤ 992px)
    ========================= */
 @media (max-width: 992px) {
   .main-nav,
   .live-btn {
-    display: none !important; /* نخفيهم بالموبايل */
+    display: none !important;
   }
 
   .header-inner {
-    direction: ltr;
+    direction: rtl;                 /* 👈 رجّعنا RTL طبيعي */
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;    /* العناصر تمشي من اليمين */
     height: 58px;
-    padding-inline: 4%; /* كان 6% */
-    gap: .35rem;        /* كان .5rem */
+    padding-inline: 4%;
+    gap: 0.35rem;
   }
 
-  /* البحث أقصى الشمال فعليًا */
+  /* البحث: نطيره لحاله عالشمال */
   .search {
-    order: 1;
+    /* 🔴 مهم: إشيل أي order من قبل */
+    margin-right: auto;             /* 👈 هذا اللي بدفعه للشمال */
     margin-left: 0;
-    margin-right: auto;      /* يطرد باقي العناصر لليمين */
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    width: 120px;            /* أوسع شوي للمرونة */
+    width: 120px;
     height: 30px;
     padding: 0 0.5rem;
     background: rgba(120, 120, 128, 0.16);
     border-radius: 100px;
-    overflow: hidden;
   }
-  .search-icon { font-size: 14px; flex-shrink: 0; }
-  .search-input { font-size: 13px; width: 100%; }
 
-  /* اللوجو والهامبرغر عاليمين */
-  .logo {
-    order: 2;
-    max-width: 128px;  /* كان 140px */
+  /* اللوجو: يجي بعد الهمبرغر مباشرة */
+  .header-logo {
+    /* 🔴 تأكدي ما في order هون */
+    height: 50px;
+    width: auto;
+    margin-inline-start: 8px;       /* مسافة صغيرة بينه وبين الهمبرغر */
+    object-fit: contain;
     flex-shrink: 0;
   }
-  .logo-mark {
-    font-size: 1.3rem; 
-    line-height: 1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
 
+  /* الهمبرغر: أول عنصر على اليمين */
   .hamburger {
-    order: 3;
+    /* 🔴 برضو بدون order */
     display: inline-flex !important;
-    width: 24px;       /* كان 28px */
+    width: 24px;
     height: 18px;
-    margin-left: .25rem;
+    margin-left: 0;
   }
-  .hamburger span { width: 100%; height: 2px; background: #000; }
 
-  /* ما بدنا أي روابط تبين */
-  .spacer { display: none !important; }
+  .hamburger span {
+    width: 100%;
+    height: 2px;
+    background: #000;
+  }
+
+  /* خليه مخفي عشان ما يخبّص الوسط */
+  .spacer {
+    display: none !important;
+  }
 }
+
 
 /* ——— شاشات أصغر جدًا (≤ 390px) ——— */
 @media (max-width: 390px) {
   .header-inner { padding-inline: 3.5%; gap: .3rem; }
   .search { width: 104px; }
   .search-input { font-size: 12.5px; }
-  .logo { max-width: 116px; }
-  .logo-mark { font-size: 1.5rem; }
+  .header-logo { height: 44px; }
   .hamburger { width: 22px; height: 16px; }
 }
 
@@ -261,25 +251,23 @@
   .search { width: 96px; }
   .search-icon { font-size: 13px; }
   .search-input { font-size: 12px; }
-  .logo { max-width: 108px; }
-  .logo-mark { font-size: 1.4rem; }
+  .header-logo { height: 40px; }
 }
 
 /* ——— أضيق حالات (≤ 340px) ——— */
 @media (max-width: 340px) {
   .search { width: 88px; }
   .search-input::placeholder { opacity: .6; }
-  .logo { max-width: 100px; }
-  .logo-mark { font-size: 1.35rem; }
+  .header-logo { height: 38px; }
 }
-/* === روابط فرعية لاختبر معلوماتك === */
-.drawer-sub-links {
-  margin-right: 14px; /* مسافة بسيطة لتمييز التفرع بالـ RTL */
-  display: flex;
-  flex-direction: column;
+/* 🔽 تصغير ارتفاع الهيدر بدون ما يصغر اللوجو أو يخرب الترتيب */
+.header {
+  min-height: 58px !important;     /* 👈 كان 64px، هيك بصير أنحف */
+  padding-block: 4px !important;
 }
 
-.drawer-sub-links .sub-link {
-  font-size: 0.95em;
-  opacity: 0.9;
+.header-inner {
+  height: 80px !important;         /* 👈 كان 100px، هيك بيصير أقصر */
+  align-items: center !important;
+  padding-block: 0 !important;
 }
