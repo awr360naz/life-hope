@@ -15,6 +15,8 @@ import ourPicksRouter from "./routes/ourPicks.js";
 import programsTodayRouter from "./routes/programsToday.routes.js";
 import quizzesRouter from "./routes/quizzes.js";
 import sabbathRoutes from "./routes/sabbathRoutes.js"; 
+import prayerRequestRouter from "./routes/prayerRequest.js";
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -104,6 +106,8 @@ app.use(shortSegmentsRouter);
 app.use("/api/content/our-picks", ourPicksRouter);
 app.use("/api/content/quizzes", quizzesRouter);
 app.use("/api/content", sabbathRoutes);
+app.use("/api/contact/prayer-request", prayerRequestRouter);
+
 
 // ✅ ثبّت المسار الصح لبرنامج اليوم/الأسبوع:
 app.use("/api/content/programs", programsTodayRouter);

@@ -37,6 +37,7 @@
   border: 0;
   padding: 0;
   cursor: pointer;
+ 
 }
 .hamburger span {
   display: block;
@@ -141,6 +142,8 @@
   transition: transform 0.25s ease;
   z-index: 2100;
   overflow-y: auto;
+  font-family: "Cairo", sans-serif;
+  
 }
 .drawer--open .drawer-panel { transform: translateX(0); }
 
@@ -148,7 +151,7 @@
   text-decoration: none;
   font-family: "Cairo", sans-serif;
   font-weight: 600;
-  font-size: 1.05rem;
+  font-size: 1.2rem;
   color: #222;
   padding: 0.5rem 0.25rem;
   border-radius: 8px;
@@ -165,6 +168,26 @@
   font-weight: 700;
   text-align: center;
   color: #c0162e;
+}
+.quiz-submenu {
+  display: flex;
+  flex-direction: column; 
+  gap: 4px;
+  margin-right: 18px; 
+  margin-top: 4px;
+}
+
+.drawer-sub-item {
+  font-family: "Cairo", sans-serif;
+  font-size: 1.1rem; 
+  color: #444;
+  padding: 2px 0;
+  text-decoration: none;
+  display: block;
+}
+
+.drawer-sub-item:hover {
+  color: #000;
 }
 
 /* =========================
