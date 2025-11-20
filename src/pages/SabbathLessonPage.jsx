@@ -72,19 +72,18 @@ export default function SabbathLessonPage() {
         <h1>{lesson?.title || "…"}</h1>
       </header>
 
-      <div className="sabbath-brief">
-        <p className="one-line">
-          {lesson?.short_desc}
-          {lesson?.long_desc ? (
-            <>
-              {" "}
-              <button className="linklike" onClick={() => setShowMore(true)}>
-                للمزيد
-              </button>
-            </>
-          ) : null}
-        </p>
-      </div>
+     <div className="sabbath-brief">
+  <div className="brief-row">
+    <p className="one-line">{lesson?.short_desc}...</p>
+
+    {lesson?.long_desc ? (
+      <button className="linklike" onClick={() => setShowMore(true)}>
+        للمزيد
+      </button>
+    ) : null}
+  </div>
+</div>
+
 
       {loading ? (
         <div className="sabbath-loading">جارِ التحميل…</div>

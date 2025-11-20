@@ -31,6 +31,7 @@ import SabbathLessonsIndex from "./pages/SabbathLessonsIndex";
 import SabbathLessonPage from "./pages/SabbathLessonPage";
 import SabbathWeekPage from "./pages/SabbathWeekPage";
 import SabbathItemPage from "./pages/SabbathItemPage";
+import CamiPropheciesPage from "./pages/CamiPropheciesPage";
 /* 1) عطّل استرجاع التمرير من المتصفّح */
 function UseManualScrollRestoration() {
   useEffect(() => {
@@ -178,6 +179,7 @@ export default function App() {
 <Route path="/sabbath-lessons/:lessonSlug" element={<SabbathLessonPage />} />
 <Route path="/sabbath-weeks/:weekSlug" element={<SabbathWeekPage />} />
 <Route path="/sabbath-items/:itemSlug" element={<SabbathItemPage />} />
+<Route path="/cami-prophecies" element={<CamiPropheciesPage />} />
 
           </Routes>
           

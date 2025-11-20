@@ -12,6 +12,8 @@ import MiniScheduleWidget from "./MiniScheduleWidget";
 import GifNotice from "../components/GifNotice";
 import angel from "../assets/angel.gif";
 import ThreeAngelsmp4 from "../assets/ThreeAngels.mp4";
+import CamiPropheciesCarousel from "../components/CamiPropheciesCarousel";
+
 
 
 /* function ThirdFrame() {
@@ -227,7 +229,7 @@ export default function HomePage() {
 
    <ProgramsCarousel title="برامجنا" />
    <br></br>
- 
+ <CamiPropheciesCarousel />
       <ShortSegmentsCarousel
   title="فقرات قصيرة"
   perView={5}
@@ -236,6 +238,7 @@ export default function HomePage() {
   toAllHref="/shorts"
   limit={48}
 />
+
   <OurPicks
        title="فقرات قصيرة"
       />

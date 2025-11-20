@@ -1,0 +1,133 @@
+.cami-page {
+  direction: rtl;
+  font-family: Cairo, sans-serif;
+}
+
+.cami-heading {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 8px 0 16px;
+}
+
+/* الشبكة */
+.cami-grid {
+  --gap: 12px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--gap);
+  justify-content: center;
+}
+
+/* الكرت */
+.cami-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  text-decoration: none;
+  color: inherit;
+  min-height: 0;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  border: none;
+  text-align: start;
+}
+.cami-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* الصورة 16:9 */
+.cami-thumb {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: #f2f2f2;
+  overflow: hidden;
+}
+.cami-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* أيقونة تشغيل */
+.cami-play {
+  position: absolute;
+  inset-inline-start: 10px;
+  inset-block-end: 10px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  border-radius: 999px;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+}
+
+/* النص */
+.cami-body {
+  padding: 10px 12px 14px;
+}
+.cami-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* Error */
+.cami-error {
+  color: #b30000;
+}
+
+/* الترقيم */
+.cami-pager {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 12px;
+  font-size: 14px;
+}
+
+.cami-numbers {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.cami-btn {
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 10px;
+  padding: 0.5rem 0.8rem;
+  cursor: pointer;
+}
+.cami-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.cami-btn.is-active {
+  border-color: #111;
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .cami-grid {
+    grid-template-columns: repeat(2, minmax(140px, 1fr));
+  }
+
+  .cami-title {
+    font-size: 13px;
+    -webkit-line-clamp: 3;
+  }
+}

@@ -178,6 +178,7 @@
   .sabbath-card__subtitle {
     font-size: 13px;
   }
+  
 }
 /* ===== Modal overlay ===== */
 .sabbath-modal {
@@ -299,4 +300,17 @@
     max-height: 88vh;          /* مساحة أكبر قليلًا للجوال */
   }
   .modal-title { font-size: 18px; }
+}
+.brief-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.one-line {
+  flex: 1; 
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

@@ -194,3 +194,20 @@
   display: flex;
   align-items: flex-start;
 }
+/* ===== فتح نبؤات مع Cami — فيديوهات 16:9 ===== */
+
+.cami-prophecies-section .shortseg-thumb {
+  aspect-ratio: 16 / 9;            /* بدل 9 / 16 */
+  border-radius: 12px 12px 0 0;    /* زوايا الصورة من فوق */
+}
+
+.cami-prophecies-section .shortseg-body {
+  border-radius: 0 0 12px 12px;    /* الصندوق الأبيض من تحت */
+  margin-top: 0;
+}
+
+.cami-prophecies-section .program-card.shortseg-card {
+  scroll-snap-align: start;
+  background: transparent;
+  box-shadow: none;
+}
