@@ -2,6 +2,14 @@
 .our-picks { padding: 8px 0 20px; }
 .our-picks__inner { max-width: 1420px; margin-inline: auto; padding-inline: 10px; }
 .our-picks__heading { font-size: 24px; font-weight: 700; margin: 6px 0 12px; }
+.our-picks__sub {
+  font-size: 18px;      /* أصغر من 24px */
+  font-weight: 400;     /* وزن أخف */
+  margin-right: 6px;    /* مسافة صغيرة يمين العنوان */
+  color: #555;          /* لون أنعم (اختياري) */
+}
+
+
 
 /* شبكة: الشورت يسار على صفّين، يمين فيديو فوق وصورة تحت */
 .our-picks__grid {

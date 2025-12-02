@@ -267,7 +267,15 @@ const handleShortCardClick = React.useCallback((e) => {
   return (
     <section className="our-picks" dir="rtl">
       <div className="our-picks__inner">
-        <h2 className="our-picks__heading">اختياراتنا</h2>
+    
+        <h2 className="our-picks__heading">
+  ميلاد مجيد 
+  <span className="our-picks__sub"> – محتوى ميلادي</span>
+</h2>
+
+        
+        
+        
 
         <div className="our-picks__grid">
           {/* SHORT: يملا ارتفاع صفّين — الصورة تملأ الإطار، والعنوان تحتها */}
