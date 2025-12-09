@@ -17,6 +17,7 @@ import quizzesRouter from "./routes/quizzes.js";
 import sabbathRoutes from "./routes/sabbathRoutes.js"; 
 import prayerRequestRouter from "./routes/prayerRequest.js";
 import camiPropheciesRouter from "./routes/camiProphecies.js";
+import searchRouter from "./routes/search.routes.js";
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -33,16 +34,15 @@ app.set("trust proxy", true);
 
 app.use(
   cors({
-    origin: (_origin, cb) => cb(null, true), // مرن للتطوير
+    origin: (_origin, cb) => cb(null, true), 
     credentials: true,
   })
 );
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
-// === إصلاح اختفاء فيديوهات YouTube في Chrome ===
+
 app.use((req, res, next) => {
-  // السماح بتضمين iframes من youtube.com بدون حظر الكوكيز
   res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
   res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
   res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
@@ -52,17 +52,14 @@ app.use((req, res, next) => {
 
 
 
-/* فحص سريع: لازم يرجّع {ok:true} على :4000/api/_ping */
+
 app.get("/api/_ping", (_req, res) => res.json({ ok: true, at: new Date().toISOString() }));
 
-/* صحة */
+
 app.get("/api/health", (_req, res) => {
   res.json({ ok: true, service: "life-hope-backend", time: new Date().toISOString() });
 });
 
-/* =========================
-   قصتنا — لازم يسبق أي app.use(...)
-   ========================= */
 app.get("/api/content/about", async (_req, res) => {
   try {
     const supabase = getSupabase();
@@ -77,7 +74,7 @@ app.get("/api/content/about", async (_req, res) => {
     if (error) return res.status(500).json({ ok: false, error: "DB_ERROR" });
 
     if (!data) {
-      // فولباك مؤقت
+
       return res.json({
         ok: true,
         data: {
@@ -109,21 +106,19 @@ app.use("/api/content/quizzes", quizzesRouter);
 app.use("/api/content", sabbathRoutes);
 app.use("/api/contact/prayer-request", prayerRequestRouter);
 app.use(camiPropheciesRouter);
-
-
-// ✅ ثبّت المسار الصح لبرنامج اليوم/الأسبوع:
 app.use("/api/content/programs", programsTodayRouter);
-
-// (اختياري) alias لو في كود قديم بينادي /api/programs/...
 app.use("/api/programs", programsTodayRouter);
-/**
- * Simple Search endpoint
- * GET /api/content/search?q=كلمة&limit=20&offset=0
- */
+app.use("/api", searchRouter);
+
+ /*
 app.get("/api/content/search", async (req: Request, res: Response) => {
   const supabase = getSupabase();
   const rawQ = (req.query.q ?? "").toString().trim();
-  const limit = Math.min(parseInt((req.query.limit ?? "20") as string, 10) || 20, 50);
+  const limit =
+    Math.min(
+      parseInt((req.query.limit ?? "20") as string, 10) || 20,
+      50
+    );
   const debug = String(req.query.debug || "") === "1";
 
   const AR_TATWEEL = /\u0640/g;
@@ -141,60 +136,265 @@ app.get("/api/content/search", async (req: Request, res: Response) => {
   const qNorm = norm(rawQ);
   const pats = Array.from(new Set([`%${rawQ}%`, `%${qNorm}%`]));
 
+  type ResultType = "article" | "program" | "short" | "cami" | "quiz";
+
   const dbg: any = { q: rawQ, pats, steps: [], errors: [] };
   if (!rawQ || !supabase) {
-    if (debug) return res.json({ ...dbg, note: "no query or no supabase", results: [] });
+    if (debug)
+      return res.json({
+        ...dbg,
+        note: "no query or no supabase",
+        results: [],
+      });
     return res.json([]);
   }
 
-  const mapRecord = (r: any, type: "article" | "program") => ({
-    id: r?.id ?? null,
-    type,
-    slug: r?.slug ?? null,
-    title: r?.title ?? "",
-    excerpt:
-      (typeof r?.excerpt === "string" && r.excerpt) ||
-      (typeof r?.content === "string" && String(r.content).slice(0, 140)) ||
-      "",
-    cover_url: r?.cover_url ?? null,
-    created_at: r?.created_at ?? null,
-    url: r?.slug ? (type === "article" ? `/articles/${r.slug}` : `/programs/${r.slug}`) : null,
-  });
+  const mapRecord = (r: any, type: ResultType) => {
+    const base: any = {
+      id: r?.id ?? null,
+      type,
+      slug: r?.slug ?? null,
+      title: r?.title ?? "",
+      // نخليها snippet عشان الفرونت
+      snippet:
+        (typeof r?.excerpt === "string" && r.excerpt) ||
+        (typeof r?.description === "string" && r.description) ||
+        (typeof r?.content === "string" &&
+          String(r.content).slice(0, 140)) ||
+        "",
+      cover_url:
+        r?.cover_url ??
+        r?.thumbnail_url ??
+        r?.cover ??
+        null,
+      created_at: r?.created_at ?? r?.published_at ?? null,
+    };
 
-  async function tryIlike(table: string, field: string, sel: string, type: "article" | "program") {
+    // URL حسب النوع
+    switch (type) {
+      case "article":
+        base.category = "مقال";
+        base.url = base.slug
+          ? `/articles/${base.slug}`
+          : base.id
+          ? `/articles/${base.id}`
+          : null;
+        break;
+      case "program":
+        base.category = "برنامج";
+        base.url = base.slug
+          ? `/programs/${base.slug}`
+          : base.id
+          ? `/programs/${base.id}`
+          : null;
+        break;
+      case "short":
+        base.category = "مقاطع قصيرة";
+        base.url = base.id
+          ? `/short-segments?focus=${base.id}`
+          : null;
+        break;
+      case "cami":
+        base.category = "نبوّات كامي";
+        base.url = base.id
+          ? `/cami-prophecies?video=${base.id}`
+          : null;
+        break;
+      case "quiz":
+        base.category = "اختبار";
+        base.url = base.slug
+          ? `/quizzes/${base.slug}`
+          : base.id
+          ? `/quizzes/${base.id}`
+          : null;
+        break;
+    }
+
+    return base;
+  };
+
+  async function tryIlike(
+    table: string,
+    field: string,
+    sel: string,
+    type: ResultType
+  ) {
     try {
       let acc: any[] = [];
       for (const p of pats) {
-        const r = await supabase.from(table).select(sel).ilike(field, p).order("created_at", { ascending: false });
+        const r = await supabase
+          .from(table)
+          .select(sel)
+          .ilike(field, p)
+          .order("created_at", { ascending: false });
         if (r.error) throw r.error;
         acc = acc.concat(r.data || []);
       }
       dbg.steps.push({ table, field, count: acc.length });
       return acc.map((x) => mapRecord(x, type));
     } catch (e: any) {
-      dbg.errors.push({ table, field, message: String(e?.message || e) });
+      dbg.errors.push({
+        table,
+        field,
+        message: String(e?.message || e),
+      });
       return [];
     }
   }
 
   let articles: any[] = [];
   let programs: any[] = [];
+  let shorts: any[] = [];
+  let cami: any[] = [];
+  let quizzes: any[] = [];
 
-  articles = articles.concat(await tryIlike("articles", "title", "*", "article"));
-  programs = programs.concat(await tryIlike("programs_catalog", "title", "*", "program"));
+  // ===== المقالات والبرامج =====
+  articles = articles.concat(
+    await tryIlike(
+      "articles",
+      "title",
+      "id, slug, title, excerpt, content, cover_url, created_at, published_at",
+      "article"
+    )
+  );
+  programs = programs.concat(
+    await tryIlike(
+      "programs_catalog",
+      "title",
+      "id, slug, title, content, cover_url, created_at, published_at",
+      "program"
+    )
+  );
 
-  if (articles.length === 0) articles = articles.concat(await tryIlike("articles", "excerpt", "*", "article"));
-  if (articles.length === 0) articles = articles.concat(await tryIlike("articles", "content", "*", "article"));
-  if (programs.length === 0) programs = programs.concat(await tryIlike("programs_catalog", "content", "*", "program"));
+  if (articles.length === 0) {
+    articles = articles.concat(
+      await tryIlike(
+        "articles",
+        "excerpt",
+        "id, slug, title, excerpt, content, cover_url, created_at, published_at",
+        "article"
+      )
+    );
+  }
+  if (articles.length === 0) {
+    articles = articles.concat(
+      await tryIlike(
+        "articles",
+        "content",
+        "id, slug, title, excerpt, content, cover_url, created_at, published_at",
+        "article"
+      )
+    );
+  }
+  if (programs.length === 0) {
+    programs = programs.concat(
+      await tryIlike(
+        "programs_catalog",
+        "content",
+        "id, slug, title, content, cover_url, created_at, published_at",
+        "program"
+      )
+    );
+  }
 
-  let merged = [...articles, ...programs].sort((a, b) => (b.created_at ?? "").localeCompare(a.created_at ?? ""));
-  merged = merged.slice(0, limit);
+  // ===== المقاطع القصيرة =====
+  shorts = shorts.concat(
+    await tryIlike(
+      "short_segments", // غيّر الاسم لو مختلف
+      "title",
+      "id, title, description, thumbnail_url, created_at",
+      "short"
+    )
+  );
+  if (shorts.length === 0) {
+    shorts = shorts.concat(
+      await tryIlike(
+        "short_segments",
+        "description",
+        "id, title, description, thumbnail_url, created_at",
+        "short"
+      )
+    );
+  }
 
+  // ===== Cami Prophecies =====
+  cami = cami.concat(
+    await tryIlike(
+      "cami_videos", // غيّر الاسم لو مختلف
+      "title",
+      "id, title, description, thumbnail_url, created_at",
+      "cami"
+    )
+  );
+  if (cami.length === 0) {
+    cami = cami.concat(
+      await tryIlike(
+        "cami_videos",
+        "description",
+        "id, title, description, thumbnail_url, created_at",
+        "cami"
+      )
+    );
+  }
+
+  // ===== Quizzes =====
+  quizzes = quizzes.concat(
+    await tryIlike(
+      "quizzes", // غيّر الاسم لو مختلف
+      "title",
+      "id, slug, title, description, cover_url, created_at",
+      "quiz"
+    )
+  );
+  if (quizzes.length === 0) {
+    quizzes = quizzes.concat(
+      await tryIlike(
+        "quizzes",
+        "description",
+        "id, slug, title, description, cover_url, created_at",
+        "quiz"
+      )
+    );
+  }
+
+  // دمج أولي
+  let merged: any[] = [
+    ...articles,
+    ...programs,
+    ...shorts,
+    ...cami,
+    ...quizzes,
+  ];
+
+  // لو لسا فاضي، استخدم fallback المحلي
   if (merged.length === 0) {
     try {
-      const [a2, p2] = await Promise.all([
-        supabase.from("articles").select("*").order("created_at", { ascending: false }).limit(200),
-        supabase.from("programs_catalog").select("*").order("created_at", { ascending: false }).limit(200),
+      const [a2, p2, s2, c2, q2] = await Promise.all([
+        supabase
+          .from("articles")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(200),
+        supabase
+          .from("programs_catalog")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(200),
+        supabase
+          .from("short_segments")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(200),
+        supabase
+          .from("cami_videos")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(200),
+        supabase
+          .from("quizzes")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(200),
       ]);
 
       const pickText = (obj: any) =>
@@ -202,40 +402,96 @@ app.get("/api/content/search", async (req: Request, res: Response) => {
           .filter((v) => typeof v === "string")
           .join(" ");
 
-      const ok = (obj: any) => norm(pickText(obj)).includes(qNorm);
+      const ok = (obj: any) =>
+        norm(pickText(obj)).includes(qNorm);
 
-      const aLoc = (a2.data || []).filter(ok).map((x) => mapRecord(x, "article"));
-      const pLoc = (p2.data || []).filter(ok).map((x) => mapRecord(x, "program"));
+      const aLoc = (a2.data || [])
+        .filter(ok)
+        .map((x) => mapRecord(x, "article"));
+      const pLoc = (p2.data || [])
+        .filter(ok)
+        .map((x) => mapRecord(x, "program"));
+      const sLoc = (s2.data || [])
+        .filter(ok)
+        .map((x) => mapRecord(x, "short"));
+      const cLoc = (c2.data || [])
+        .filter(ok)
+        .map((x) => mapRecord(x, "cami"));
+      const qLoc = (q2.data || [])
+        .filter(ok)
+        .map((x) => mapRecord(x, "quiz"));
 
-      merged = [...aLoc, ...pLoc]
-        .sort((a, b) => (b.created_at ?? "").localeCompare(a.created_at ?? ""))
-        .slice(0, limit);
-      dbg.steps.push({ fallback_local: true, aLoc: aLoc.length, pLoc: pLoc.length });
+      merged = [
+        ...aLoc,
+        ...pLoc,
+        ...sLoc,
+        ...cLoc,
+        ...qLoc,
+      ];
+      dbg.steps.push({
+        fallback_local: true,
+        counts: {
+          aLoc: aLoc.length,
+          pLoc: pLoc.length,
+          sLoc: sLoc.length,
+          cLoc: cLoc.length,
+          qLoc: qLoc.length,
+        },
+      });
     } catch (e: any) {
-      dbg.errors.push({ fallback_local_error: String(e?.message || e) });
+      dbg.errors.push({
+        fallback_local_error: String(e?.message || e),
+      });
     }
   }
 
-  return debug ? res.json({ ...dbg, counts: { merged: merged.length }, results: merged }) : res.json(merged);
-});
+  // ترتيب: أولًا اللي العنوان فيه الكلمة، بعدين حسب التاريخ
+  const qLower = rawQ.toLowerCase();
+  merged = merged
+    .sort((a, b) => {
+      const at = (a.title || "")
+        .toLowerCase()
+        .includes(qLower)
+        ? 0
+        : 1;
+      const bt = (b.title || "")
+        .toLowerCase()
+        .includes(qLower)
+        ? 0
+        : 1;
+      if (at !== bt) return at - bt;
 
-/* =========================
-   إعدادات عامة من البيئة
-   ========================= */
+      const ad = String(a.created_at || "");
+      const bd = String(b.created_at || "");
+      if (ad !== bd) return bd.localeCompare(ad);
+
+      return (a.title || "").localeCompare(
+        b.title || "",
+        "ar"
+      );
+    })
+    .slice(0, limit);
+
+  return debug
+    ? res.json({
+        ...dbg,
+        counts: { merged: merged.length },
+        results: merged,
+      })
+    : res.json(merged);
+});
+*/
+
 const PROGRAMS_TABLE = process.env.PROGRAMS_TABLE || "programs";
 const THIRD_TABLE = process.env.THIRD_FRAME_TABLE || "home_third_frame_items";
 const PROGRAMS_CATALOG_TABLE = process.env.PROGRAMS_CATALOG_TABLE || "programs_catalog";
 
-/* =========================
-   أدوات مساعدة
-   ========================= */
+
 function getTzDayName() {
   return new Date().toLocaleString("en-US", { weekday: "long", timeZone: "Asia/Jerusalem" });
 }
 
-/* =========================
-   الإطار 2: برنامج اليوم
-   ========================= */
+
 async function handleGetProgramToday(req: express.Request, res: express.Response) {
   const sb = getSupabase();
   if (!sb) return res.status(500).json({ error: "Supabase not configured (env missing)" });
@@ -253,39 +509,24 @@ async function handleGetProgramToday(req: express.Request, res: express.Response
   }
 }
 app.get("/api/content/programs/today", handleGetProgramToday);
-app.get("/api/programs/today", handleGetProgramToday); // جسر توافق
+app.get("/api/programs/today", handleGetProgramToday); 
 
-/* =========================
-   الإطار 3: نص + صورة (Home Third Frame)
-   — يرجّع نفس الشكل القديم { ok: true, content }
-   ========================= */
-/* =========================
-   الإطار 3: نص + صورة (Home Third Frame)
-   — robust: بدون أعمدة محددة، و sorting في JS
-   ========================= */
-/* =========================
-   الإطار 3: نص + صورة (Home Third Frame)
-   — robust: بدون أعمدة محددة، و sorting في JS
-   ========================= */
 
-// helper: تنضيف URL (يشيل " والمسافات والبدايات الغلط)
-// ====== Helpers ======
-/* ========= Helpers ========= */
 function unwrapUrl(v: any): string | null {
   let s = String(v ?? "").trim();
-  s = s.replace(/^["'\s]+|["'\s]+$/g, ""); // إزالة لفّافات
+  s = s.replace(/^["'\s]+|["'\s]+$/g, ""); 
 
-  // http/https كامل
+
   const m = s.match(/https?:\/\/[^\s"'<>)\]}]+/i);
   if (m) return m[0];
 
-  // بروتوكول نسبي //cdn...
+
   if (/^\/\//.test(s)) return "https:" + s;
 
-  // مسار مطلق /images/...
+
   if (/^\//.test(s)) return s;
 
-  // bucket/path أو أي مسار نسبي ذو دلالة
+ 
   if (/^[\w.-]+\/.+/.test(s)) return s;
 
   return s ? s : null;
@@ -295,25 +536,25 @@ function toPublicStorageUrl(u: string | null): string | null {
   if (!u) return null;
   let s = String(u).trim().replace(/^["'\s]+|["'\s]+$/g, "");
 
-  // 1) رابط كامل
+ 
   if (/^https?:\/\//i.test(s)) return s;
 
-  // 2) بروتوكول نسبي //cdn...
+
   if (/^\/\//.test(s)) return "https:" + s;
 
-  // 3) مسار storage بدون دومين
+
   if (/^\/storage\/v1\/object\//.test(s)) {
     const base = process.env.SUPABASE_URL?.replace(/\/+$/, "");
     return base ? `${base}${s}` : s;
   }
 
-  // 4) bucket/path -> public URL
+
   if (/^[\w.-]+\/.+/.test(s)) {
     const base = process.env.SUPABASE_URL?.replace(/\/+$/, "");
     return base ? `${base}/storage/v1/object/public/${s}` : s;
   }
 
-  // 5) مسار مطلق داخل الموقع (غير storage)
+
   if (/^\//.test(s)) return s;
 
   return s || null;
@@ -333,7 +574,6 @@ async function handleGetHomeThird(req: express.Request, res: express.Response) {
   console.log("[home-third-frame]", { url: req.originalUrl, rawSort, sortNum, drafts });
 
   try {
-    // لا نحدّد أعمدة لتفادي فشل عند اختلاف المخطط
     const { data, error } = await sb.from(THIRD_TABLE).select("*");
     if (error) {
       console.error("[home-third-frame] DB_ERROR:", error);
@@ -342,7 +582,7 @@ async function handleGetHomeThird(req: express.Request, res: express.Response) {
 
     let rows: any[] = data ?? [];
 
-    // فلترة المنشور/غير المنشور
+
     if (!drafts) {
       rows = rows.filter((r: any) => {
         const pub =
@@ -356,7 +596,7 @@ async function handleGetHomeThird(req: express.Request, res: express.Response) {
       return res.status(404).json({ ok: false, error: "NOT_FOUND" });
     }
 
-    // ترتيب آمن
+ 
     const numVal = (v: any) => (Number.isFinite(Number(v)) ? Number(v) : 0);
     const tsVal = (r: any) => (r?.updated_at || r?.created_at || "");
     rows.sort((a: any, b: any) => {
@@ -366,24 +606,24 @@ async function handleGetHomeThird(req: express.Request, res: express.Response) {
 
       const ta = tsVal(a);
       const tb = tsVal(b);
-      const tcmp = (tb || "").localeCompare(ta || ""); // desc
+      const tcmp = (tb || "").localeCompare(ta || "");
       if (tcmp !== 0) return tcmp;
 
       return String(a?.id || "").localeCompare(String(b?.id || ""));
     });
 
-    // اختيار العنصر حسب sortNum (index)
+  
     const pick = Math.max(0, Math.min(sortNum, rows.length - 1));
     const r: any = rows[pick];
 
-    // تطبيع النص
+  
     const body =
       (typeof r?.body === "string" && r.body) ??
       (typeof r?.text === "string" && r.text) ??
       (typeof r?.content === "string" && r.content) ??
       "";
 
-    // جرّب كل الأعمدة المحتملة للصورة (أولوية لـ hero_url)
+
     let heroRaw =
       r?.hero_url ??
       r?.image_url ??
@@ -391,13 +631,13 @@ async function handleGetHomeThird(req: express.Request, res: express.Response) {
       r?.img ??
       null;
 
-    // fallback: استخرج أول صورة من body إذا الأعمدة فاضية
+
     if (!heroRaw && typeof body === "string") {
       const m = body.match(/<img[^>]+src=["']([^"']+)["']/i);
       if (m) heroRaw = m[1];
     }
 
-    // URL نهائي وآمن (يدعم relative/bucket)
+  
     const hero_url = toPublicStorageUrl(unwrapUrl(heroRaw));
 
     const images = r?.images ?? null;
@@ -420,7 +660,7 @@ async function handleGetHomeThird(req: express.Request, res: express.Response) {
         id: r?.id,
         title: r?.title ?? "",
         body: String(body).trim(),
-        hero_url,     // ← الحقل الذي يستهلكه الفرونت
+        hero_url,     
         images,
         sort: sortField,
         updated_at: updated,
@@ -435,19 +675,15 @@ async function handleGetHomeThird(req: express.Request, res: express.Response) {
 }
 
 /* ========= Routes ========= */
-app.get("/api/content/home-third-frame", handleGetHomeThird);        // ?sort=0
-app.get("/api/content/home-third-frame/:sort", handleGetHomeThird);  // /.../0
+app.get("/api/content/home-third-frame", handleGetHomeThird);       
+app.get("/api/content/home-third-frame/:sort", handleGetHomeThird); 
 app.get("/api/home-third-frame", handleGetHomeThird);
 app.get("/api/home-third-frame/:sort", handleGetHomeThird);
 
-/* =========================
-   المقالات: باقي المسارات بالراوتر الخارجي
-   ========================= */
+
 const ARTICLES_TABLE = process.env.ARTICLES_TABLE || "articles";
 
-/* =========================
-   برامج عامة (كاروسول "برامجنا")
-   ========================= */
+
 app.get("/api/content/programs", async (req, res) => {
   try {
     const limit = Math.min(
@@ -461,9 +697,7 @@ app.get("/api/content/programs", async (req, res) => {
       .from(PROGRAMS_CATALOG_TABLE)
       .select("id, title, content, cover_url, sort_order, updated_at")
       .eq("published", true)
-      // ✅ أولًا: حسب sort_order، والـ NULLs ييجوا بالآخر
       .order("sort_order", { ascending: true, nullsFirst: false })
-      // ✅ ثانيًا: لو نفس sort_order، يرتّب بالأحدث أولًا
       .order("updated_at", { ascending: false })
       .limit(limit);
 
@@ -525,9 +759,7 @@ app.get("/api/content/programs/:id", async (req, res) => {
   }
 });
 
-/* =========================
-   فقرات قصيرة — نسخة مكيَّشة
-   ========================= */
+
 type ShortSeg = {
   id: string;
   title: string | null;
@@ -608,7 +840,7 @@ app.get("/api/content/short-segments", async (req: Request, res: Response) => {
   }
 });
 
-// جسور Redirect صريحة
+
 app.get("/api/short-segments", (req, res) => {
   const qs = req.url.includes("?") ? req.url.slice(req.url.indexOf("?")) : "";
   res.redirect(307, `/api/content/short-segments${qs}`);
@@ -619,14 +851,12 @@ app.get("/api/programs", (req, res) => {
   res.redirect(307, `/api/content/programs${qs}`);
 });
 
-/* =========================
-   404 JSON لمسارات /api/*
-   ========================= */
+
 app.use((req, res, next) => {
   if (req.path.startsWith("/api/")) return res.status(404).json({ error: "Not found" });
   next();
 });
-// ==== Serve React build (الجذر /build) ====
+
 const clientBuildDir = path.resolve(__dirname, "../../build");
 app.use(express.static(clientBuildDir));
 
@@ -635,26 +865,16 @@ app.get(/^\/(?!api\/).*/, (_req, res) => {
 });
 
 
-/* =========================
-   Error handler
-   ========================= */
+
 app.use((err: any, _req: any, res: any, _next: any) => {
   console.error("Unhandled error:", err);
   res.status(err?.status || 500).json({ error: err?.message || "Internal Server Error" });
 });
 
-/* =========================
-   تشغيل السيرفر + معالجة EADDRINUSE
-   ========================= */
-/* =========================
-   تشغيل السيرفر + معالجة EADDRINUSE
-   ========================= */
 
-// سمّه APP_PORT لتجنّب تضارب اسم PORT
 const APP_PORT = Number(process.env.PORT || 4000);
 
 const server = app
-  // مهم: لا تحدد "127.0.0.1" عشان Render يحتاج 0.0.0.0 — تركه بدون host = يسمع على كل الواجهات
   .listen(APP_PORT, () => {
     console.log(`✅ Backend up at :${APP_PORT}`);
     console.log(

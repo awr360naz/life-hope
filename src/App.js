@@ -8,7 +8,7 @@ import HomePage from './pages/HomePage';
 import './assets/fonts.css';
 import './App.css';
 import ProgramsPage from './pages/ProgramsPage';
-import StoriesPage from './pages/StoriesPage';
+
 import LivePage from './pages/LivePage';
 import AudioLive from './pages/AudioLive';
 import VedioAudioLive from "./pages/VedioAudioLive";
@@ -24,7 +24,6 @@ import CategoryArticlesPage from "./pages/CategoryArticlesPage.jsx";
 import QuizCategoryPage from "./pages/QuizCategory";
 import AngelsPage from "./pages/AngelsPage";
 import ManagerSpeech from "./pages/ManagerSpeech";
-
 import { QuizIndex } from "./pages/QuizIndex";
 import { QuizPage } from "./pages/QuizPage";
 import SabbathLessonsIndex from "./pages/SabbathLessonsIndex";
@@ -32,13 +31,12 @@ import SabbathLessonPage from "./pages/SabbathLessonPage";
 import SabbathWeekPage from "./pages/SabbathWeekPage";
 import SabbathItemPage from "./pages/SabbathItemPage";
 import CamiPropheciesPage from "./pages/CamiPropheciesPage";
-/* 1) عطّل استرجاع التمرير من المتصفّح */
 function UseManualScrollRestoration() {
   useEffect(() => {
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
     }
-    // على الخروج برضو ارجعه manual
+  
     const beforeUnload = () => window.scrollTo(0, 0);
     window.addEventListener('beforeunload', beforeUnload);
     return () => window.removeEventListener('beforeunload', beforeUnload);
@@ -46,40 +44,40 @@ function UseManualScrollRestoration() {
   return null;
 }
 
-/* 2) سكول للأعلى بقوة (قبل الرسم + بعده) */
+
 function ScrollToTopHard() {
   const { pathname } = useLocation();
 
-  // قبل الرسم: يمنع أي “قفزة” بتصير من عناصر داخل الصفحة
+ 
   useLayoutEffect(() => {
-    // عطل السموث مؤقتًا
+ 
     const html = document.documentElement;
     const prev = html.style.scrollBehavior;
     html.style.scrollBehavior = 'auto';
 
-    // فك أي فوكس ممكن يجرّ تمرير
+   
     if (document.activeElement && typeof document.activeElement.blur === 'function') {
       document.activeElement.blur();
     }
 
-    // صفّر التمرير على كل الأماكن المحتملة
+   
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
 
-    // نبضة بعد الرسمة الأولى
+ 
     requestAnimationFrame(() => {
       window.scrollTo(0, 0);
       document.documentElement.scrollTop = 0;
       document.body.scrollTop = 0;
     });
 
-    // نبضة احتياطية بعد 60ms لو في شيء أخّر الـlayout
+   
     const t = setTimeout(() => {
       window.scrollTo(0, 0);
       document.documentElement.scrollTop = 0;
       document.body.scrollTop = 0;
-      // رجّع السلوك القديم
+   
       html.style.scrollBehavior = prev || '';
     }, 60);
 
@@ -137,25 +135,23 @@ function TitleManager() {
     document.title = title;
   }, [location.pathname]);
 
-  return null; // ما بترسم إشي
+  return null; 
 }
 
 
 export default function App() {
   return (
     <Router>
-      {/* حطّهم أول ما داخل الـ Router */}
       <UseManualScrollRestoration />
       <TitleManager/>
       <ScrollToTopHard />
-
       <div className="app-shell">
         <Header />
         <main className="app-main">
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/programs" element={<ProgramsPage />} />
-            <Route path="/stories" element={<StoriesPage />} />
+           
             <Route path="/live" element={<LivePage />} />
             <Route path="/AudioLive" element={<AudioLive />} />
             <Route path="/vedio-audio-live" element={<VedioAudioLive />} />

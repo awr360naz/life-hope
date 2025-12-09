@@ -36,11 +36,11 @@ export default function ProgramsCarousel({
     })();
   }, [apiUrl]);
 
-  // اضبطي المؤشر إذا تغير عدد العناصر المرئية
+
   useEffect(() => {
     const max = Math.max(0, items.length - visible);
     if (index > max) setIndex(max);
-  }, [visible, items.length]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [visible, items.length]);
 
   const maxIndex = Math.max(0, items.length - visible);
   const canPrev = items.length > visible && index > 0;
@@ -57,13 +57,13 @@ const goToIndex = (nextIdx) => {
   const gap = parseInt(cardStyle.marginRight) || 12;
   const cardWidth = card.offsetWidth + gap;
 
-  // الفرق: بدل ما نستعمل scrollIntoView، نحرّك المسار نفسه
+
   const delta = (nextIdx - index) * cardWidth;
 
-  // RTL → نخلي الإشارة معكوسة
+  
   track.scrollBy({ left: -delta, behavior: "smooth" });
 
-  // حدّد المؤشر الجديد
+
   const clamped = Math.max(0, Math.min(maxIndex, nextIdx));
   setIndex(clamped);
 };
@@ -90,7 +90,7 @@ const goToIndex = (nextIdx) => {
 
         {!loading && !error && items.length > 0 && (
           <div className="carousel-viewport">
-            {/* مهم: خلي المسار RTL مش LTR */}
+            {}
             <div
               ref={scrollRef}
               className="carousel-track"

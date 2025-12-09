@@ -1,18 +1,21 @@
 // src/pages/CamiPropheciesPage.jsx
 import React, { useEffect, useMemo, useState } from "react";
+import { useLocation } from "react-router-dom";
 import "./CamiPropheciesPage.css";
 import ResilientThumb from "../components/ResilientThumb";
 import ShortsegSafePlayerModal from "../components/ShortsegSafePlayerModal";
 
 const PAGE_SIZE = 12;
-const MAX_PAGES = 2; 
+const MAX_PAGES = 2;
 const LS_KEY = "camiProphecies_cache_v1";
 
-function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
+function sleep(ms) {
+  return new Promise((r) => setTimeout(r, ms));
+}
 function uniqBy(arr, keyFn) {
   const seen = new Set();
   const out = [];
-  for (const it of arr) {
+  for (const it of arr || []) {
     const k = keyFn(it);
     if (k && !seen.has(k)) {
       seen.add(k);
@@ -31,14 +34,20 @@ function toYouTubeId(urlOrId = "") {
     if (u.pathname.startsWith("/shorts/")) return u.pathname.split("/")[2] || "";
     const v = u.searchParams.get("v");
     if (v) return v;
-    const m = urlOrId.match(/[?&]v=([^&#]+)|youtu\.be\/([^?#/]+)|shorts\/([^?#/]+)/);
-    return m ? (m[1] || m[2] || m[3]) : "";
+    const m = urlOrId.match(
+      /[?&]v=([^&#]+)|youtu\.be\/([^?#/]+)|shorts\/([^?#/]+)/
+    );
+    return m ? m[1] || m[2] || m[3] : "";
   } catch {
     return "";
   }
 }
 
 export default function CamiPropheciesPage() {
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const focusId = searchParams.get("video"); // جاي من صفحة البحث
+
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
@@ -56,9 +65,18 @@ export default function CamiPropheciesPage() {
       });
       const text = await res.text();
       let data = null;
-      try { data = text ? JSON.parse(text) : null; } catch {}
-      if (!res.ok) throw new Error(data?.error || data?.message || text || `HTTP ${res.status}`);
-      return Array.isArray(data?.items) ? data.items : (Array.isArray(data) ? data : []);
+      try {
+        data = text ? JSON.parse(text) : null;
+      } catch {}
+      if (!res.ok)
+        throw new Error(
+          data?.error || data?.message || text || `HTTP ${res.status}`
+        );
+      return Array.isArray(data?.items)
+        ? data.items
+        : Array.isArray(data)
+        ? data
+        : [];
     };
 
     const fetchResilient = async () => {
@@ -74,7 +92,9 @@ export default function CamiPropheciesPage() {
         if (!alive) return best;
 
         try {
-          const results = await Promise.allSettled(sources.map((s) => tryFetch(s)));
+          const results = await Promise.allSettled(
+            sources.map((s) => tryFetch(s))
+          );
           let merged = [];
           for (const r of results) {
             if (r.status === "fulfilled" && Array.isArray(r.value)) {
@@ -86,7 +106,13 @@ export default function CamiPropheciesPage() {
             .map((it) => {
               const id =
                 it.youtube_id ||
-                toYouTubeId(it.youtube_url || it.url || it.video_url || it.short_url || "");
+                toYouTubeId(
+                  it.youtube_url ||
+                    it.url ||
+                    it.video_url ||
+                    it.short_url ||
+                    ""
+                );
               return id ? { ...it, _ytid: id } : null;
             })
             .filter(Boolean);
@@ -94,8 +120,10 @@ export default function CamiPropheciesPage() {
           merged = uniqBy(merged, (x) => x._ytid);
 
           merged.sort((a, b) => {
-            const ta = new Date(a.published_at || a.created_at || 0).getTime() || 0;
-            const tb = new Date(b.published_at || b.created_at || 0).getTime() || 0;
+            const ta =
+              new Date(a.published_at || a.created_at || 0).getTime() || 0;
+            const tb =
+              new Date(b.published_at || b.created_at || 0).getTime() || 0;
             return tb - ta;
           });
 
@@ -154,13 +182,16 @@ export default function CamiPropheciesPage() {
 
   const normalized = useMemo(
     () =>
-      items
+      (items || [])
         .map((it) => {
           const id =
             it._ytid ||
             it.youtube_id ||
-            toYouTubeId(it.youtube_url || it.url || it.video_url || it.short_url || "");
-          return id ? { ...it, _ytid: id } : null;
+            toYouTubeId(
+              it.youtube_url || it.url || it.video_url || it.short_url || ""
+            );
+          const finalId = id || it.id;
+          return finalId ? { ...it, _ytid: finalId } : null;
         })
         .filter(Boolean),
     [items]
@@ -172,8 +203,7 @@ export default function CamiPropheciesPage() {
   useEffect(() => {
     if (page > totalPages) setPage(totalPages);
     if (page < 1) setPage(1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [totalPages]);
+  }, [page, totalPages]);
 
   const start = (page - 1) * PAGE_SIZE;
   const end = start + PAGE_SIZE;
@@ -181,8 +211,34 @@ export default function CamiPropheciesPage() {
 
   const onCardClick = (it) => setPlayer({ open: true, item: it });
 
+  // لو جينا مع ?video= في الرابط، جرّب افتح الفيديو المطلوب
   useEffect(() => {
-    const onKey = (e) => e.key === "Escape" && setPlayer({ open: false, item: null });
+    if (!focusId || !normalized.length) return;
+
+    // أولاً جرّب طابقه مع id أو _ytid
+    let target =
+      normalized.find(
+        (it) =>
+          String(it.id) === String(focusId) ||
+          String(it._ytid) === String(focusId)
+      ) ||
+      normalized.find((it) => String(it.slug || "") === String(focusId));
+
+    if (target) {
+      setPlayer({ open: true, item: target });
+
+      // (اختياري) نقل الصفحة بحيث يكون ضمن الصفحة الأولى/الثانية
+      const idx = normalized.indexOf(target);
+      if (idx >= 0) {
+        const newPage = Math.floor(idx / PAGE_SIZE) + 1;
+        setPage(newPage);
+      }
+    }
+  }, [focusId, normalized]);
+
+  useEffect(() => {
+    const onKey = (e) =>
+      e.key === "Escape" && setPlayer({ open: false, item: null });
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
