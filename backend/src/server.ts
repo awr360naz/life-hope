@@ -18,6 +18,7 @@ import sabbathRoutes from "./routes/sabbathRoutes.js";
 import prayerRequestRouter from "./routes/prayerRequest.js";
 import camiPropheciesRouter from "./routes/camiProphecies.js";
 import searchRouter from "./routes/search.routes.js";
+import * as Sentry from "@sentry/node";
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -28,8 +29,13 @@ const __dirname = path.dirname(__filename);
 
 
 
+Sentry.init({
+  dsn: process.env.SENTRY_DSN,
+  environment: process.env.NODE_ENV || "development",
+});
 
 const app = express();
+
 app.set("trust proxy", true);
 
 app.use(
@@ -98,6 +104,13 @@ app.get("/api/content/about", async (_req, res) => {
 /* =========================
    راوترات خارجية
    ========================= */
+app.use(Sentry.Handlers.requestHandler());
+
+// 🔹 حطي route التجربة هون قبل /api
+app.get("/api/debug-sentry", (_req, _res) => {
+  throw new Error("Test Sentry error from Life-Hope backend");
+});
+
 app.use(articlesRouter);
 app.use(categoriesRouter);
 app.use(shortSegmentsRouter);
@@ -108,379 +121,14 @@ app.use("/api/contact/prayer-request", prayerRequestRouter);
 app.use(camiPropheciesRouter);
 app.use("/api/content/programs", programsTodayRouter);
 app.use("/api/programs", programsTodayRouter);
+
+// 👇 آخر واحد يكون searchRouter
 app.use("/api", searchRouter);
 
- /*
-app.get("/api/content/search", async (req: Request, res: Response) => {
-  const supabase = getSupabase();
-  const rawQ = (req.query.q ?? "").toString().trim();
-  const limit =
-    Math.min(
-      parseInt((req.query.limit ?? "20") as string, 10) || 20,
-      50
-    );
-  const debug = String(req.query.debug || "") === "1";
+// وبعدين Sentry error handler
+app.use(Sentry.Handlers.errorHandler());
 
-  const AR_TATWEEL = /\u0640/g;
-  const AR_DIACRITICS = /[\u064B-\u065F\u0670\u0674]/g;
-  const norm = (s: string) =>
-    (s || "")
-      .replace(AR_TATWEEL, "")
-      .replace(AR_DIACRITICS, "")
-      .replace(/[أإآ]/g, "ا")
-      .replace(/ؤ|ئ/g, "ء")
-      .replace(/ة/g, "ه")
-      .replace(/ى/g, "ي")
-      .trim();
 
-  const qNorm = norm(rawQ);
-  const pats = Array.from(new Set([`%${rawQ}%`, `%${qNorm}%`]));
-
-  type ResultType = "article" | "program" | "short" | "cami" | "quiz";
-
-  const dbg: any = { q: rawQ, pats, steps: [], errors: [] };
-  if (!rawQ || !supabase) {
-    if (debug)
-      return res.json({
-        ...dbg,
-        note: "no query or no supabase",
-        results: [],
-      });
-    return res.json([]);
-  }
-
-  const mapRecord = (r: any, type: ResultType) => {
-    const base: any = {
-      id: r?.id ?? null,
-      type,
-      slug: r?.slug ?? null,
-      title: r?.title ?? "",
-      // نخليها snippet عشان الفرونت
-      snippet:
-        (typeof r?.excerpt === "string" && r.excerpt) ||
-        (typeof r?.description === "string" && r.description) ||
-        (typeof r?.content === "string" &&
-          String(r.content).slice(0, 140)) ||
-        "",
-      cover_url:
-        r?.cover_url ??
-        r?.thumbnail_url ??
-        r?.cover ??
-        null,
-      created_at: r?.created_at ?? r?.published_at ?? null,
-    };
-
-    // URL حسب النوع
-    switch (type) {
-      case "article":
-        base.category = "مقال";
-        base.url = base.slug
-          ? `/articles/${base.slug}`
-          : base.id
-          ? `/articles/${base.id}`
-          : null;
-        break;
-      case "program":
-        base.category = "برنامج";
-        base.url = base.slug
-          ? `/programs/${base.slug}`
-          : base.id
-          ? `/programs/${base.id}`
-          : null;
-        break;
-      case "short":
-        base.category = "مقاطع قصيرة";
-        base.url = base.id
-          ? `/short-segments?focus=${base.id}`
-          : null;
-        break;
-      case "cami":
-        base.category = "نبوّات كامي";
-        base.url = base.id
-          ? `/cami-prophecies?video=${base.id}`
-          : null;
-        break;
-      case "quiz":
-        base.category = "اختبار";
-        base.url = base.slug
-          ? `/quizzes/${base.slug}`
-          : base.id
-          ? `/quizzes/${base.id}`
-          : null;
-        break;
-    }
-
-    return base;
-  };
-
-  async function tryIlike(
-    table: string,
-    field: string,
-    sel: string,
-    type: ResultType
-  ) {
-    try {
-      let acc: any[] = [];
-      for (const p of pats) {
-        const r = await supabase
-          .from(table)
-          .select(sel)
-          .ilike(field, p)
-          .order("created_at", { ascending: false });
-        if (r.error) throw r.error;
-        acc = acc.concat(r.data || []);
-      }
-      dbg.steps.push({ table, field, count: acc.length });
-      return acc.map((x) => mapRecord(x, type));
-    } catch (e: any) {
-      dbg.errors.push({
-        table,
-        field,
-        message: String(e?.message || e),
-      });
-      return [];
-    }
-  }
-
-  let articles: any[] = [];
-  let programs: any[] = [];
-  let shorts: any[] = [];
-  let cami: any[] = [];
-  let quizzes: any[] = [];
-
-  // ===== المقالات والبرامج =====
-  articles = articles.concat(
-    await tryIlike(
-      "articles",
-      "title",
-      "id, slug, title, excerpt, content, cover_url, created_at, published_at",
-      "article"
-    )
-  );
-  programs = programs.concat(
-    await tryIlike(
-      "programs_catalog",
-      "title",
-      "id, slug, title, content, cover_url, created_at, published_at",
-      "program"
-    )
-  );
-
-  if (articles.length === 0) {
-    articles = articles.concat(
-      await tryIlike(
-        "articles",
-        "excerpt",
-        "id, slug, title, excerpt, content, cover_url, created_at, published_at",
-        "article"
-      )
-    );
-  }
-  if (articles.length === 0) {
-    articles = articles.concat(
-      await tryIlike(
-        "articles",
-        "content",
-        "id, slug, title, excerpt, content, cover_url, created_at, published_at",
-        "article"
-      )
-    );
-  }
-  if (programs.length === 0) {
-    programs = programs.concat(
-      await tryIlike(
-        "programs_catalog",
-        "content",
-        "id, slug, title, content, cover_url, created_at, published_at",
-        "program"
-      )
-    );
-  }
-
-  // ===== المقاطع القصيرة =====
-  shorts = shorts.concat(
-    await tryIlike(
-      "short_segments", // غيّر الاسم لو مختلف
-      "title",
-      "id, title, description, thumbnail_url, created_at",
-      "short"
-    )
-  );
-  if (shorts.length === 0) {
-    shorts = shorts.concat(
-      await tryIlike(
-        "short_segments",
-        "description",
-        "id, title, description, thumbnail_url, created_at",
-        "short"
-      )
-    );
-  }
-
-  // ===== Cami Prophecies =====
-  cami = cami.concat(
-    await tryIlike(
-      "cami_videos", // غيّر الاسم لو مختلف
-      "title",
-      "id, title, description, thumbnail_url, created_at",
-      "cami"
-    )
-  );
-  if (cami.length === 0) {
-    cami = cami.concat(
-      await tryIlike(
-        "cami_videos",
-        "description",
-        "id, title, description, thumbnail_url, created_at",
-        "cami"
-      )
-    );
-  }
-
-  // ===== Quizzes =====
-  quizzes = quizzes.concat(
-    await tryIlike(
-      "quizzes", // غيّر الاسم لو مختلف
-      "title",
-      "id, slug, title, description, cover_url, created_at",
-      "quiz"
-    )
-  );
-  if (quizzes.length === 0) {
-    quizzes = quizzes.concat(
-      await tryIlike(
-        "quizzes",
-        "description",
-        "id, slug, title, description, cover_url, created_at",
-        "quiz"
-      )
-    );
-  }
-
-  // دمج أولي
-  let merged: any[] = [
-    ...articles,
-    ...programs,
-    ...shorts,
-    ...cami,
-    ...quizzes,
-  ];
-
-  // لو لسا فاضي، استخدم fallback المحلي
-  if (merged.length === 0) {
-    try {
-      const [a2, p2, s2, c2, q2] = await Promise.all([
-        supabase
-          .from("articles")
-          .select("*")
-          .order("created_at", { ascending: false })
-          .limit(200),
-        supabase
-          .from("programs_catalog")
-          .select("*")
-          .order("created_at", { ascending: false })
-          .limit(200),
-        supabase
-          .from("short_segments")
-          .select("*")
-          .order("created_at", { ascending: false })
-          .limit(200),
-        supabase
-          .from("cami_videos")
-          .select("*")
-          .order("created_at", { ascending: false })
-          .limit(200),
-        supabase
-          .from("quizzes")
-          .select("*")
-          .order("created_at", { ascending: false })
-          .limit(200),
-      ]);
-
-      const pickText = (obj: any) =>
-        Object.values(obj || {})
-          .filter((v) => typeof v === "string")
-          .join(" ");
-
-      const ok = (obj: any) =>
-        norm(pickText(obj)).includes(qNorm);
-
-      const aLoc = (a2.data || [])
-        .filter(ok)
-        .map((x) => mapRecord(x, "article"));
-      const pLoc = (p2.data || [])
-        .filter(ok)
-        .map((x) => mapRecord(x, "program"));
-      const sLoc = (s2.data || [])
-        .filter(ok)
-        .map((x) => mapRecord(x, "short"));
-      const cLoc = (c2.data || [])
-        .filter(ok)
-        .map((x) => mapRecord(x, "cami"));
-      const qLoc = (q2.data || [])
-        .filter(ok)
-        .map((x) => mapRecord(x, "quiz"));
-
-      merged = [
-        ...aLoc,
-        ...pLoc,
-        ...sLoc,
-        ...cLoc,
-        ...qLoc,
-      ];
-      dbg.steps.push({
-        fallback_local: true,
-        counts: {
-          aLoc: aLoc.length,
-          pLoc: pLoc.length,
-          sLoc: sLoc.length,
-          cLoc: cLoc.length,
-          qLoc: qLoc.length,
-        },
-      });
-    } catch (e: any) {
-      dbg.errors.push({
-        fallback_local_error: String(e?.message || e),
-      });
-    }
-  }
-
-  // ترتيب: أولًا اللي العنوان فيه الكلمة، بعدين حسب التاريخ
-  const qLower = rawQ.toLowerCase();
-  merged = merged
-    .sort((a, b) => {
-      const at = (a.title || "")
-        .toLowerCase()
-        .includes(qLower)
-        ? 0
-        : 1;
-      const bt = (b.title || "")
-        .toLowerCase()
-        .includes(qLower)
-        ? 0
-        : 1;
-      if (at !== bt) return at - bt;
-
-      const ad = String(a.created_at || "");
-      const bd = String(b.created_at || "");
-      if (ad !== bd) return bd.localeCompare(ad);
-
-      return (a.title || "").localeCompare(
-        b.title || "",
-        "ar"
-      );
-    })
-    .slice(0, limit);
-
-  return debug
-    ? res.json({
-        ...dbg,
-        counts: { merged: merged.length },
-        results: merged,
-      })
-    : res.json(merged);
-});
-*/
 
 const PROGRAMS_TABLE = process.env.PROGRAMS_TABLE || "programs";
 const THIRD_TABLE = process.env.THIRD_FRAME_TABLE || "home_third_frame_items";
@@ -690,6 +338,7 @@ app.get("/api/content/programs", async (req, res) => {
       parseInt(String(req.query.limit || "24"), 10) || 24,
       50
     );
+    
 
     const supabase = getSupabase();
 

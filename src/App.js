@@ -8,7 +8,6 @@ import HomePage from './pages/HomePage';
 import './assets/fonts.css';
 import './App.css';
 import ProgramsPage from './pages/ProgramsPage';
-
 import LivePage from './pages/LivePage';
 import AudioLive from './pages/AudioLive';
 import VedioAudioLive from "./pages/VedioAudioLive";
@@ -31,6 +30,8 @@ import SabbathLessonPage from "./pages/SabbathLessonPage";
 import SabbathWeekPage from "./pages/SabbathWeekPage";
 import SabbathItemPage from "./pages/SabbathItemPage";
 import CamiPropheciesPage from "./pages/CamiPropheciesPage";
+import TestSentryButton from "./TestSentryButton";
+<TestSentryButton />
 function UseManualScrollRestoration() {
   useEffect(() => {
     if ('scrollRestoration' in window.history) {

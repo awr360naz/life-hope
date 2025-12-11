@@ -56,7 +56,7 @@ function normalize(it) {
   };
 }
 
-/* Placeholder نظيف */
+
 const PLACEHOLDER_SVG =
   'data:image/svg+xml;utf8,' +
   encodeURIComponent(
@@ -65,7 +65,7 @@ const PLACEHOLDER_SVG =
     </svg>`
   );
 
-/* صورة يوتيوب — تحميل أوف-DOM بدون رمش + مسارات بديلة وكسر كاش */
+
 function YtThumb({ id, alt = "", style, fit = "cover" }) {
   const t = Date.now() % 100000;
   const candidates = useMemo(() => ([
@@ -132,7 +132,7 @@ function YtThumb({ id, alt = "", style, fit = "cover" }) {
   );
 }
 
-/* زر التشغيل — مستطيل أحمر ثابت */
+
 function PlayButton({ onClick, label = "تشغيل", small = false }) {
   return (
     <button
@@ -159,7 +159,7 @@ export default function OurPicks() {
 
   const LS_KEY = `${LS_KEY_BASE}_p${page}`;
 
-  // كاش
+
   useEffect(() => {
     try {
       const cached = JSON.parse(localStorage.getItem(LS_KEY) || "[]");
@@ -168,7 +168,7 @@ export default function OurPicks() {
     } catch { setItems([]); }
   }, [page]);
 
-  // Fetch مرن (row/page)
+
   useEffect(() => {
     let aborted = false;
     const controller = new AbortController();
@@ -242,7 +242,7 @@ export default function OurPicks() {
     (img?.image && String(img.image)) ||
     (isDirectImage(img?._imageLinkClean || "") ? img?._imageLinkClean : "");
 
-  // فتح الروابط فقط من زر التشغيل
+
   const openInNew = (href) => {
     if (!href) return;
     window.open(href, "_blank", "noopener,noreferrer");
@@ -253,11 +253,11 @@ const handleShortCardClick = React.useCallback((e) => {
   if (e.defaultPrevented) return;
   if (!short || !shortHref) return;
 
-  // لو النقر كان على عنصر تفاعلي (زر/رابط/إلخ) خلّيه يشتغل كالمعتاد
+
   const isInteractive = e.target.closest?.("button, a, input, textarea, select, label");
   if (isInteractive) return;
 
-  // لو النقر كان على زر التشغيل نفسه، ما نكرر الفتح
+
   const onPlayBtn = e.target.closest?.(".ourpicks-playbtn");
   if (onPlayBtn) return;
 
@@ -278,7 +278,7 @@ const handleShortCardClick = React.useCallback((e) => {
         
 
         <div className="our-picks__grid">
-          {/* SHORT: يملا ارتفاع صفّين — الصورة تملأ الإطار، والعنوان تحتها */}
+        
            <div
   className={`ourpicks-card ourpicks-card--short tabIndex={0}  ${short ? "" : " is-disabled"}` }
   onClick={handleShortCardClick}
@@ -317,7 +317,7 @@ const handleShortCardClick = React.useCallback((e) => {
 
             
 
-          {/* VIDEO: صورة + زر تشغيل فقط */}
+         
           <div className={`ourpicks-card ourpicks-card--video${vid ? "" : " is-disabled"}`}>
             <div className="ourpicks-box" aria-label="فيديو">
               {vidId ? (
@@ -333,7 +333,7 @@ const handleShortCardClick = React.useCallback((e) => {
             </div>
           </div>
 
-          {/* IMAGE: تفتح من الكرت نفسه */}
+        
           <a
             className={`ourpicks-card ourpicks-card--image${imageSrc ? "" : " is-disabled"}`}
             href={(img?._imageLinkClean || "#")}

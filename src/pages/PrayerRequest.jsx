@@ -4,10 +4,11 @@ import "./PrayerRequest.css";
 export default function PrayerRequest() {
   const [form, setForm] = useState({
     name: "",
+    country: "",   // ⭐ تمت الإضافة
     message: "",
     topic: "شفاء",
     canContact: false,
-    contactInfo: "", // ← جديد
+    contactInfo: "",
   });
 
   const [status, setStatus] = useState("");
@@ -46,12 +47,11 @@ export default function PrayerRequest() {
         throw new Error("Bad status");
       }
 
-      setStatus(
-        "شكرًا لك، تم استلام طلب الصلاة وسنرفعه أمام الرب."
-      );
+      setStatus("شكرًا لك، تم استلام طلب الصلاة وسنرفعه أمام الرب.");
 
       setForm({
         name: "",
+        country: "",  // ⭐ يعاد ضبطه
         message: "",
         topic: "شفاء",
         canContact: false,
@@ -59,9 +59,7 @@ export default function PrayerRequest() {
       });
     } catch (err) {
       console.error(err);
-      setStatus(
-        "حدث خطأ أثناء إرسال الطلب، يرجى المحاولة مرة أخرى لاحقًا."
-      );
+      setStatus("حدث خطأ أثناء إرسال الطلب، يرجى المحاولة مرة أخرى لاحقًا.");
     } finally {
       setIsSubmitting(false);
     }
@@ -72,18 +70,14 @@ export default function PrayerRequest() {
       <section className="prayer-hero">
         <h1 className="prayer-title">اطلب صلاة</h1>
         <p className="prayer-subtitle">
-          يمكنك إرسال طلب الصلاة بدون إدخال بريد إلكتروني. سيتم إرسال الطلب
-          مباشرةً لفريق الصلاة.
+          يمكنك إرسال طلب الصلاة بدون إدخال بريد إلكتروني. سيتم إرسال الطلب مباشرةً لفريق الصلاة.
         </p>
       </section>
 
       <section className="prayer-card">
-        <form
-          className="prayer-form"
-          onSubmit={handleSubmit}
-          noValidate
-        >
-          {/* صف الاسم + الموضوع */}
+        <form className="prayer-form" onSubmit={handleSubmit} noValidate>
+
+          {/* ⭐ الاسم + البلد */}
           <div className="form-row">
             <div className="form-field">
               <label htmlFor="name">الاسم (اختياري)</label>
@@ -98,6 +92,20 @@ export default function PrayerRequest() {
               />
             </div>
 
+            <div className="form-field">
+              <label htmlFor="country">البلد (اختياري)</label>
+              <input
+                id="country"
+                name="country"
+                type="text"
+                placeholder=""
+                value={form.country}
+                onChange={onChange}
+              />
+            </div>
+          </div>
+
+          <div className="form-row">
             <div className="form-field">
               <label htmlFor="topic">موضوع الطلب (اختياري)</label>
               <select
@@ -115,7 +123,6 @@ export default function PrayerRequest() {
             </div>
           </div>
 
-          {/* صف خيار التواصل + حقل طريقة التواصل */}
           <div className="form-row">
             <div className="form-field checkbox-field">
               <label className="checkbox-label">
@@ -133,9 +140,7 @@ export default function PrayerRequest() {
             </div>
 
             <div className="form-field">
-              <label htmlFor="contactInfo">
-                طريقة التواصل (اختياري)
-              </label>
+              <label htmlFor="contactInfo">طريقة التواصل (اختياري)</label>
               <input
                 id="contactInfo"
                 name="contactInfo"
@@ -143,12 +148,11 @@ export default function PrayerRequest() {
                 placeholder="إيميل، رقم هاتف، واتساب..."
                 value={form.contactInfo}
                 onChange={onChange}
-                disabled={!form.canContact} // يتفعّل بس لما يختار "يمكن التواصل معي"
+                disabled={!form.canContact}
               />
             </div>
           </div>
 
-          {/* حقل طلب الصلاة */}
           <div className="form-field">
             <label htmlFor="message">
               طلب الصلاة<span className="req">*</span>
@@ -167,20 +171,14 @@ export default function PrayerRequest() {
             </div>
           </div>
 
-          {/* حالة النموذج */}
           {status && (
             <div className="form-status info" role="status">
               {status}
             </div>
           )}
 
-          {/* زر الإرسال */}
           <div className="actions">
-            <button
-              type="submit"
-              className="btn-primary"
-              disabled={isSubmitting}
-            >
+            <button type="submit" className="btn-primary" disabled={isSubmitting}>
               {isSubmitting ? "جارٍ الإرسال..." : "أرسِل الطلب"}
             </button>
           </div>

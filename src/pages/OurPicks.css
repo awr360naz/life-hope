@@ -3,19 +3,19 @@
 .our-picks__inner { max-width: 1420px; margin-inline: auto; padding-inline: 10px; }
 .our-picks__heading { font-size: 24px; font-weight: 700; margin: 6px 0 12px; }
 .our-picks__sub {
-  font-size: 18px;      /* أصغر من 24px */
-  font-weight: 400;     /* وزن أخف */
-  margin-right: 6px;    /* مسافة صغيرة يمين العنوان */
-  color: #555;          /* لون أنعم (اختياري) */
+  font-size: 18px;      
+  font-weight: 400;     
+  margin-right: 6px;   
+  color: #555;          
 }
 
 
 
-/* شبكة: الشورت يسار على صفّين، يمين فيديو فوق وصورة تحت */
+
 .our-picks__grid {
   --gap: 10px;
   display: grid;
-  grid-template-columns: 0.8fr 1.6fr;  /* الشورت أضيق، يمين أعرض */
+  grid-template-columns: 0.8fr 1.6fr;  
   grid-template-areas:
     "short video"
     "short image";
@@ -23,7 +23,7 @@
   align-items: stretch;
 }
 
-/* الكروت */
+
 .ourpicks-card {
   position: relative;
   border-radius: 12px;
@@ -35,11 +35,11 @@
 .ourpicks-card--video { grid-area: video; }
 .ourpicks-card--image { grid-area: image; text-decoration: none; }
 
-/* ================== نسب الفيديو والصورة يمين ================== */
+
 .ourpicks-card--video .ourpicks-box { aspect-ratio: 16 / 9; }
 .ourpicks-card--image .ourpicks-box { aspect-ratio: 16 / 5; }
 
-/* صندوق الصورة العام */
+
 .ourpicks-box {
   position: relative;
   width: 100%;
@@ -49,14 +49,14 @@
   overflow: hidden;
 }
 
-/* داخل الصندوق */
+
 .ourpicks-box > img,
 .ourpicks-box > iframe {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;            /* تملأ الإطار دائمًا */
+  object-fit: cover;           
   object-position: center;
   border: 0;
   display: block;
@@ -64,19 +64,19 @@
   backface-visibility: hidden;
 }
 
-/* ===== الشورت: اجعل الصورة تتمدّد لملء الارتفاع المتبقي بالضبط ===== */
+
 .short-thumb-wrap {
-  flex: 1 1 auto;               /* تملأ كل ما تبقّى من ارتفاع البطاقة */
+  flex: 1 1 auto;              
   min-height: 0;
   position: relative;
   
   overflow: hidden;
   background: #000;
 }
-/* ألغِ أي نسبة سابقة على الشورت (نخليه مرنًا) */
+
 .ourpicks-card--short .ourpicks-box { aspect-ratio: auto; }
 
-/* العنوان تحت الصورة، والفاصل = gap الشبكة لضبط المطابقة */
+
 .ourpicks-short-titlebox { margin-top: var(--gap); }
 
 .ourpicks-titlebar {
@@ -94,14 +94,13 @@
   overflow: visible;
   text-overflow: clip;
 
-  /* حدّ أدنى بسيط لسطرين لتماسك البطاقات */
+
   --title-lines: 2;
   --title-lh: 1.35;
   --title-fs: 20px;
   min-height: calc((var(--title-fs) * var(--title-lh) * var(--title-lines)));
 }
 
-/* ===================== زر التشغيل (المستطيل الأحمر) ===================== */
 .ourpicks-playbtn {
   position: absolute;
   inset: 0;
@@ -113,31 +112,31 @@
   cursor: pointer;
   z-index: 3;
 }
-/* شكل الزر */
+
 .ourpicks-playbtn__rect {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%); /* يبقى بالنص */
+  transform: translate(-50%, -50%); 
   background: rgba(199, 0, 30, 0.85);
-  border-radius: 6px;              /* زوايا خفيفة للمستطيل */
+  border-radius: 6px;             
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 64px;                     /* عرض المستطيل */
-  height: 40px;                    /* ارتفاع المستطيل */
+  width: 64px;                    
+  height: 40px;                   
   transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* عند المرور بالماوس */
+
 .ourpicks-playbtn:hover .ourpicks-playbtn__rect,
 .ourpicks-playbtn:focus-visible .ourpicks-playbtn__rect {
   background: #c7001e;
-  transform: translate(-50%, -50%) scale(1.08); /* تكبير طفيف بدون اهتزاز */
+  transform: translate(-50%, -50%) scale(1.08);
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
 }
 
-/* ===================== Pager ===================== */
+
 .ourpicks-pager {
   display: flex;
   gap: 8px;
@@ -154,108 +153,106 @@
   cursor: pointer;
 }
 .ourpicks-pager > button.is-active { background: #111; color: #fff; }
-/* 1) خلي عنصر الشورت نفسه يمتد بطول المسار تبع الشبكة */
+
 .our-picks__grid .ourpicks-card--short {
   height: 100%;
   display: flex;
   flex-direction: column;
-  border-radius: 12px;   /* نفس نصف القطر المستخدم بالكروت عندك */
-  overflow: hidden;      /* عشان العنوان يصير جزء من نفس الكرت */
+  border-radius: 12px;   
+  overflow: hidden;      
 }
 
-/* 2) خلي صورة الشورت تتمدّد وتاخذ كل المساحة المتبقية فوق العنوان */
+
 .ourpicks-card--short .short-thumb-wrap {
   position: relative;
-  flex: 1 1 auto;  /* يتمدّد عموديًا */
-  min-height: 0;   /* مهم مع flex حتى ما يصير overflow عمودي */
+  flex: 1 1 auto;  
+  min-height: 0;  
 }
 
-/* 3) أي صورة/ثَمب داخل الشورت تغطي كامل الحاوية بدون فراغات */
+
 .ourpicks-card--short .short-thumb-wrap img,
 .ourpicks-card--short .short-thumb-wrap picture,
 .ourpicks-card--short .short-thumb-wrap canvas {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  display: block;         /* يمنع فجوة الصور الافتراضية */
+  display: block;        
 }
 
-/* لو عندك مكوّن YtThumb بيرجع <img> فالسطرين فوق بكفّوا */
 
-/* 4) خلي صندوق عنوان الشورت يشتغل كـ "فوتر" للكرت نفسه */
+
+
 .ourpicks-card--short .ourpicks-short-titlebox {
-  margin: 0;                          /* يلغي أي فصل بصري */
-  padding: 8px 10px;                  /* نفس الهوية البصرية */
-  background: #fff;                   /* أو استخدم var(--card-bg) إن وجدت */
+  margin: 0;                         
+  padding: 8px 10px;                  
+  background: #fff;                 
   border-top: 1px solid rgba(0,0,0,.08);
 }
 
-/* 5) قصّ العنوان لسطرين كحد أقصى حتى يضل الطول الكلي مضبوط */
+
 .ourpicks-card--short .ourpicks-titlebar {
-  font-size: 14px;        /* صغّر للموبايل لاحقًا إن بدك */
+  font-size: 14px;       
   line-height: 1.35;
   overflow: hidden;
   display: -webkit-box;
-  -webkit-line-clamp: 2;  /* حد أقصى سطرين */
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 }
 
-/* 6) (اختياري) تأكد إن زر التشغيل يضل فوق الصورة داخل الكرت */
+
 .ourpicks-card--short .short-thumb-wrap .ourpicks-playbtn {
   position: absolute;
   inset: 0;
   display: grid;
   place-items: center;
-   /* خليه none إذا الزر decor فقط، 
-                           أو اشيله إذا بدك تظله قابل للنقر */
+
 }
 .ourpicks-card--short .short-thumb-wrap .ourpicks-playbtn > * {
-  pointer-events: auto; /* يرجّع النقر للزر نفسه لو بدك النقر يشتغل */
+  pointer-events: auto; 
 }
 
-/* تأكد إن الشورت كرت واحد بانحناءة كاملة */
+
 .ourpicks-card--short {
   border-radius: 12px;
   overflow: hidden;
-  background: #fff; /* أو var(--card-bg) إذا عندك */
+  background: #fff;
 }
 
-/* شيل الانحناءة الداخلي عن الصورة فقط */
+
 .ourpicks-card--short .short-thumb-wrap {
-  border-radius: 0;      /* ما يكون إلها زاوية لحالها */
-  overflow: hidden;      /* يظل المحتوى جوّا الكرت */
+  border-radius: 0;      
+  overflow: hidden;     
 }
 
-/* خفف الحد الفاصل بين الصورة والعنوان */
+
 .ourpicks-card--short .ourpicks-short-titlebox {
-  border-top: 1px solid rgba(0,0,0,0.06); /* خط ناعم جداً */
+  border-top: 1px solid rgba(0,0,0,0.06); 
 }
 
-/* اختياري: لمسة بسيطة عشان العنوان يندمج */
 .ourpicks-card--short .ourpicks-short-titlebox {
-  background: #fff;  /* نفس خلفية الكرت */
-  border-radius: 0;  /* بدون انحناء إضافي */
+  background: #fff;  
+  border-radius: 0; 
 }
 
 @media (max-width: 992px) and (orientation: landscape) {
   .our-picks__grid { --gap: 6px; }
 }
-/* الإطار نفسه – نفس ستايل الفيديو */
+
 .ourpicks-iframe-wrap{
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 9;     /* للفيديو العادي */
-  border-radius: 12px;      /* نفس رادياس الكرت */
-  overflow: hidden;         /* مهم لقص الصورة */
-  background: #000;         /* يمنع ظهور فراغات */
+  aspect-ratio: 16 / 9;     
+  border-radius: 12px;      
+  overflow: hidden;        
+  background: #000;        
 }
 
-/* الشورت نخليه 9:16 */
+
 .ourpicks-card--short .ourpicks-iframe-wrap{
   aspect-ratio: 9 / 16;
 }
 
-/* خلّي الزر والصورة والـiframe يملوا الإطار 1:1 */
+
 .ourpicks-thumbbtn,
 .ourpicks-iframe-wrap iframe{
   position: absolute;
@@ -269,18 +266,18 @@
   cursor: pointer;
 }
 
-/* الصورة تغطي بدون تمدّد غريب */
+
 .ourpicks-thumbbtn img{
   width: 100%;
   height: 100%;
   display: block;
-  object-fit: cover;        /* السر هنا */
+  object-fit: cover;       
 }
 
-/* لو بدك التخريم يختفي تمامًا، خبّي أيقونة التشغيل */
+
 .ourpicks-play{ display: none; }
 
-/* تأكد إن iframe بدون إطار */
+
 .ourpicks-iframe-wrap iframe{ border: 0; }
 .ourpicks-iframe-wrap{ position:relative; width:100%; aspect-ratio:16/9; border-radius:12px; overflow:hidden; background:#000; }
 .ourpicks-card--short .ourpicks-iframe-wrap{ aspect-ratio:9/16; }
@@ -296,15 +293,15 @@
 .ourpicks-retry, .ourpicks-open{
   background:rgba(0,0,0,.6); color:#fff; text-decoration:none; border:0; border-radius:8px; padding:8px 10px; cursor:pointer;
 }
-/* === تقليل مساحة العنوان للفيديو والصورة === */
+
 .ourpicks-card--video .ourpicks-titlebar,
 .ourpicks-card--image .ourpicks-titlebar {
-  padding: 6px 10px; /* بدل 10px 12px */
+  padding: 6px 10px;
   font-size: 18px;
   line-height: 1.3;
 }
 
-/* === موبايل: خط أصغر للعنوان === */
+
 @media (max-width: 992px) {
   .ourpicks-card--video .ourpicks-titlebar,
   .ourpicks-card--image .ourpicks-titlebar,
@@ -315,34 +312,34 @@
   }
 }
 
-/* === هوفر الشورت: يتفاعل على الكرت كله مش بس الزر === */
+
 .ourpicks-card--short:hover .ourpicks-playbtn__rect,
 .ourpicks-card--short:focus-within .ourpicks-playbtn__rect {
   background: #c7001e;
   transform: translate(-50%, -50%) scale(1.08);
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
 }
-/* === تقليل المساحة البيضاء تحت الصورة (عنوان الشورت) === */
+
 .ourpicks-card--short .ourpicks-short-titlebox {
-  padding: 4px 6px; /* كان 8px 10px */
+  padding: 4px 6px;
 }
 
 .ourpicks-card--short .ourpicks-titlebar {
-  font-size: 16px;  /* كان 20px */
+  font-size: 16px;  
   line-height: 1.3;
-  min-height: unset; /* نلغي الحد الأدنى للسطرين لتصير أقل ارتفاع */
+  min-height: unset; 
 }
 
-/* === في الموبايل: خط أصغر للعنوان ليبين كله === */
+
 @media (max-width: 768px) {
   .ourpicks-card--short .ourpicks-titlebar {
     font-size: 9px;
     
   }
 }
-/* === تصليح الهوفر والمؤشر على الشورت === */
+
 .ourpicks-card--short {
-  cursor: pointer; /* يخلي الماوس يظهر كيد */
+  cursor: pointer; 
 }
 
 .ourpicks-card--short:hover .ourpicks-playbtn__rect,
@@ -352,26 +349,26 @@
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
 }
 
-/* نخلي الزر يقبل النقر دائمًا (مش pointer-events: none) */
+
 .ourpicks-card--short .short-thumb-wrap .ourpicks-playbtn {
   pointer-events: auto;
 }
-/* خليه واضح إنه قابل للنقر */
+
 .ourpicks-card--short,
 .ourpicks-card--short .short-thumb-wrap,
 .ourpicks-card--short .ourpicks-playbtn {
   cursor: pointer;
 }
 
-/* تأكد إن الزر المغطي فوق كل شيء ويستقبل الهوفر */
+
 .ourpicks-card--short .ourpicks-playbtn {
   position: absolute;
   inset: 0;
-  z-index: 5;        /* أعلى من الصورة وأي عناصر داخلية */
+  z-index: 5;    
   pointer-events: auto;
 }
 
-/* فعّل التأثير سواء هوفر على الكرت أو على الزر نفسه أو على الصورة */
+
 .ourpicks-card--short:hover .ourpicks-playbtn__rect,
 .ourpicks-card--short .ourpicks-playbtn:hover .ourpicks-playbtn__rect,
 .ourpicks-card--short .short-thumb-wrap:hover .ourpicks-playbtn__rect,

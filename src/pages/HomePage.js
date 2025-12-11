@@ -13,91 +13,15 @@ import GifNotice from "../components/GifNotice";
 import angel from "../assets/angel.gif";
 import ThreeAngelsmp4 from "../assets/ThreeAngels.mp4";
 import CamiPropheciesCarousel from "../components/CamiPropheciesCarousel";
+import TestSentryButton from "../TestSentryButton";
 
 
-
-/* function ThirdFrame() {
-  const [item, setItem] = React.useState(null);
-  const [err, setErr] = React.useState("");
-
-  React.useEffect(() => {
-    (async () => {
-      try {
-        const res = await fetch("/api/content/home-third-frame", {
-          headers: { Accept: "application/json" },
-          cache: "no-store",
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data?.error || "HTTP " + res.status);
-
-        const it = data?.content;
-        if (!it) throw new Error("لا توجد بيانات.");
-
-        // 👈 أهم نقطة: خُذ hero_url أولاً ثم fallback على image_url
-        const img = (it.hero_url || it.image_url || "").trim();
-
-        setItem({
-          title: (it.title || "").trim(),
-          // لو بدك تحافظ على السطور، خلي التعامل بالـ JSX (تحت) مع <div dangerouslySetInnerHTML>
-          body: it.body || "",
-          image_url: img || null,
-        });
-      } catch (e) {
-        setErr("تعذّر تحميل معلومات الإطار الثالث: " + e.message);
-      }
-    })();
-  }, []);
-
-  if (err) return <p className="third-frame-error">{err}</p>;
-  if (!item) return null;
-
-  return (
-    <section className="third-frame"  dir="rtl" aria-label="تأمل هذا الأسبوع">
-      
-      <div className="tf-col tf-col--right">
-        <h2 className="tf-title">تأمل هذا الأسبوع</h2>
-        {item.title && <h3 className="tf-subtitle">{item.title}</h3>}
-
-       
-        {item.body ? (
-          <div
-            className="tf-paragraph"
-            dangerouslySetInnerHTML={{
-              __html: String(item.body).replace(/\r?\n/g, "<br/>"),
-            }}
-          />
-        ) : null}
-      </div>
-
-      
-      <div className="tf-col tf-col--left">
-        <div className="image-4x5">
-          {item.image_url ? (
-            <img
-              src={item.image_url}
-              alt={item.title || "صورة التأمل"}
-              loading="lazy"
-              onError={(e) => {
-                // فالباك نظيف لو فشل التحميل
-                e.currentTarget.src = "https://placehold.co/800x1000?text=No+Image";
-              }}
-            />
-          ) : (
-            <div className="image-placeholder">لا توجد صورة</div>
-          )}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-*/
 
 export default function HomePage() { 
   useEffect(() => {
     document.title = "AWR360ARABIC – الصفحة الرئيسية";
   }, []);
-  // تاريخ اليوم بأرقام إنجليزية (Asia/Jerusalem)
+
   const todayStr = useMemo(() => {
     const tz = "Asia/Jerusalem";
     const fmt = new Intl.DateTimeFormat("en-GB", {
@@ -106,10 +30,10 @@ export default function HomePage() {
       month: "2-digit",
       year: "numeric",
     });
-    return fmt.format(new Date()); // مثل: 20/08/2025
+    return fmt.format(new Date()); 
   }, []);
 
-   // ===== برنامج اليوم =====
+
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const [items, setItems] = useState([]);
@@ -120,13 +44,13 @@ export default function HomePage() {
   const ROW_H = 24;
   const STEP_MS = 1000;
 
-  // ✅ تعديل normalizeItems
+
   function normalizeItems(arr) {
     if (!Array.isArray(arr)) return [];
     return arr.map((it) => {
-      if (typeof it?.t === "string") return { time: "—", title: it.t }; // دعم Supabase {t:"..."}
-      if (typeof it === "string") return { time: "—", title: it }; // سترينغ عادي
-      return { time: it?.time ?? "—", title: it?.title ?? "" }; // شكل {time,title}
+      if (typeof it?.t === "string") return { time: "—", title: it.t };
+      if (typeof it === "string") return { time: "—", title: it }; 
+      return { time: it?.time ?? "—", title: it?.title ?? "" }; 
     });
   }
 
@@ -142,14 +66,14 @@ export default function HomePage() {
       .finally(() => setLoading(false));
   }, []);
 
-  // مؤقّت التحريك
+  
   useEffect(() => {
     if (paused || max <= 1) return;
     const id = setInterval(() => setIndex((i) => i + 1), STEP_MS);
     return () => clearInterval(id);
   }, [paused, max]);
 
-  // عند انتهاء الانتقال: لو دخلنا النصف الثاني، نرجّع للصفر بلا أنيميشن
+
   const handleTransitionEnd = () => {
     if (max && index >= max) {
       setResetting(true);
@@ -163,7 +87,7 @@ export default function HomePage() {
 
   const LIVE_SRC = "https://closeradio.tv/awrara/player.htm";
 
-  // نسخة مكررة من العناصر لعمل لوب سلس
+
   const items2 = items.length ? [...items, ...items] : [];
 
   return (
@@ -173,7 +97,7 @@ export default function HomePage() {
       <div className="frames-center">
         
         
-        {/* ===== عنوان/تاريخ البث ===== */}
+ 
         
         <div className="live-topline">
           
@@ -185,7 +109,6 @@ export default function HomePage() {
         {/* ===== الإطار 1: البث ===== */}
  <section className="live-frame">
   <div className="live-box">
-    {/* غلاف بنسبة 16:9 داخل الإطار ليظهر كامل بدون قص ويكون أصغر بشوي من الإطار */}
     <div className="livebox-aspect">
       <iframe
         className="live-iframe"
@@ -201,7 +124,7 @@ export default function HomePage() {
 </section>
 
         {/* ===== الإطار 2: برنامج اليوم ===== */}
-{/* ===== الإطار 2: برنامج اليوم ===== */}
+
 <section
   className="schedule-frame"
   onMouseEnter={() => setPaused(true)}
@@ -211,7 +134,7 @@ export default function HomePage() {
   onMouseDown={() => setPaused(true)}
   onMouseUp={() => setPaused(false)}
 >
-  {/* مهم: لا تعمل “على الهواء” خارج المكوّن—المكوّن نفسه يعرِضها تحت الستة أسطر */}
+
   <MiniScheduleWidget className="msw-wide" paused={paused} />
 </section>
 

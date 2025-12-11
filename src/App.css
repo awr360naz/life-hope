@@ -29,21 +29,21 @@
 .App-link {
   color: #61dafb;
 }
-/* مهم جدًا */
+
 html, body, #root {
   height: 100%;
-  margin: 0; /* يشيل حافة البودي */
+  margin: 0; 
 }
 
 .app-shell {
-  min-height: 100vh;          /* يخلي ارتفاع الحاوية طول الشاشة */
+  min-height: 100vh;       
   display: flex;
-  flex-direction: column;     /* عمودي: هيدر / مين / فوتر */
+  flex-direction: column;     
 }
 
 .app-main {
-  flex: 1;                    /* يدفش الفوتر لتحت لما المحتوى قليل */
-  display: block;             /* أو flex لو بدك */
+  flex: 1;                  
+  display: block;         
 }
 
 
@@ -57,9 +57,23 @@ html, body, #root {
 }
 
 html, body {
-  scroll-padding-top: 0 !important;  /* لو كنت مستخدمها لتعويض الهيدر */
+  scroll-padding-top: 0 !important;
 }
 
 :target {
-  scroll-margin-top: 0 !important;   /* يمنع نزلة تلقائية لرؤوس الأقسام */
+  scroll-margin-top: 0 !important;   
+}
+/* تابلت – من 768 لحد 1024 */
+@media (min-width: 768px) and (max-width: 1024px) {
+  /* الكونتينر الأساسي للصفحة */
+  main,
+  .home-page,
+  .home-root,
+  .page-container,
+  .content-wrapper {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin-inline: 0 !important;
+    padding-inline: 0 !important;
+  }
 }

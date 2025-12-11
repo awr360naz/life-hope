@@ -1,30 +1,33 @@
+import "./index.css";
 
-import './index.css';
+import React, { useEffect } from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
 
+// ==== Sentry بسيط للأخطاء فقط ====
+import * as Sentry from "@sentry/react";
 
-// داخل src/index.js أو App.jsx
-import React, { useEffect } from 'react';
-import ReactDOM from 'react-dom/client';
-import App from './App';
+Sentry.init({
+  dsn: process.env.REACT_APP_SENTRY_DSN,
+  // بنقدر نستخدم tracesSampleRate=0 أو نشيلها تمامًا
+  // بس نخلي الإعداد بسيط وواضح
+});
+// =================================
 
 function Root() {
   useEffect(() => {
-    // 1) خذ لغة المتصفح (مثلاً "ar" أو "en-US")
-    const lang = navigator.language || navigator.userLanguage || 'en';
-    const shortLang = lang.split('-')[0]; // ["ar","en",...]
+    const lang = navigator.language || navigator.userLanguage || "en";
+    const shortLang = lang.split("-")[0];
 
-    // 2) حدد هل هي RTL
-    const rtlLangs = ['ar', 'he', 'fa', 'ur'];
-    const dir = rtlLangs.includes(shortLang) ? 'rtl' : 'ltr';
+    const rtlLangs = ["ar", "he", "fa", "ur"];
+    const dir = rtlLangs.includes(shortLang) ? "rtl" : "ltr";
 
-    // 3) اضبط على html
-    document.documentElement.setAttribute('lang', shortLang);
-    document.documentElement.setAttribute('dir', dir);
+    document.documentElement.setAttribute("lang", shortLang);
+    document.documentElement.setAttribute("dir", dir);
   }, []);
 
   return <App />;
 }
 
-
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(<Root />);

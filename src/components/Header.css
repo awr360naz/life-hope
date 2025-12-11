@@ -1,6 +1,4 @@
-/* =========================
-   HEADER — Desktop (النسخة الأصلية المعدّلة)
-   ========================= */
+
 .header {
   align-items: center;
   justify-content: space-between;
@@ -13,7 +11,7 @@
   z-index: 1000;
   background: white;
   border-bottom: none;
-  overflow: visible; /* يسمح للأوف-كانفاس يبين فوق */
+  overflow: visible; 
 }
 
 .header-inner {
@@ -26,7 +24,7 @@
   direction: rtl;
 }
 
-/* الهمبرغر */
+
 .hamburger {
   width: 23.5px;
   height: 17.5px;
@@ -50,7 +48,7 @@
 .hamburger.is-open span:nth-child(2) { opacity: 0; }
 .hamburger.is-open span:nth-child(3) { transform: translateY(-9px) rotate(-45deg); }
 
-/* اللوجو فقط (بدون نص) */
+
 .header-logo {
   height: 65px;
   width: auto;
@@ -59,7 +57,7 @@
   flex-shrink: 0;
 }
 
-/* الروابط الرئيسية */
+
 .main-nav {
   display: inline-flex;
   align-items: center;
@@ -75,7 +73,7 @@
 }
 .nav-link:hover { color: #000; }
 
-/* زر البث المباشر */
+
 .live-btn {
   display: inline-flex;
   align-items: center;
@@ -87,10 +85,9 @@
   display: block;
 }
 
-/* يدفش البحث للطرف الشمالي */
 .spacer { flex: 1 1 auto; }
 
-/* البحث */
+
 .search {
   display: inline-flex;
   align-items: center;
@@ -113,7 +110,7 @@
 }
 .search-input::placeholder { color: #999; }
 
-/* ===== الأوف-كانفاس (المنيو) ===== */
+
 .drawer {
   position: fixed;
   inset: 0;
@@ -121,7 +118,7 @@
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.25s ease;
-  z-index: 2000; /* فوق الهيدر */
+  z-index: 2000; 
   direction: rtl;
 }
 .drawer--open { opacity: 1; pointer-events: auto; }
@@ -190,32 +187,63 @@
   color: #000;
 }
 
-/* =========================
-   Mobile — (≤ 992px)
-   ========================= */
-/* =========================
-   Mobile — (≤ 992px)
-   ========================= */
+
 @media (max-width: 992px) {
   .main-nav,
   .live-btn {
     display: none !important;
   }
+/* تابلت فقط: بين 768px و 992px */
+@media (min-width: 768px) and (max-width: 992px) {
+  /* خليه يرجع يشبه الديسكتوب */
 
   .header-inner {
-    direction: rtl;                 /* 👈 رجّعنا RTL طبيعي */
+    padding-inline-start: 6%;
+    padding-inline-end: 6%;
+    height: 100px !important;   /* نفس الديسكتوب تقريبا */
     display: flex;
     align-items: center;
-    justify-content: flex-start;    /* العناصر تمشي من اليمين */
+    gap: 0.5rem;
+    direction: rtl;
+  }
+
+  /* ارجع فعّل المين منيو وزر اللايف */
+  .main-nav,
+  .live-btn {
+    display: inline-flex !important;
+  }
+
+  /* خبّي الهامبرغر عالتابلت */
+  .hamburger {
+    display: none !important;
+  }
+
+  /* رجّع الـ spacer يشتغل عشان العناصر تتمدد صح */
+  .spacer {
+    display: block !important;
+    flex: 1 1 auto;
+  }
+
+  /* كبر شوية حقل البحث عالتابلت */
+  .search {
+    width: 200px;
+    height: 32px;
+  }
+}
+
+  .header-inner {
+    direction: rtl;              
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;  
     height: 58px;
     padding-inline: 4%;
     gap: 0.35rem;
   }
 
-  /* البحث: نطيره لحاله عالشمال */
+
   .search {
-    /* 🔴 مهم: إشيل أي order من قبل */
-    margin-right: auto;             /* 👈 هذا اللي بدفعه للشمال */
+    margin-right: auto;            
     margin-left: 0;
     display: inline-flex;
     align-items: center;
@@ -227,19 +255,17 @@
     border-radius: 100px;
   }
 
-  /* اللوجو: يجي بعد الهمبرغر مباشرة */
+
   .header-logo {
-    /* 🔴 تأكدي ما في order هون */
     height: 50px;
     width: auto;
-    margin-inline-start: 8px;       /* مسافة صغيرة بينه وبين الهمبرغر */
+    margin-inline-start: 8px;       
     object-fit: contain;
     flex-shrink: 0;
   }
 
-  /* الهمبرغر: أول عنصر على اليمين */
+
   .hamburger {
-    /* 🔴 برضو بدون order */
     display: inline-flex !important;
     width: 24px;
     height: 18px;
@@ -252,14 +278,14 @@
     background: #000;
   }
 
-  /* خليه مخفي عشان ما يخبّص الوسط */
+
   .spacer {
     display: none !important;
   }
 }
 
 
-/* ——— شاشات أصغر جدًا (≤ 390px) ——— */
+
 @media (max-width: 390px) {
   .header-inner { padding-inline: 3.5%; gap: .3rem; }
   .search { width: 104px; }
@@ -268,7 +294,7 @@
   .hamburger { width: 22px; height: 16px; }
 }
 
-/* ——— صغيرة جدًا جدًا (≤ 360px) ——— */
+
 @media (max-width: 360px) {
   .header-inner { padding-inline: 3%; gap: .25rem; }
   .search { width: 96px; }
@@ -277,20 +303,33 @@
   .header-logo { height: 40px; }
 }
 
-/* ——— أضيق حالات (≤ 340px) ——— */
+
 @media (max-width: 340px) {
   .search { width: 88px; }
   .search-input::placeholder { opacity: .6; }
   .header-logo { height: 38px; }
 }
-/* 🔽 تصغير ارتفاع الهيدر بدون ما يصغر اللوجو أو يخرب الترتيب */
+
 .header {
-  min-height: 58px !important;     /* 👈 كان 64px، هيك بصير أنحف */
+  min-height: 58px !important;    
   padding-block: 4px !important;
 }
 
 .header-inner {
-  height: 80px !important;         /* 👈 كان 100px، هيك بيصير أقصر */
+  height: 80px !important;        
   align-items: center !important;
   padding-block: 0 !important;
+}
+
+/* من 768 لحد 1024 = تابلت */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .page-container,
+  .app,
+  .layout,
+  .site-wrapper {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin-inline: 0 !important;
+    padding-inline: 0 !important;  /* لو في padding زيادة */
+  }
 }
