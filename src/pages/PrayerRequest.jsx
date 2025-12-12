@@ -77,7 +77,7 @@ export default function PrayerRequest() {
       <section className="prayer-card">
         <form className="prayer-form" onSubmit={handleSubmit} noValidate>
 
-          {/* ⭐ الاسم + البلد */}
+         
           <div className="form-row">
             <div className="form-field">
               <label htmlFor="name">الاسم (اختياري)</label>
@@ -167,7 +167,7 @@ export default function PrayerRequest() {
               required
             />
             <div className="hint">
-              سيُرسل طلبك بشكل آمن إلى فريق الصلاة في الإذاعة.
+             سيُرسل طلبك بشكل آمن إلى فريق الصلاة في الإذاعة، وسيتم رفعه في برنامج “نصلّي معًا” على قناتنا للصلاة من أجلك.
             </div>
           </div>
 
