@@ -8,7 +8,7 @@ export default function ThreeAngels() {
       <header className="ta-hero">
         <h1 className="ta-title">رسالة الملائكة الثلاث</h1>
 
-        {/* 👇 بدلنا الـ img بفيديو */}
+       
         <video
           className="ta-gif"
           src={ThreeAngelsmp4}

@@ -38,7 +38,6 @@ function guessThumb(id) {
   return `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`;
 }
 
-/* === إضافات للتمهّل و التسريع === */
 const isSafari = (() => {
   if (typeof navigator === "undefined") return false;
   const ua = navigator.userAgent.toLowerCase();
@@ -49,8 +48,10 @@ function getFallbackDelays() {
   const slowNet = (() => {
     try {
       const c = navigator.connection;
-      return c && (c.saveData || ["slow-2g","2g"].includes(c.effectiveType));
-    } catch { return false; }
+      return c && (c.saveData || ["slow-2g", "2g"].includes(c.effectiveType));
+    } catch {
+      return false;
+    }
   })();
 
   if (slowNet && isSafari) return { d1: 7000, d2: 12000 };
@@ -67,7 +68,7 @@ function preconnectYouTubeOnce() {
     "https://i.ytimg.com",
   ];
   for (const href of hosts) {
-    if ([...document.head.querySelectorAll('link[rel="preconnect"]')].some(l => l.href === href)) continue;
+    if ([...document.head.querySelectorAll('link[rel="preconnect"]')].some((l) => l.href === href)) continue;
     const l = document.createElement("link");
     l.rel = "preconnect";
     l.href = href;
@@ -76,7 +77,6 @@ function preconnectYouTubeOnce() {
   }
 }
 
-/** ========== Modal Component ========== */
 export default function ShortsegSafePlayerModal({
   open = false,
   onClose = () => {},
@@ -86,7 +86,7 @@ export default function ShortsegSafePlayerModal({
   const modalRef = useRef(null);
   const iframeRef = useRef(null);
 
-  const safeItem = (item && typeof item === "object") ? item : {};
+  const safeItem = item && typeof item === "object" ? item : {};
 
   const vidId = useMemo(() => {
     const candidates = [
@@ -110,7 +110,7 @@ export default function ShortsegSafePlayerModal({
 
   const title = titleProp || safeItem.title || "فيديو";
   const embedUrl = useMemo(() => buildEmbedUrl(vidId), [vidId]);
-  const pageUrl  = useMemo(() => buildYouTubePageUrl(vidId, true), [vidId]);
+  const pageUrl = useMemo(() => buildYouTubePageUrl(vidId, true), [vidId]);
   const thumbUrl = useMemo(() => guessThumb(vidId), [vidId]);
 
   const [loaded, setLoaded] = useState(false);
@@ -124,19 +124,61 @@ export default function ShortsegSafePlayerModal({
     }
     preconnectYouTubeOnce();
     const { d1, d2 } = getFallbackDelays();
-    const t1 = setTimeout(() => { if (!loaded) setShowFallback(true); }, d1);
-    const t2 = setTimeout(() => { if (!loaded) setShowFallback(true); }, d2);
-    return () => { clearTimeout(t1); clearTimeout(t2); };
+    const t1 = setTimeout(() => {
+      if (!loaded) setShowFallback(true);
+    }, d1);
+    const t2 = setTimeout(() => {
+      if (!loaded) setShowFallback(true);
+    }, d2);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
   }, [open, loaded]);
 
   const onIframeLoad = () => setLoaded(true);
-  const stopPropagation = (e) => e.stopPropagation();
+
+  // ✅ 1) امنع الإغلاق لو في Fullscreen (ESC بيطلع fullscreen بس ما بسكّر المودال)
+  const isInFullscreen = () => {
+    if (typeof document === "undefined") return false;
+    return !!document.fullscreenElement;
+  };
+
+  // ✅ 2) اغلق فقط إذا الكبس كان فعلًا على الخلفية (مش من داخل المحتوى)
+  const onBackdropClick = (e) => {
+    // إذا في fullscreen: لا نغلق
+    if (isInFullscreen()) return;
+
+    // اغلق فقط إذا الهدف هو الخلفية نفسها (وليس عنصر داخلها)
+    if (e.target !== e.currentTarget) return;
+
+    onClose();
+  };
+
+  // ✅ 3) ESC ذكي: إذا مش fullscreen → ممكن تسكير (اختياري)
+  // إذا بدك ESC ما يسكر أبدًا حتى خارج fullscreen: احذف هذا اليوزإفكت.
+  useEffect(() => {
+    if (!open) return;
+
+    const onKeyDown = (e) => {
+      if (e.key !== "Escape") return;
+
+      // إذا في fullscreen → خلي المتصفح يطلع من fullscreen فقط
+      if (isInFullscreen()) return;
+
+      // خارج fullscreen: سكّر المودال (تقدر تعطلها إذا بدك)
+      onClose();
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [open, onClose]);
 
   if (!open) return null;
 
   return (
-    <div className="shortsegmodal-backdrop" onClick={onClose} role="dialog" aria-modal="true">
-      <div className="shortsegmodal-content" onClick={stopPropagation} ref={modalRef}>
+    <div className="shortsegmodal-backdrop" onClick={onBackdropClick} role="dialog" aria-modal="true">
+      <div className="shortsegmodal-content" ref={modalRef}>
         {!!vidId && !showFallback ? (
           <div className="shortsegmodal-frame">
             <iframe

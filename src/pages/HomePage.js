@@ -14,6 +14,8 @@ import angel from "../assets/angel.gif";
 import ThreeAngelsmp4 from "../assets/ThreeAngels.mp4";
 import CamiPropheciesCarousel from "../components/CamiPropheciesCarousel";
 import TestSentryButton from "../TestSentryButton";
+import AWR_360_ChristmasWishes from "../assets/AWR_360_ChristmasWishes.mp4";
+
 
 
 
@@ -166,8 +168,9 @@ export default function HomePage() {
        title="فقرات قصيرة"
       />
 <GifNotice
-  gifSrc={ThreeAngelsmp4}
-  text="ثُمَّ رَأَيْتُ مَلاَكًا آخَرَ طَائِرًا فِي وَسَطِ السَّمَاءِ مَعَهُ بِشَارَةٌ أَبَدِيَّةٌ..."
+
+  gifSrc={AWR_360_ChristmasWishes}
+ // text="ثُمَّ رَأَيْتُ مَلاَكًا آخَرَ طَائِرًا فِي وَسَطِ السَّمَاءِ مَعَهُ بِشَارَةٌ أَبَدِيَّةٌ..."
   viewAllHref="/angels"
   delayMs={2000}
   durationMs={10000}

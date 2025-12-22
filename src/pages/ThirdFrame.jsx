@@ -15,8 +15,8 @@ function coerceBodyToHtml(body) {
   if (body == null) return "";
   const toHtml = (s) =>
     s
-      .replace(/\r?\n/g, "<br/>") // سطور -> <br/>
-      .replace(/[ \t]+/g, " ")    // تقليل مضاعفات المسافات
+      .replace(/\r?\n/g, "<br/>") 
+      .replace(/[ \t]+/g, " ")   
       .trim();
 
   if (typeof body === "string") {
@@ -37,45 +37,45 @@ function coerceBodyToHtml(body) {
   return String(body);
 }
 
-// تنظيف صارم للصورة: يشيل الفراغات ويصلّح https(s) وينقلها لـhttps عند الحاجة
+
 function sanitizeImageUrl(url) {
   if (!url) return null;
   try {
-    let s = String(url).trim().replace(/\s+/g, ""); // احذف كل الفراغات
+    let s = String(url).trim().replace(/\s+/g, ""); 
     s = s
-      .replace(/^httpss:\/\//i, "https://") // httpss:// -> https://
-      .replace(/^https:\/\//i, "https://")  // توحيد
+      .replace(/^httpss:\/\//i, "https://") 
+      .replace(/^https:\/\//i, "https://")  
       .replace(/^http:\/\//i, window.location.protocol === "https:" ? "https://" : "http://")
-      .replace(/^https:\/\/g+/i, "https://g"); // لو صار تكرار g بالغلط
+      .replace(/^https:\/\/g+/i, "https://g");
     const u = new URL(s, window.location.origin);
     if (window.location.protocol === "https:" && u.protocol === "http:") {
       u.protocol = "https:";
     }
     return u.toString();
   } catch {
-    return null; // رجّع null ليفعّل placeholder بدل صورة مكسورة
+    return null; 
   }
 }
 
-/* === مرسى التناوب الأسبوعي: أول جمعة من السنة الساعة 10:00 === */
+
 function firstFriday10OfYear(d = new Date()) {
   const y = d.getFullYear();
-  const x = new Date(y, 0, 1, 10, 0, 0, 0); // 1 Jan, 10:00
-  const day = x.getDay(); // 0=Sun..6=Sat
-  const toFri = (5 - day + 7) % 7; // 5=Fri
+  const x = new Date(y, 0, 1, 10, 0, 0, 0); 
+  const day = x.getDay(); 
+  const toFri = (5 - day + 7) % 7; 
   x.setDate(x.getDate() + toFri);
-  return x; // أول جمعة 10:00
+  return x; 
 }
 
 function weeklyIndexAnchoredOnFriday10(now = new Date()) {
   const anchor = firstFriday10OfYear(now);
   const diff = now.getTime() - anchor.getTime();
-  return Math.floor(diff / (7 * 24 * 60 * 60 * 1000)); // 0,1,2,...
+  return Math.floor(diff / (7 * 24 * 60 * 60 * 1000)); 
 }
 
 /* ===================== Fetch + Normalize ===================== */
 async function fetchThirdFrameItems() {
-  // مرّر at= الآن (UTC ISO)
+ 
   const at = nowIsoUtc();
   const res = await fetch(`/api/content/home-third-frame?at=${encodeURIComponent(at)}`, {
     headers: { Accept: "application/json" },
@@ -87,7 +87,7 @@ async function fetchThirdFrameItems() {
   try {
     data = text ? JSON.parse(text) : null;
   } catch {
-    /* ignore parse errors and show raw message below */
+    
   }
 
   if (!res.ok) {
@@ -95,7 +95,7 @@ async function fetchThirdFrameItems() {
     throw new Error(serverMsg ? `${res.status}: ${serverMsg}` : `HTTP ${res.status}`);
   }
 
-  // دعم أشكال مختلفة للرد
+ 
   let list = [];
   if (Array.isArray(data)) list = data;
   else if (Array.isArray(data?.items)) list = data.items;
@@ -108,13 +108,12 @@ async function fetchThirdFrameItems() {
     throw new Error("لا توجد عناصر لعرضها في الإطار الثالث.");
   }
 
-  // طبعنة العناصر لنفس مفاتيحك (title, bodyHtml, image_url)
   const normalized = list.map((it) => {
     const title = (it.title || it.name || "").trim();
     const bodyHtml = coerceBodyToHtml(
       it.body ?? it.content ?? it.description ?? it.summary ?? it.text ?? it
     );
-    // hero_url أولاً ثم بدائل أخرى
+ 
     const rawImg = pickFirstString(it.hero_url, it.image_url, it.cover_url, it.thumbnail, it.photo);
     const image_url = sanitizeImageUrl(rawImg) || null;
 
@@ -134,7 +133,7 @@ export default function ThirdFrame() {
       try {
         const items = await fetchThirdFrameItems();
 
-        // اختيار العنصر وفق "الجمعة 10:00"
+      
         const weekIdx = weeklyIndexAnchoredOnFriday10(new Date());
         const idx = ((weekIdx % items.length) + items.length) % items.length;
 
@@ -150,7 +149,7 @@ export default function ThirdFrame() {
 
   return (
     <section className="third-frame" dir="rtl" aria-label="تأمل هذا الأسبوع">
-      {/* النص يمين */}
+     
       <div className="tf-col tf-col--right">
         <h2 className="tf-title">تأمل هذا الأسبوع</h2>
         {item.title && <h3 className="tf-subtitle">{item.title}</h3>}
@@ -163,7 +162,7 @@ export default function ThirdFrame() {
         ) : null}
       </div>
 
-      {/* الصورة شمال */}
+
       <div className="tf-col tf-col--left">
         <div className="image-4x5">
           {item.image_url ? (

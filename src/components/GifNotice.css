@@ -1,4 +1,4 @@
-/* RTL افتراضي */
+
 :root { --gifnotice-maxw: 360px; }
 
 .gifnotice-overlay {
@@ -40,7 +40,7 @@
   position: absolute;
   top: 6px;
   inset-inline-start: 6px;
-  z-index: 10; /* ✅ فوق الفيديو وكل شيء */
+  z-index: 10; 
   width: 32px;
   height: 32px;
   border: none;
@@ -49,7 +49,7 @@
   line-height: 1;
   background: rgba(0,0,0,.06);
   cursor: pointer;
-  color: rgb(251, 3, 3);
+  color: black;
 }
 .gifnotice-close:hover { background: rgba(0,0,0,.12); }
 
@@ -59,13 +59,13 @@
   aspect-ratio: 16 / 9;
   background: #f4f4f4;
   overflow: hidden;
-  border-radius: 0;           /* خليه صفر لأن الكرت نفسه فيه radius */
+  border-radius: 0;           
 }
 .gifnotice-media img,
 .gifnotice-media video {
   width: 100%;
   height: 100%;
-  object-fit: contain;        /* ✅ يظهر المحتوى كامل بدون قص */
+  object-fit: contain;       
   display: block;
 }
 
@@ -84,7 +84,7 @@
   display: inline-block;
   padding: 10px 14px;
   border-radius: 12px;
-  background: #e60023;        /* أحمر ناعم */
+  background: #e60023;        
   color: #fff;
   text-decoration: none;
   font-weight: 600;
@@ -95,8 +95,8 @@
   display: block;
   width: 100%;
   height: auto;
-  max-height: 70vh; /* يمنع التمدد الزايد */
-  object-fit: contain; /* ✅ يخلي كل الفيديو ظاهر بدون قصّ */
+  max-height: 70vh; 
+  object-fit: contain; 
   border-radius: 14px;
   margin: 0 auto;
 }

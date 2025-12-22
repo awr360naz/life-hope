@@ -35,7 +35,7 @@ export default function GifNotice({
     };
   }, [delayMs, durationMs]);
 
-  // شغّل الفيديو تلقائيًا عند الظهور
+
   useEffect(() => {
     if (show && isVideo && videoRef.current) {
       try {
@@ -81,6 +81,7 @@ export default function GifNotice({
         <div className="gifnotice-text">{text}</div>
 
         <div className="gifnotice-actions">
+        {/*
           <Link
             className="gifnotice-viewall"
             to="/AngelsPage"
@@ -88,7 +89,9 @@ export default function GifNotice({
           >
             للمزيد
           </Link>
+          */}
         </div>
+ 
       </div>
 
       <button className="gifnotice-backdrop" aria-label="إغلاق" onClick={() => setShow(false)} />
