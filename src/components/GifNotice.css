@@ -47,9 +47,9 @@
   border-radius: 10px;
   font-size: 20px;
   line-height: 1;
-  background: rgba(0,0,0,.06);
+  background: white(0,0,0,.06);
   cursor: pointer;
-  color: black;
+  color: rgb(139, 5, 5);
 }
 .gifnotice-close:hover { background: rgba(0,0,0,.12); }
 

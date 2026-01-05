@@ -6,7 +6,7 @@ import ResilientThumb from "../components/ResilientThumb";
 import ShortsegSafePlayerModal from "../components/ShortsegSafePlayerModal";
 
 const PAGE_SIZE = 12;
-const MAX_PAGES = 2;
+const MAX_PAGES = 1;
 const LS_KEY = "camiProphecies_cache_v1";
 
 function sleep(ms) {

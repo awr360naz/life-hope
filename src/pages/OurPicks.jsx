@@ -269,8 +269,8 @@ const handleShortCardClick = React.useCallback((e) => {
       <div className="our-picks__inner">
     
         <h2 className="our-picks__heading">
-  ميلاد مجيد 
-  <span className="our-picks__sub"> – محتوى ميلادي</span>
+ اختيارتنا
+ 
 </h2>
 
         

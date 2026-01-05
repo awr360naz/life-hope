@@ -169,8 +169,8 @@ export default function HomePage() {
       />
 <GifNotice
 
-  gifSrc={AWR_360_ChristmasWishes}
- // text="ثُمَّ رَأَيْتُ مَلاَكًا آخَرَ طَائِرًا فِي وَسَطِ السَّمَاءِ مَعَهُ بِشَارَةٌ أَبَدِيَّةٌ..."
+  gifSrc={ThreeAngelsmp4}
+  text="ثُمَّ رَأَيْتُ مَلاَكًا آخَرَ طَائِرًا فِي وَسَطِ السَّمَاءِ مَعَهُ بِشَارَةٌ أَبَدِيَّةٌ..."
   viewAllHref="/angels"
   delayMs={2000}
   durationMs={10000}

@@ -81,7 +81,7 @@ export default function GifNotice({
         <div className="gifnotice-text">{text}</div>
 
         <div className="gifnotice-actions">
-        {/*
+        {
           <Link
             className="gifnotice-viewall"
             to="/AngelsPage"
@@ -89,7 +89,7 @@ export default function GifNotice({
           >
             للمزيد
           </Link>
-          */}
+          }
         </div>
  
       </div>

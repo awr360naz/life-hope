@@ -86,8 +86,7 @@ const items = useMemo(
   () =>
     raw
       .map((it) => {
-        // ⛔ تجاهل url / short_url / video_url
-        // ✔️ اعتمد فقط على youtube_id أو youtube_url
+    
         let id = "";
         if (it.youtube_id) {
           id = it.youtube_id;
@@ -108,7 +107,7 @@ const items = useMemo(
   useEffect(() => {
     const max = Math.max(0, items.length - visible);
     if (index > max) setIndex(max);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [visible, items.length]);
 
   const maxIndex = Math.max(0, items.length - visible);
@@ -227,3 +226,6 @@ const items = useMemo(
     </section>
   );
 }
+
+
+
