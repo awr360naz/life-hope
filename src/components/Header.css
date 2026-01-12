@@ -311,7 +311,7 @@
 }
 
 .header {
-  min-height: 58px !important;    
+  min-height: 58px !important;   
   padding-block: 4px !important;
 }
 
@@ -331,5 +331,42 @@
     width: 100% !important;
     margin-inline: 0 !important;
     padding-inline: 0 !important;  /* لو في padding زيادة */
+  }
+}
+/* =========================
+   FORCE Hamburger visibility
+   - Tablet PORTRAIT: Mobile layout
+   - Mobile LANDSCAPE: Mobile layout (حتى لو العرض كبير)
+   ضع هذا آخر الملف لضمان إنه يغلب أي تعارض
+========================= */
+
+/* 1) Tablet Portrait = مثل الموبايل */
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
+  .hamburger { display: inline-flex !important; }
+  .main-nav, .live-btn { display: none !important; }
+  .spacer { display: none !important; }
+
+  .header-inner {
+    height: 58px !important;
+    padding-inline: 4% !important;
+  }
+}
+
+/* 2) Mobile Landscape = مثل الموبايل
+   (معظم الموبايلات باللاندسكيب ارتفاعها صغير ~ 360-450px)
+*/
+@media (orientation: landscape) and (max-height: 500px) {
+  .hamburger { display: inline-flex !important; }
+  .main-nav, .live-btn { display: none !important; }
+  .spacer { display: none !important; }
+
+  .header-inner {
+    height: 58px !important;
+    padding-inline: 4% !important;
+  }
+
+  .search {
+    width: 140px !important;
+    height: 30px !important;
   }
 }

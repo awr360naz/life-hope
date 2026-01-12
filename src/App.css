@@ -1,3 +1,4 @@
+
 .App {
   text-align: center;
 }
@@ -75,5 +76,46 @@ html, body {
     width: 100% !important;
     margin-inline: 0 !important;
     padding-inline: 0 !important;
+  }
+}
+/* TABLET: zoom-out whole site (Portrait + Landscape) */
+@media (min-width: 768px) and (max-width: 1024px) {
+  #root {
+    overflow-x: hidden;
+  }
+
+  /* يطبق على أول عنصر داخل #root (عادة App) */
+  #root > * {
+    transform: scale(0.90);
+    transform-origin: top center;
+
+    width: calc(100% / 0.90);
+    margin-left: calc((100% - (100% / 0.90)) / 2);
+
+    min-height: 100vh;
+  }
+}
+/* =========================
+   TABLET ONLY – TRUE CENTERED ZOOM OUT
+========================= */
+/* =========================
+   TABLET (Portrait + Landscape) – CENTERED ZOOM OUT
+   No left/right clipping
+========================= */
+@media (min-width: 768px) and (max-width: 1600px) {
+
+  html, body { overflow-x: hidden; }
+  #root { overflow: visible; }
+
+  /* زوم على كل التطبيق (عادة أول عنصر داخل #root) */
+  #root > * {
+    position: relative;
+    left: 55%;
+
+    transform: translateX(-50%) scale(0.85);
+    transform-origin: top center;
+
+    width: calc(100% / 0.95);
+    min-height: 100vh;
   }
 }
