@@ -5,8 +5,8 @@ import "./CamiPropheciesPage.css";
 import ResilientThumb from "../components/ResilientThumb";
 import ShortsegSafePlayerModal from "../components/ShortsegSafePlayerModal";
 
-const PAGE_SIZE = 12;
-const MAX_PAGES = 1;
+const PAGE_SIZE = 14;
+const MAX_PAGES = 2 ;
 const LS_KEY = "camiProphecies_cache_v1";
 
 function sleep(ms) {
@@ -245,7 +245,7 @@ export default function CamiPropheciesPage() {
 
   return (
     <div className="cami-page wrap">
-      <h2 className="cami-heading">فتح نبؤات مع Cami</h2>
+      <h2 className="cami-heading">فتح نبؤات</h2>
 
       {loading && <p>جار التحميل...</p>}
       {err && <p className="cami-error">صار خطأ: {err}</p>}
@@ -254,7 +254,7 @@ export default function CamiPropheciesPage() {
         <>
           <div className="cami-grid">
             {paginatedItems.map((it) => {
-              const title = it.title || "فتح نبؤات مع Cami";
+              const title = it.title || "فتح نبؤات";
               return (
                 <button
                   key={it.id || it.slug || it._ytid}

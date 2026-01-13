@@ -38,7 +38,7 @@ function useResponsivePerView(defaultPerView = 4) {
 }
 
 export default function CamiPropheciesCarousel({
-  title = "فتح نبؤات مع Cami",
+  title = "فتح نبؤات ",
   perView = 4,
   step = 1,
   apiUrl = "/api/content/cami-prophecies?limit=24",
@@ -96,7 +96,7 @@ const items = useMemo(
 
         if (!id) return null;
 
-        const t = it.title || "فتح نبؤات مع Cami";
+        const t = it.title || "فتح نبؤات";
         return { ...it, _ytid: id, _title: t, _key: it.id || it.slug || id };
       })
       .filter(Boolean),
