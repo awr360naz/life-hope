@@ -106,10 +106,7 @@ app.get("/api/content/about", async (_req, res) => {
    ========================= */
 app.use(Sentry.Handlers.requestHandler());
 
-// 🔹 حطي route التجربة هون قبل /api
-app.get("/api/debug-sentry", (_req, _res) => {
-  throw new Error("Test Sentry error from Life-Hope backend");
-});
+
 
 app.use(articlesRouter);
 app.use(categoriesRouter);
