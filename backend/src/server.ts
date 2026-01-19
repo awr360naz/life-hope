@@ -18,7 +18,7 @@ import sabbathRoutes from "./routes/sabbathRoutes.js";
 import prayerRequestRouter from "./routes/prayerRequest.js";
 import camiPropheciesRouter from "./routes/camiProphecies.js";
 import searchRouter from "./routes/search.routes.js";
-import * as Sentry from "@sentry/node";
+import * as Sentry from "@sentry/node";                                                                                             
 
 
 const __filename = fileURLToPath(import.meta.url);

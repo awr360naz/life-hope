@@ -8,19 +8,19 @@ const Footer = () => {
     <footer className="footer">
       <div className="footer-container">
 
-        {/* صف الفوتر الرئيسي */}
+  
         <div className="footer-bottom-row">
 
-          {/* العمود اليمين */}
+
           <div className="footer-right-stack">
-            {/* اللوجو */}
+      
             <img
               src="/Awr360logo.png"
               alt="AWR360 Logo"
               className="header-logo footer-logo-img"
             />
 
-            {/* النص التعريفي */}
+       
             <p className="footer-tagline" dir="rtl">
               اذاعة مسيحية تبشيرية باللغة العربية تابعة لاذاعة AWR360 العالمية
             </p>
@@ -30,14 +30,14 @@ const Footer = () => {
             </p>
           </div>
 
-          {/* العمود الشمال */}
+   
           <div className="footer-left-block">
-            {/* تابعنا أيضا على */}
+           
             <p className="footer-follow-label" dir="rtl">
-              تابعنا ايضا على:
+              تابعونا ايضا على:
             </p>
 
-            {/* أيقونات السوشال */}
+          
             <div className="footer-social-icons">
               <a href="https://www.facebook.com/AWR360Arabic" target="_blank" rel="noopener noreferrer">
                 <FaFacebookF />
@@ -53,7 +53,7 @@ const Footer = () => {
               </a>
             </div>
 
-            {/* حقوق النشر تحت الأيقونات */}
+ 
             <p className="footer-copy" dir="rtl">
               2025 - جميع الحقوق محفوظة .
             </p>

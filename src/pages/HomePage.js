@@ -15,6 +15,7 @@ import ThreeAngelsmp4 from "../assets/ThreeAngels.mp4";
 import CamiPropheciesCarousel from "../components/CamiPropheciesCarousel";
 import TestSentryButton from "../TestSentryButton";
 import AWR_360_ChristmasWishes from "../assets/AWR_360_ChristmasWishes.mp4";
+import MessageOfTheDay from "./MessageOfTheDay";
 
 
 
@@ -151,7 +152,12 @@ export default function HomePage() {
 
 
 <br></br>
-
+{/*
+<div>
+      {/* باقي الهوم 
+      <MessageOfTheDay apiUrl="/api/message-of-the-day" lang="ar" />
+    </div>
+    */}
    <ProgramsCarousel title="برامجنا" />
    <br></br>
  <CamiPropheciesCarousel />
