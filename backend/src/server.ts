@@ -104,7 +104,9 @@ app.get("/api/content/about", async (_req, res) => {
 /* =========================
    راوترات خارجية
    ========================= */
-app.use(Sentry.Handlers.requestHandler());
+
+
+
 
 
 
