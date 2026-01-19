@@ -125,8 +125,7 @@ app.use("/api/programs", programsTodayRouter);
 // 👇 آخر واحد يكون searchRouter
 app.use("/api", searchRouter);
 
-// وبعدين Sentry error handler
-app.use(Sentry.Handlers.errorHandler());
+
 
 
 
