@@ -117,7 +117,9 @@ app.use("/api/content/our-picks", ourPicksRouter);
 app.use("/api/content/quizzes", quizzesRouter);
 app.use("/api/content", sabbathRoutes);
 app.use("/api/contact/prayer-request", prayerRequestRouter);
-app.use(camiPropheciesRouter);
+app.use("/api/content/cami-prophecies", camiPropheciesRouter);
+app.use("/api/cami-prophecies", camiPropheciesRouter); // alias قديم
+
 app.use("/api/content/programs", programsTodayRouter);
 app.use("/api/programs", programsTodayRouter);
 

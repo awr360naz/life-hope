@@ -5,13 +5,10 @@ import "./CamiPropheciesPage.css";
 import ResilientThumb from "../components/ResilientThumb";
 import ShortsegSafePlayerModal from "../components/ShortsegSafePlayerModal";
 
-const PAGE_SIZE = 14;
-const MAX_PAGES = 2 ;
-const LS_KEY = "camiProphecies_cache_v1";
+const PAGE_SIZE = 15;
+const MAX_PAGES = 2;
+const LS_KEY = "camiProphecies_cache_v2";
 
-function sleep(ms) {
-  return new Promise((r) => setTimeout(r, ms));
-}
 function uniqBy(arr, keyFn) {
   const seen = new Set();
   const out = [];
@@ -31,7 +28,8 @@ function toYouTubeId(urlOrId = "") {
   try {
     const u = new URL(urlOrId);
     if (u.hostname.includes("youtu.be")) return u.pathname.split("/")[1] || "";
-    if (u.pathname.startsWith("/shorts/")) return u.pathname.split("/")[2] || "";
+    if (u.pathname.startsWith("/shorts/"))
+      return u.pathname.split("/")[2] || "";
     const v = u.searchParams.get("v");
     if (v) return v;
     const m = urlOrId.match(
@@ -43,10 +41,24 @@ function toYouTubeId(urlOrId = "") {
   }
 }
 
+function sortByDbSort(list) {
+  const arr = [...(list || [])];
+  arr.sort((a, b) => {
+    const sa = Number.isFinite(+a.sort) ? +a.sort : 999999999;
+    const sb = Number.isFinite(+b.sort) ? +b.sort : 999999999;
+    if (sa !== sb) return sa - sb;
+
+    const ta = new Date(a.published_at || a.created_at || 0).getTime() || 0;
+    const tb = new Date(b.published_at || b.created_at || 0).getTime() || 0;
+    return tb - ta;
+  });
+  return arr;
+}
+
 export default function CamiPropheciesPage() {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const focusId = searchParams.get("video"); // جاي من صفحة البحث
+  const focusId = searchParams.get("video");
 
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -57,6 +69,7 @@ export default function CamiPropheciesPage() {
   useEffect(() => {
     let alive = true;
     const ac = new AbortController();
+    const need = MAX_PAGES * PAGE_SIZE; // 30
 
     const tryFetch = async (url) => {
       const res = await fetch(url, {
@@ -68,10 +81,11 @@ export default function CamiPropheciesPage() {
       try {
         data = text ? JSON.parse(text) : null;
       } catch {}
-      if (!res.ok)
+      if (!res.ok) {
         throw new Error(
           data?.error || data?.message || text || `HTTP ${res.status}`
         );
+      }
       return Array.isArray(data?.items)
         ? data.items
         : Array.isArray(data)
@@ -79,92 +93,58 @@ export default function CamiPropheciesPage() {
         : [];
     };
 
-    const fetchResilient = async () => {
+    const fetchFast = async () => {
       const cb = Date.now();
-      const sources = [
-        `/api/content/cami-prophecies?limit=200&_cb=${cb}`,
-        `/api/cami-prophecies?limit=200&_cb=${cb}`,
-      ];
-      const attempts = [200, 600, 1200, 2000];
-      let best = [];
+      // ✅ مصدر واحد سريع + limit بس اللي نحتاجه
+      const url = `/api/content/cami-prophecies?limit=${need}&_cb=${cb}`;
 
-      for (let i = 0; i < attempts.length; i++) {
-        if (!alive) return best;
+      const fresh = await tryFetch(url);
 
-        try {
-          const results = await Promise.allSettled(
-            sources.map((s) => tryFetch(s))
-          );
-          let merged = [];
-          for (const r of results) {
-            if (r.status === "fulfilled" && Array.isArray(r.value)) {
-              merged = merged.concat(r.value);
-            }
-          }
+      let merged = (fresh || [])
+        .map((it) => {
+          // ✅ اعتمد بس على youtube_id / youtube_url
+          const id =
+            it.youtube_id || toYouTubeId(it.youtube_url || it.youtubeId || "");
+          return id ? { ...it, _ytid: id } : null;
+        })
+        .filter(Boolean);
 
-          merged = merged
-            .map((it) => {
-              const id =
-                it.youtube_id ||
-                toYouTubeId(
-                  it.youtube_url ||
-                    it.url ||
-                    it.video_url ||
-                    it.short_url ||
-                    ""
-                );
-              return id ? { ...it, _ytid: id } : null;
-            })
-            .filter(Boolean);
+      merged = uniqBy(merged, (x) => x._ytid);
 
-          merged = uniqBy(merged, (x) => x._ytid);
+      // ✅ ترتيب نهائي حسب sort (حتى لو رجعت من كاش)
+      merged = sortByDbSort(merged);
 
-          merged.sort((a, b) => {
-            const ta =
-              new Date(a.published_at || a.created_at || 0).getTime() || 0;
-            const tb =
-              new Date(b.published_at || b.created_at || 0).getTime() || 0;
-            return tb - ta;
-          });
-
-          merged = merged.slice(0, MAX_PAGES * PAGE_SIZE);
-
-          if (merged.length >= 36) {
-            return merged;
-          } else if (merged.length > best.length) {
-            best = merged;
-          }
-        } catch {}
-        await sleep(attempts[i]);
-      }
-
-      return best;
+      return merged.slice(0, need);
     };
 
     (async () => {
-      setLoading(true);
       setErr("");
 
+      // ✅ اعرض الكاش فورًا لو موجود
       try {
         const cached = JSON.parse(localStorage.getItem(LS_KEY) || "[]");
         if (Array.isArray(cached) && cached.length) {
-          setItems(cached);
+          setItems(sortByDbSort(cached));
           setLoading(false);
+        } else {
+          setLoading(true);
         }
-      } catch {}
+      } catch {
+        setLoading(true);
+      }
 
       try {
-        const fresh = await fetchResilient();
+        const fresh = await fetchFast();
         if (!alive) return;
 
-        if (fresh.length >= 24) {
+        if (fresh.length) {
           setItems(fresh);
           localStorage.setItem(LS_KEY, JSON.stringify(fresh));
           setErr("");
         } else {
-          const hasCache = Array.isArray(items) && items.length > 0;
-          if (!hasCache) setItems(fresh);
-          setErr(fresh.length ? "" : "لم تصل بيانات كافية");
+          // لو ما في بيانات، خليها فاضية بس بدون ما نكسر الصفحة
+          setItems([]);
+          setErr("لم تصل بيانات كافية");
         }
       } catch (e) {
         if (!alive) return;
@@ -180,24 +160,22 @@ export default function CamiPropheciesPage() {
     };
   }, []);
 
-  const normalized = useMemo(
-    () =>
-      (items || [])
-        .map((it) => {
-          const id =
-            it._ytid ||
-            it.youtube_id ||
-            toYouTubeId(
-              it.youtube_url || it.url || it.video_url || it.short_url || ""
-            );
-          const finalId = id || it.id;
-          return finalId ? { ...it, _ytid: finalId } : null;
-        })
-        .filter(Boolean),
-    [items]
-  );
+  const normalized = useMemo(() => {
+    return (items || [])
+      .map((it) => {
+        const id =
+          it._ytid ||
+          it.youtube_id ||
+          toYouTubeId(it.youtube_url || it.youtubeId || "");
+        const finalId = id || it.id;
+        return finalId ? { ...it, _ytid: finalId } : null;
+      })
+      .filter(Boolean);
+  }, [items]);
 
-  const totalCap = Math.min(normalized.length, MAX_PAGES * PAGE_SIZE);
+  // ✅ ضمان ترتيب حتى لو items اجت بأي ترتيب
+  const ordered = useMemo(() => sortByDbSort(normalized), [normalized]);
+
   const totalPages = MAX_PAGES;
 
   useEffect(() => {
@@ -207,34 +185,29 @@ export default function CamiPropheciesPage() {
 
   const start = (page - 1) * PAGE_SIZE;
   const end = start + PAGE_SIZE;
-  const paginatedItems = normalized.slice(start, end);
+  const paginatedItems = ordered.slice(start, end);
 
   const onCardClick = (it) => setPlayer({ open: true, item: it });
 
-  // لو جينا مع ?video= في الرابط، جرّب افتح الفيديو المطلوب
   useEffect(() => {
-    if (!focusId || !normalized.length) return;
+    if (!focusId || !ordered.length) return;
 
-    // أولاً جرّب طابقه مع id أو _ytid
     let target =
-      normalized.find(
+      ordered.find(
         (it) =>
           String(it.id) === String(focusId) ||
           String(it._ytid) === String(focusId)
-      ) ||
-      normalized.find((it) => String(it.slug || "") === String(focusId));
+      ) || ordered.find((it) => String(it.slug || "") === String(focusId));
 
     if (target) {
       setPlayer({ open: true, item: target });
-
-      // (اختياري) نقل الصفحة بحيث يكون ضمن الصفحة الأولى/الثانية
-      const idx = normalized.indexOf(target);
+      const idx = ordered.indexOf(target);
       if (idx >= 0) {
         const newPage = Math.floor(idx / PAGE_SIZE) + 1;
         setPage(newPage);
       }
     }
-  }, [focusId, normalized]);
+  }, [focusId, ordered]);
 
   useEffect(() => {
     const onKey = (e) =>
