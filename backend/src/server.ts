@@ -19,6 +19,9 @@ import prayerRequestRouter from "./routes/prayerRequest.js";
 import camiPropheciesRouter from "./routes/camiProphecies.js";
 import searchRouter from "./routes/search.routes.js";
 import * as Sentry from "@sentry/node";                                                                                             
+import thtSaqfWahdRouter from "./routes/thtSaqfWahd.js";
+import mrayaAlrohRouter from "./routes/mrayaAlroh.js";
+import sehaAfdalRouter from "./routes/sehaAfdal.js";
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -125,7 +128,9 @@ app.use("/api/programs", programsTodayRouter);
 
 // 👇 آخر واحد يكون searchRouter
 app.use("/api", searchRouter);
-
+app.use("/api/content/tht-saqf-wahd", thtSaqfWahdRouter);
+app.use("/api/content/mraya-alroh", mrayaAlrohRouter);
+app.use("/api/content/seha-afdal", sehaAfdalRouter);
 
 
 

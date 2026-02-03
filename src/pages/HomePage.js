@@ -13,9 +13,14 @@ import GifNotice from "../components/GifNotice";
 import angel from "../assets/angel.gif";
 import ThreeAngelsmp4 from "../assets/ThreeAngels.mp4";
 import CamiPropheciesCarousel from "../components/CamiPropheciesCarousel";
+import ThtSaqfWahdCarousel from "../components/ThtSaqfWahdCarousel";
 import TestSentryButton from "../TestSentryButton";
 import AWR_360_ChristmasWishes from "../assets/AWR_360_ChristmasWishes.mp4";
 import MessageOfTheDay from "./MessageOfTheDay";
+import MrayaAlrohCarousel from "../components/MrayaAlrohCarousel";
+import SehaAfdalCarousel from "../components/SehaAfdalCarousel";
+
+
 
 
 
@@ -152,15 +157,16 @@ export default function HomePage() {
 
 
 <br></br>
-{/*
-<div>
-      {/* باقي الهوم 
-      <MessageOfTheDay apiUrl="/api/message-of-the-day" lang="ar" />
-    </div>
-    */}
+
    <ProgramsCarousel title="برامجنا" />
    <br></br>
  <CamiPropheciesCarousel />
+  <br></br>
+<ThtSaqfWahdCarousel
+
+/>
+ <br></br>
+
       <ShortSegmentsCarousel
   title="فقرات قصيرة"
   perView={5}
@@ -169,6 +175,19 @@ export default function HomePage() {
   toAllHref="/shorts"
   limit={48}
 />
+<br></br>
+<MrayaAlrohCarousel
+  title="مرايا الروح"
+  apiUrl="/api/content/mraya-alroh?limit=24"
+  linkTo="/mraya-alroh"
+/>
+<br></br>
+<SehaAfdalCarousel
+  title="صحة افضل لحياة افضل"
+  apiUrl="/api/content/seha-afdal?limit=24"
+  linkTo="/seha-afdal"
+/>
+
 
   <OurPicks
        title="فقرات قصيرة"
@@ -186,5 +205,4 @@ export default function HomePage() {
     </main>
   );
 }
-
 

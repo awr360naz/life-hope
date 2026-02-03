@@ -30,8 +30,13 @@ import SabbathLessonPage from "./pages/SabbathLessonPage";
 import SabbathWeekPage from "./pages/SabbathWeekPage";
 import SabbathItemPage from "./pages/SabbathItemPage";
 import CamiPropheciesPage from "./pages/CamiPropheciesPage";
-import TestSentryButton from "./TestSentryButton";
-<TestSentryButton />
+import ThtSaqfWahdPage from "./pages/ThtSaqfWahdPage";
+import MrayaAlrohPage from "./pages/MrayaAlrohPage";
+import SehaAfdalPage from "./pages/SehaAfdalPage";
+
+
+
+
 function UseManualScrollRestoration() {
   useEffect(() => {
     if ('scrollRestoration' in window.history) {
@@ -177,6 +182,12 @@ export default function App() {
 <Route path="/sabbath-weeks/:weekSlug" element={<SabbathWeekPage />} />
 <Route path="/sabbath-items/:itemSlug" element={<SabbathItemPage />} />
 <Route path="/cami-prophecies" element={<CamiPropheciesPage />} />
+<Route path="/tht-saqf-wahd" element={<ThtSaqfWahdPage />} />
+<Route path="/mraya-alroh" element={<MrayaAlrohPage />} />
+<Route path="/seha-afdal" element={<SehaAfdalPage />} />
+
+
+
 
           </Routes>
           
