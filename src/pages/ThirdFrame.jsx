@@ -1,6 +1,7 @@
 import React from "react";
 import "./ThirdFrame.css";
 
+
 /* ===================== Helpers ===================== */
 function pickFirstString(...vals) {
   for (const v of vals) if (typeof v === "string" && v.trim()) return v.trim();
@@ -73,7 +74,7 @@ function weeklyIndexAnchoredOnFriday10(now = new Date()) {
   return Math.floor(diff / (7 * 24 * 60 * 60 * 1000)); 
 }
 
-/* ===================== Fetch + Normalize ===================== */
+
 async function fetchThirdFrameItems() {
  
   const at = nowIsoUtc();
@@ -81,6 +82,8 @@ async function fetchThirdFrameItems() {
     headers: { Accept: "application/json" },
     cache: "no-store",
   });
+
+
 
   const text = await res.text();
   let data = null;
@@ -123,7 +126,9 @@ async function fetchThirdFrameItems() {
   return normalized;
 }
 
-/* ===================== Component ===================== */
+
+
+
 export default function ThirdFrame() {
   const [item, setItem] = React.useState(null);
   const [err, setErr] = React.useState("");
@@ -151,7 +156,7 @@ export default function ThirdFrame() {
     <section className="third-frame" dir="rtl" aria-label="تأمل هذا الأسبوع">
      
       <div className="tf-col tf-col--right">
-        <h2 className="tf-title">تأمل هذا الأسبوع</h2>
+        
         {item.title && <h3 className="tf-subtitle">{item.title}</h3>}
 
         {item.bodyHtml ? (

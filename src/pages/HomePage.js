@@ -102,61 +102,77 @@ export default function HomePage() {
     
     <main className="homepage-rtl">
       
-      <div className="frames-center">
-        
-        
- 
-        
-        <div className="live-topline">
-          
-           <span className="live-date">{todayStr}</span>
-          <span className="live-title">البث المباشر</span>
-         
-        </div>
-         
-        {/* ===== الإطار 1: البث ===== */}
- <section className="live-frame">
-  <div className="live-box">
-    <div className="livebox-aspect">
-      <iframe
-        className="live-iframe"
-        src={LIVE_SRC}
-        title="البث المباشر"
-        scrolling="no"
-        referrerPolicy="no-referrer"
-        allow="autoplay; encrypted-media; fullscreen; picture-in-picture; web-share"
-        allowFullScreen
-      />
-    </div>
+  <div className="frames-center">
+
+  {/* ===== الإطار 1: برنامج اليوم ===== */}
+  <section
+    className="schedule-frame"
+    onMouseEnter={() => setPaused(true)}
+    onMouseLeave={() => setPaused(false)}
+    onTouchStart={() => setPaused(true)}
+    onTouchEnd={() => setPaused(false)}
+    onMouseDown={() => setPaused(true)}
+    onMouseUp={() => setPaused(false)}
+  >
+    <MiniScheduleWidget className="msw-wide" paused={paused} />
+  </section>
+
+  <div className="live-topline">
+    <span className="live-date">{todayStr}</span>
+    <span className="live-title">البث المباشر</span>
   </div>
-</section>
 
-        {/* ===== الإطار 2: برنامج اليوم ===== */}
-
-<section
-  className="schedule-frame"
-  onMouseEnter={() => setPaused(true)}
-  onMouseLeave={() => setPaused(false)}
-  onTouchStart={() => setPaused(true)}
-  onTouchEnd={() => setPaused(false)}
-  onMouseDown={() => setPaused(true)}
-  onMouseUp={() => setPaused(false)}
->
-
-  <MiniScheduleWidget className="msw-wide" paused={paused} />
-</section>
-
-        {/* ===== الإطار 3 ===== */}
-        <section className="text-frame frame-3" dir="rtl">
-          <ThirdFrame />
-        </section>
+  {/* ===== الإطار 2: البث ===== */}
+  <section className="live-frame">
+    <div className="live-box">
+      <div className="livebox-aspect">
+        <iframe
+          className="live-iframe"
+          src={LIVE_SRC}
+          title="البث المباشر"
+          scrolling="no"
+          referrerPolicy="no-referrer"
+          allow="autoplay; encrypted-media; fullscreen; picture-in-picture; web-share"
+          allowFullScreen
+        />
+        
       </div>
+    </div>
+  </section>
+
+  {/* ===== الإطار 3: رسالة الملائكة الثلاث (ثابت بدل البوب اب) ===== */}
+  <section className="text-frame frame-3 angels-frame" dir="rtl">
+    <div className="angels-card">
+      <div className="angels-media">
+        <video
+          className="angels-video"
+          src={ThreeAngelsmp4}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+        />
+      </div>
+
+      <p className="angels-text">
+        ثُمَّ رَأَيْتُ مَلاَكًا آخَرَ طَائِرًا فِي وَسَطِ السَّمَاءِ مَعَهُ بِشَارَةٌ أَبَدِيَّةٌ...
+      </p>
+
+   <Link to="/AngelsPage" className="angels-btn">
+  للمزيد
+</Link>
+
+    </div>
+  </section>
+
+</div>
+
       
-      
 
 
 
-<br></br>
+<br></br><br></br><br></br><br></br>
 
    <ProgramsCarousel title="برامجنا" />
    <br></br>
@@ -192,17 +208,9 @@ export default function HomePage() {
   <OurPicks
        title="فقرات قصيرة"
       />
-<GifNotice
 
-  gifSrc={ThreeAngelsmp4}
-  text="ثُمَّ رَأَيْتُ مَلاَكًا آخَرَ طَائِرًا فِي وَسَطِ السَّمَاءِ مَعَهُ بِشَارَةٌ أَبَدِيَّةٌ..."
-  viewAllHref="/angels"
-  delayMs={2000}
-  durationMs={10000}
-/>
 
 
     </main>
   );
 }
-

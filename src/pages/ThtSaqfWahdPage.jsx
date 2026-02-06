@@ -222,7 +222,7 @@ export default function ThtSaqfWahdPage() {
 {paginatedItems.map((it) => {
   const title = it.title || "سقف واحد";
 
-  // ✅ جهّز cover_url: إذا موجود بالداتا خده، غير هيك خليه null
+
   const cover_url =
     (it.cover_url && String(it.cover_url).trim()) || null;
 

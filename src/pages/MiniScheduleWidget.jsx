@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import "./MiniScheduleWidget.css";
 
-const ROW_H = 24; // لازم يطابق line-height بالـ CSS
+const ROW_H = 24; 
 
 export default function MiniScheduleWidget({ className = "", paused = false }) {
   const rootRef = useRef(null);
@@ -13,15 +13,15 @@ export default function MiniScheduleWidget({ className = "", paused = false }) {
   const [now, setNow] = useState(null);
   const [next, setNext] = useState(null);
 
-  // عدد الأسطر المرئيّة (نحسبه ديناميكيًا لملء الإطار، وأقلّه 6)
+
   const [visibleRows, setVisibleRows] = useState(6);
 
-  // مؤشر الحركة + إعادة الضبط السلس
+
   const [index, setIndex] = useState(0);
   const [resetting, setResetting] = useState(false);
   const timerRef = useRef(null);
 
-  // ===== Helpers =====
+
   const WD_EN3 = ["sun","mon","tue","wed","thu","fri","sat"];
   const WD_EN_FULL = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
   const WD_AR = ["الأحد","الإثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
@@ -46,7 +46,7 @@ export default function MiniScheduleWidget({ className = "", paused = false }) {
     return (+m[1]) * 60 + (+m[2]);
   }
 
-  // ✅ أدق: يلتقط next حتى لو ما في now
+
   function pickNowNext(list, tz = "Asia/Jerusalem"){
     const nowStr = new Intl.DateTimeFormat("en-GB",{
       hour:"2-digit", minute:"2-digit", hour12:false, timeZone:tz
@@ -59,8 +59,8 @@ export default function MiniScheduleWidget({ className = "", paused = false }) {
     for (let i = 0; i < list.length; i++){
       const t = hhmmToMinutes(list[i]?.time || "");
       if (t === -1) continue;
-      if (t <= nowMin) nowIdx = i;              // آخر عنصر قبل/عند الآن
-      if (nextIdx === -1 && t > nowMin) nextIdx = i; // أول عنصر بعد الآن
+      if (t <= nowMin) nowIdx = i;            
+      if (nextIdx === -1 && t > nowMin) nextIdx = i; 
     }
 
     return {
@@ -80,7 +80,7 @@ export default function MiniScheduleWidget({ className = "", paused = false }) {
     return [];
   }
 
-  // ✅ توحيد الوقت + إزالة التكرارات + ترتيب تصاعدي
+ 
   function padHHMM(s=""){
     const m = /^(\d{1,2}):(\d{2})$/.exec((s || "").trim());
     if (!m) return (s || "");
@@ -102,7 +102,7 @@ export default function MiniScheduleWidget({ className = "", paused = false }) {
     return dedup;
   }
 
-  // ===== Fetch weekly (فرونت فقط) =====
+  
   useEffect(() => {
     let stop = false;
     (async () => {
@@ -133,7 +133,7 @@ export default function MiniScheduleWidget({ className = "", paused = false }) {
         setNow(picked.now);
         setNext(picked.next);
       } catch (e) {
-        // ✅ fallback: today (يدعم الشكلين items أو program.items)
+      
         try {
           const res2 = await fetch("/api/content/programs/today", { headers: { Accept: "application/json" } });
           const d2 = await res2.json();
@@ -164,7 +164,7 @@ export default function MiniScheduleWidget({ className = "", paused = false }) {
     return () => { stop = true; };
   }, []);
 
-  // ===== قياس الارتفاع لإحتساب عدد الأسطر لملء الإطار =====
+ 
   useEffect(() => {
     if (!rootRef.current) return;
     const ro = new ResizeObserver(() => {
@@ -182,15 +182,14 @@ export default function MiniScheduleWidget({ className = "", paused = false }) {
     return () => ro.disconnect();
   }, []);
 
-  // ===== Infinite smooth scroll =====
-  // نضاعف أول visibleRows كجسر غير مرئي
+
   const items2 = useMemo(() => {
     if (!items || items.length === 0) return [];
     const bridge = items.slice(0, visibleRows);
     return items.concat(bridge);
   }, [items, visibleRows]);
 
-  // الحدّ عند نهاية القائمة الأصلية
+ 
   const maxIdx = Math.max(0, items.length);
 
   useEffect(() => {
@@ -202,13 +201,13 @@ export default function MiniScheduleWidget({ className = "", paused = false }) {
         const nextIdx = prev + 1;
         return nextIdx > maxIdx ? maxIdx : nextIdx;
       });
-    }, 1000); // أسرع وأنعم
+    }, 1000); 
     return () => clearInterval(timerRef.current);
   }, [paused, loading, items, visibleRows, maxIdx]);
 
   function handleTransitionEnd() {
     if (index >= maxIdx) {
-      // رجوع للصفر بلا أنيميشن (قفزة غير مرئية)
+     
       setResetting(true);
       requestAnimationFrame(() => {
         setIndex(0);
@@ -217,15 +216,15 @@ export default function MiniScheduleWidget({ className = "", paused = false }) {
     }
   }
 
-  // ===== Render =====
+
   return (
     <div ref={rootRef} className={`mini-schedule ${className}`}>
-      {/* العنوان */}
+    
       <div ref={headerRef} className="frame-header center">
         <span className="schedule-title">برنامج اليوم</span>
       </div>
 
-      {/* العرض: عدد أسطر ديناميكي يملأ الإطار */}
+  
       <div
         className="schedule-viewport"
         aria-busy={loading}
@@ -260,7 +259,7 @@ export default function MiniScheduleWidget({ className = "", paused = false }) {
           >
             {items2.map((it, i) => (
               <li key={i} className="schedule-row">
-                {/* 🔁 العنوان أولًا ثم الوقت */}
+            
                 <span className="row-title">{it.title}</span>
                 <time className="row-time">{it.time}</time>
               </li>
@@ -269,7 +268,7 @@ export default function MiniScheduleWidget({ className = "", paused = false }) {
         )}
       </div>
 
-      {/* على الهواء + التالي */}
+    
       <div ref={onairRef} className="onair-box" aria-live="polite">
         <div className="onair-lines">
           <div className="onair-line">
@@ -278,7 +277,7 @@ export default function MiniScheduleWidget({ className = "", paused = false }) {
               مباشر
             </span>
             <span className="onair-text">
-              {now?.title ? `${now.title} — ${now.time}` : "—"}
+              {now?.title ? `${now.title}  ${now.time}` : "—"}
             </span>
           </div>
           <div className="next-line">
