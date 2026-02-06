@@ -277,11 +277,11 @@ export default function MiniScheduleWidget({ className = "", paused = false }) {
               مباشر
             </span>
             <span className="onair-text">
-              {now?.title ? `${now.title}  ${now.time}` : "—"}
+              {now?.title ? `${now.title}  ${now.time}` : " "}
             </span>
           </div>
           <div className="next-line">
-            <span className="next-label">التالي:</span>{" "}
+            <span className="next-label">التالي: </span>{" -"}
             <span className="next-text">{next?.title ? `${next.title} : ${next.time}` : "—"}</span>
           </div>
         </div>
