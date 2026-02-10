@@ -22,6 +22,8 @@ import * as Sentry from "@sentry/node";
 import thtSaqfWahdRouter from "./routes/thtSaqfWahd.js";
 import mrayaAlrohRouter from "./routes/mrayaAlroh.js";
 import sehaAfdalRouter from "./routes/sehaAfdal.js";
+import sbahAlkherRouter from "./routes/sbahAlkher.js";
+
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -131,6 +133,7 @@ app.use("/api", searchRouter);
 app.use("/api/content/tht-saqf-wahd", thtSaqfWahdRouter);
 app.use("/api/content/mraya-alroh", mrayaAlrohRouter);
 app.use("/api/content/seha-afdal", sehaAfdalRouter);
+app.use("/api/content/sbah-alkher", sbahAlkherRouter);
 
 
 

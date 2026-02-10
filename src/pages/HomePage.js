@@ -19,6 +19,7 @@ import AWR_360_ChristmasWishes from "../assets/AWR_360_ChristmasWishes.mp4";
 import MessageOfTheDay from "./MessageOfTheDay";
 import MrayaAlrohCarousel from "../components/MrayaAlrohCarousel";
 import SehaAfdalCarousel from "../components/SehaAfdalCarousel";
+import SbahAlkherCarousel from "../components/SbahAlkherCarousel";
 
 
 
@@ -203,8 +204,13 @@ export default function HomePage() {
   apiUrl="/api/content/seha-afdal?limit=24"
   linkTo="/seha-afdal"
 />
-
-
+<br></br>
+<SbahAlkherCarousel
+  title= " صباح الخير مع ايات "
+  apiUrl="/api/content/sbah-alkher?limit=24"
+  linkTo="/sbah-alkher"
+/>
+<br></br>
   <OurPicks
        title="فقرات قصيرة"
       />

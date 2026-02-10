@@ -33,6 +33,7 @@ import CamiPropheciesPage from "./pages/CamiPropheciesPage";
 import ThtSaqfWahdPage from "./pages/ThtSaqfWahdPage";
 import MrayaAlrohPage from "./pages/MrayaAlrohPage";
 import SehaAfdalPage from "./pages/SehaAfdalPage";
+import SbahAlkherPage from "./pages/SbahAlkherPage";
 
 
 
@@ -185,6 +186,7 @@ export default function App() {
 <Route path="/tht-saqf-wahd" element={<ThtSaqfWahdPage />} />
 <Route path="/mraya-alroh" element={<MrayaAlrohPage />} />
 <Route path="/seha-afdal" element={<SehaAfdalPage />} />
+<Route path="/sbah-alkher" element={<SbahAlkherPage />} />
 
 
 

@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import "./ProgramDetail.css";
+import SabahElKheirCarousel from "../components/SbahAlkherCarousel";
+
 
 // ✅ الكاروسيلات
 import CamiPropheciesCarousel from "../components/CamiPropheciesCarousel";
@@ -80,6 +82,12 @@ export default function ProgramDetail() {
     // ✅ مرايا الروح
     "برنامج مرايا الروح": <MrayaAlrohCarousel />,
     "مرايا الروح": <MrayaAlrohCarousel />,
+
+    "برنامج صباح الخير مع ايات": <SabahElKheirCarousel />,
+"صباح الخير مع ايات": <SabahElKheirCarousel />,
+"برنامج صباح الخير": <SabahElKheirCarousel />,
+"صباح الخير مع آيات": <SabahElKheirCarousel />,
+
   }),
   []
 );
