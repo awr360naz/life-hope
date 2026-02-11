@@ -23,6 +23,7 @@ import thtSaqfWahdRouter from "./routes/thtSaqfWahd.js";
 import mrayaAlrohRouter from "./routes/mrayaAlroh.js";
 import sehaAfdalRouter from "./routes/sehaAfdal.js";
 import sbahAlkherRouter from "./routes/sbahAlkher.js";
+import kolShahr4_7kayatRouter from "./routes/kolShahr4_7kayat.js";
 
 
 
@@ -134,6 +135,7 @@ app.use("/api/content/tht-saqf-wahd", thtSaqfWahdRouter);
 app.use("/api/content/mraya-alroh", mrayaAlrohRouter);
 app.use("/api/content/seha-afdal", sehaAfdalRouter);
 app.use("/api/content/sbah-alkher", sbahAlkherRouter);
+app.use("/api/content/kol-shahr-4-7kayat", kolShahr4_7kayatRouter);
 
 
 

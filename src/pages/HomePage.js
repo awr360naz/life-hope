@@ -20,6 +20,7 @@ import MessageOfTheDay from "./MessageOfTheDay";
 import MrayaAlrohCarousel from "../components/MrayaAlrohCarousel";
 import SehaAfdalCarousel from "../components/SehaAfdalCarousel";
 import SbahAlkherCarousel from "../components/SbahAlkherCarousel";
+import KolShahr4_7kayatCarousel from "../components/KolShahr4_7kayatCarousel";
 
 
 
@@ -211,6 +212,12 @@ export default function HomePage() {
   linkTo="/sbah-alkher"
 />
 <br></br>
+<KolShahr4_7kayatCarousel
+  title="كل شهر اربع حكايات"
+  apiUrl="/api/content/kol-shahr-4-7kayat?limit=24"
+  linkTo="/kol-shahr-4-7kayat"
+/>
+
   <OurPicks
        title="فقرات قصيرة"
       />

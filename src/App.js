@@ -34,6 +34,7 @@ import ThtSaqfWahdPage from "./pages/ThtSaqfWahdPage";
 import MrayaAlrohPage from "./pages/MrayaAlrohPage";
 import SehaAfdalPage from "./pages/SehaAfdalPage";
 import SbahAlkherPage from "./pages/SbahAlkherPage";
+import KolShahr4_7kayatPage from "./pages/KolShahr4_7kayatPage";
 
 
 
@@ -187,6 +188,7 @@ export default function App() {
 <Route path="/mraya-alroh" element={<MrayaAlrohPage />} />
 <Route path="/seha-afdal" element={<SehaAfdalPage />} />
 <Route path="/sbah-alkher" element={<SbahAlkherPage />} />
+<Route path="/kol-shahr-4-7kayat" element={<KolShahr4_7kayatPage />} />
 
 
 
