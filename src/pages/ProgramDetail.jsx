@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import "./ProgramDetail.css";
 import SabahElKheirCarousel from "../components/SbahAlkherCarousel";
+import KolShahr4_7kayatCarousel from "../components/KolShahr4_7kayatCarousel";
 
 
 // ✅ الكاروسيلات
@@ -87,6 +88,12 @@ export default function ProgramDetail() {
 "صباح الخير مع ايات": <SabahElKheirCarousel />,
 "برنامج صباح الخير": <SabahElKheirCarousel />,
 "صباح الخير مع آيات": <SabahElKheirCarousel />,
+
+"برنامج كل شهر اربع حكايات": <KolShahr4_7kayatCarousel />,
+"كل شهر اربع حكايات": <KolShahr4_7kayatCarousel />,
+"برنامج كل شهر أربع حكايات": <KolShahr4_7kayatCarousel />,
+"كل شهر أربع حكايات": <KolShahr4_7kayatCarousel />,
+
 
   }),
   []
