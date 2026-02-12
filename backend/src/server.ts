@@ -24,8 +24,8 @@ import mrayaAlrohRouter from "./routes/mrayaAlroh.js";
 import sehaAfdalRouter from "./routes/sehaAfdal.js";
 import sbahAlkherRouter from "./routes/sbahAlkher.js";
 import kolShahr4_7kayatRouter from "./routes/kolShahr4_7kayat.js";
-
-
+import wamdat_raw7ye from "./routes/wamdat_raw7ye.js";
+import al7ya_welamal from "./routes/al7ya_welamal.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -136,8 +136,8 @@ app.use("/api/content/mraya-alroh", mrayaAlrohRouter);
 app.use("/api/content/seha-afdal", sehaAfdalRouter);
 app.use("/api/content/sbah-alkher", sbahAlkherRouter);
 app.use("/api/content/kol-shahr-4-7kayat", kolShahr4_7kayatRouter);
-
-
+app.use("/api/content/wamdat_raw7ye", wamdat_raw7ye);
+app.use("/api/content/al7ya_welamal", al7ya_welamal);
 
 
 const PROGRAMS_TABLE = process.env.PROGRAMS_TABLE || "programs";

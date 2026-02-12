@@ -21,8 +21,8 @@ import MrayaAlrohCarousel from "../components/MrayaAlrohCarousel";
 import SehaAfdalCarousel from "../components/SehaAfdalCarousel";
 import SbahAlkherCarousel from "../components/SbahAlkherCarousel";
 import KolShahr4_7kayatCarousel from "../components/KolShahr4_7kayatCarousel";
-
-
+import WamdatRaw7yeCarousel from "../components/WamdatRaw7yeCarousel";
+import Al7yaWelamalCarousel from "../components/Al7yaWelamalCarousel";
 
 
 
@@ -217,7 +217,21 @@ export default function HomePage() {
   apiUrl="/api/content/kol-shahr-4-7kayat?limit=24"
   linkTo="/kol-shahr-4-7kayat"
 />
+  {/* 
+<br></br>
+<WamdatRaw7yeCarousel
+  title="ومضات روحية"
+  apiUrl="/api/content/wamdat_raw7ye?limit=24"
+  linkTo="/wamdat_raw7ye"
+/>
+<br></br>
+<Al7yaWelamalCarousel
+  title="الحياة والامل"
+  apiUrl="/api/content/al7ya_welamal?limit=24"
+  linkTo="/al7ya_welamal"
+/>
 
+*/}
   <OurPicks
        title="فقرات قصيرة"
       />

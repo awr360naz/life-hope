@@ -35,8 +35,8 @@ import MrayaAlrohPage from "./pages/MrayaAlrohPage";
 import SehaAfdalPage from "./pages/SehaAfdalPage";
 import SbahAlkherPage from "./pages/SbahAlkherPage";
 import KolShahr4_7kayatPage from "./pages/KolShahr4_7kayatPage";
-
-
+import WamdatRaw7yePage from "./pages/WamdatRaw7yePage";
+import Al7yaWelamalPage from "./pages/Al7yaWelamalPage.jsx";
 
 
 function UseManualScrollRestoration() {
@@ -189,8 +189,8 @@ export default function App() {
 <Route path="/seha-afdal" element={<SehaAfdalPage />} />
 <Route path="/sbah-alkher" element={<SbahAlkherPage />} />
 <Route path="/kol-shahr-4-7kayat" element={<KolShahr4_7kayatPage />} />
-
-
+<Route path="/wamdat_raw7ye" element={<WamdatRaw7yePage />} />
+<Route path="/al7ya_welamal" element={<Al7yaWelamalPage />} />
 
 
           </Routes>
