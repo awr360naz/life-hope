@@ -41,8 +41,8 @@ export default function Al7yaWelamalCarousel({
   title = "الحياة والامل",
   perView = 4,
   step = 1,
-  apiUrl = "/api/content/Al7yaWelamal?limit=24",
-  linkTo = "/Al7yaWelamal",
+  apiUrl = "/api/content/al7ya_welamal?limit=24",
+  linkTo = "/al7ya_welamal",
 }) {
   const [raw, setRaw] = useState([]);
   const [loading, setLoading] = useState(true);

@@ -1,12 +1,6 @@
 import React, { useMemo, useState } from "react";
 import "./MessageOfTheDay.css";
 
-/**
- * MessageOfTheDay
- * - UI: اختيار شعور -> توليد رسالة
- * - يعمل مع API (اختياري) + fallback محلي
- * - RTL جاهز
- */
 
 const DEFAULT_API_URL = "/api/message-of-the-day";
 
@@ -18,7 +12,7 @@ const MOODS = [
   { key: "grateful", label: "✨ شُكران" },
 ];
 
-// رسائل fallback (إذا الـ API مش موجود أو فشل)
+
 const FALLBACK = {
   tired: [
     {
@@ -116,7 +110,7 @@ export default function MessageOfTheDay({ apiUrl = DEFAULT_API_URL, lang = "ar" 
     setLoading(true);
     setErrMsg("");
 
-    // 1) حاول API أولاً
+    
     try {
       const res = await fetch(apiUrl, {
         method: "POST",
@@ -124,7 +118,7 @@ export default function MessageOfTheDay({ apiUrl = DEFAULT_API_URL, lang = "ar" 
         body: JSON.stringify({
           mood,
           lang,
-          // useNew: لو بدك تخليه يغيّر النتيجة حتى لو نفس اليوم (اختياري)
+          
           useNew,
         }),
       });
@@ -137,12 +131,12 @@ export default function MessageOfTheDay({ apiUrl = DEFAULT_API_URL, lang = "ar" 
           return;
         }
       }
-      // إذا الرد مش ok أو ناقص → نوقع على fallback
+     
     } catch (e) {
-      // تجاهل وكمّل fallback
+     
     }
 
-    // 2) fallback محلي
+   
     const fb = FALLBACK[mood] || [];
     const picked = pickRandom(fb) || {
       message: "الله قريب… حتى لو ما بتحس. جرّب دقيقة هدوء واطلب السلام.",
@@ -177,7 +171,7 @@ export default function MessageOfTheDay({ apiUrl = DEFAULT_API_URL, lang = "ar" 
         await navigator.share({ text });
         return;
       } catch (e) {
-        // لو المستخدم سكرها
+     
       }
     }
 
@@ -245,7 +239,11 @@ export default function MessageOfTheDay({ apiUrl = DEFAULT_API_URL, lang = "ar" 
           </div>
         )}
 
+     
+
         {errMsg && <div className="motd-note">{errMsg}</div>}
+
+         
 
         {result && (
           <div className="motd-result">
@@ -255,6 +253,9 @@ export default function MessageOfTheDay({ apiUrl = DEFAULT_API_URL, lang = "ar" 
               <span className="motd-verse-badge">📖 آية</span>
               <span className="motd-verse-text">{result.verse}</span>
             </div>
+
+
+
 
             {result.content?.url && (
               <a className="motd-content" href={result.content.url}>

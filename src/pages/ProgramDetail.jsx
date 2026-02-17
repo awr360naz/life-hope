@@ -3,7 +3,8 @@ import { useParams } from "react-router-dom";
 import "./ProgramDetail.css";
 import SabahElKheirCarousel from "../components/SbahAlkherCarousel";
 import KolShahr4_7kayatCarousel from "../components/KolShahr4_7kayatCarousel";
-
+import WamdatRaw7yeCarousel from "../components/WamdatRaw7yeCarousel";
+import Al7yaWelamalCarousel from "../components/Al7yaWelamalCarousel";
 
 // ✅ الكاروسيلات
 import CamiPropheciesCarousel from "../components/CamiPropheciesCarousel";
@@ -48,64 +49,62 @@ export default function ProgramDetail() {
     })();
   }, [id]);
 
-  // ✅ توحيد العنوان عشان لو في مسافات زيادة
   const normalizedTitle = useMemo(() => {
-  const t = item?.title;
-  if (typeof t !== "string") return "";
+    const t = item?.title;
+    if (typeof t !== "string") return "";
 
-  return t
-    .replace(/،/g, ",")          // توحيد الفاصلة
-    .replace(/\s+/g, " ")        // مسافات
-    .trim()
-    .replace(/[أإآ]/g, "ا")      // توحيد الألف
-    .replace(/ة/g, "ه")          // (اختياري) لو عندك اختلافات
-    .replace(/ى/g, "ي");         // توحيد الياء
-}, [item]);
+    return t
+      .replace(/،/g, ",")
+      .replace(/\s+/g, " ")
+      .trim()
+      .replace(/[أإآ]/g, "ا")
+      .replace(/ة/g, "ه")
+      .replace(/ى/g, "ي");
+  }, [item]);
 
+  const programCarousels = useMemo(
+    () => ({
+      "برنامج فتح نبؤات": <CamiPropheciesCarousel />,
+      "تحت سقف واحد": <ThtSaqfWahdCarousel />,
+      "برنامج تحت سقف واحد": <ThtSaqfWahdCarousel />,
 
-  // ✅ خريطة (title -> carousel)
- const programCarousels = useMemo(
-  () => ({
-    // ✅ كامي
-    "برنامج فتح نبؤات": <CamiPropheciesCarousel />,
-    "برنامج فتح نبؤات": <CamiPropheciesCarousel />,
+      "برنامج صحه افضل لحياه افضل": <SehaAfdalCarousel />,
+      "صحه افضل لحياه افضل": <SehaAfdalCarousel />,
+      "برنامج صحة افضل لحياة افضل": <SehaAfdalCarousel />,
+      "صحة افضل لحياة افضل": <SehaAfdalCarousel />,
 
-    // ✅ تحت سقف واحد (بدون "برنامج")
-    "تحت سقف واحد": <ThtSaqfWahdCarousel />,
-    "برنامج تحت سقف واحد": <ThtSaqfWahdCarousel />,
+      "برنامج مرايا الروح": <MrayaAlrohCarousel />,
+      "مرايا الروح": <MrayaAlrohCarousel />,
 
-    // ✅ صحة افضل لحياة افضل (بدون همزات)
-    "برنامج صحه افضل لحياه افضل": <SehaAfdalCarousel />,
-    "صحه افضل لحياه افضل": <SehaAfdalCarousel />,
-    "برنامج صحة افضل لحياة افضل": <SehaAfdalCarousel />,
-    "صحة افضل لحياة افضل": <SehaAfdalCarousel />,
+      "برنامج صباح الخير مع ايات": <SabahElKheirCarousel />,
+      "صباح الخير مع ايات": <SabahElKheirCarousel />,
+      "برنامج صباح الخير": <SabahElKheirCarousel />,
+      "صباح الخير مع آيات": <SabahElKheirCarousel />,
 
-    // ✅ مرايا الروح
-    "برنامج مرايا الروح": <MrayaAlrohCarousel />,
-    "مرايا الروح": <MrayaAlrohCarousel />,
+      "برنامج كل شهر اربع حكايات": <KolShahr4_7kayatCarousel />,
+      "كل شهر اربع حكايات": <KolShahr4_7kayatCarousel />,
+      "برنامج كل شهر أربع حكايات": <KolShahr4_7kayatCarousel />,
+      "كل شهر أربع حكايات": <KolShahr4_7kayatCarousel />,
 
-    "برنامج صباح الخير مع ايات": <SabahElKheirCarousel />,
-"صباح الخير مع ايات": <SabahElKheirCarousel />,
-"برنامج صباح الخير": <SabahElKheirCarousel />,
-"صباح الخير مع آيات": <SabahElKheirCarousel />,
+      // ✅ ومضات روحية (أضفنا الشكل بعد normalization)
+      "برنامج ومضات روحية": <WamdatRaw7yeCarousel />,
+      "ومضات روحية": <WamdatRaw7yeCarousel />,
+      "برنامج ومضات روحيه": <WamdatRaw7yeCarousel />,
+      "ومضات روحيه": <WamdatRaw7yeCarousel />,
 
-"برنامج كل شهر اربع حكايات": <KolShahr4_7kayatCarousel />,
-"كل شهر اربع حكايات": <KolShahr4_7kayatCarousel />,
-"برنامج كل شهر أربع حكايات": <KolShahr4_7kayatCarousel />,
-"كل شهر أربع حكايات": <KolShahr4_7kayatCarousel />,
+      // ✅ الحياة والأمل (أضفنا كل الاحتمالات)
+      "برنامج الحياة والامل": <Al7yaWelamalCarousel />,
+      "الحياة والامل": <Al7yaWelamalCarousel />,
+      "برنامج الحياه والامل": <Al7yaWelamalCarousel />,
+      "الحياه والامل": <Al7yaWelamalCarousel />,
+    }),
+    []
+  );
 
-
-  }),
-  []
-);
-
-
-  // ✅ الكورسول النهائي (إن وجد)
   const ProgramCarousel = normalizedTitle
     ? programCarousels[normalizedTitle] || null
     : null;
 
-  // ✅ المحتوى النصي/HTML
   const content = useMemo(() => {
     if (!item) return "";
     const candidates = [
@@ -139,24 +138,25 @@ export default function ProgramDetail() {
         <h1 className="pd-title">{item.title || "بدون عنوان"}</h1>
       </header>
 
-      {/* ✅ نفس فكرة كامي: الكورسول تحت العنوان مباشرة */}
-   
-
       <section className="pd-content">
         {content ? (
           isHtml ? (
-            <div className="pd-html" dangerouslySetInnerHTML={{ __html: content }} />
+            <div
+              className="pd-html"
+              dangerouslySetInnerHTML={{ __html: content }}
+            />
           ) : (
             <p className="pd-text">{content}</p>
           )
         ) : (
           <em className="pd-empty">لا يوجد محتوى.</em>
         )}
-           {ProgramCarousel && (
-        <section className="pd-carousel-wrap">
-          {ProgramCarousel}
-        </section>
-      )}
+
+        {ProgramCarousel && (
+          <section className="pd-carousel-wrap">
+            {ProgramCarousel}
+          </section>
+        )}
       </section>
     </main>
   );

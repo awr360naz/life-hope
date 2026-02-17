@@ -70,11 +70,11 @@ async function queryTry(opts: {
 
   if (opts.orderBy === "sort") {
     q = q
-      .order("sort", { ascending: true, nullsFirst: false })
-      .order("id", { ascending: true });
-  } else if (opts.orderBy) {
-    q = q.order(opts.orderBy as any, { ascending: false });
-  }
+      .order("sort", { ascending: false, nullsFirst: false }) // صرنا بالعكس
+      .order("id", { ascending: false }); // كمان بالعكس
+} else if (opts.orderBy) {
+    q = q.order(opts.orderBy as any, { ascending: true }); // إذا بدك تصاعدي حسب العمود
+}
 
   const { data, error } = await q.limit(opts.limit);
   if (error) throw error;

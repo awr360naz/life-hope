@@ -217,7 +217,7 @@ export default function HomePage() {
   apiUrl="/api/content/kol-shahr-4-7kayat?limit=24"
   linkTo="/kol-shahr-4-7kayat"
 />
-  {/* 
+  {/*  
 <br></br>
 <WamdatRaw7yeCarousel
   title="ومضات روحية"
@@ -230,8 +230,8 @@ export default function HomePage() {
   apiUrl="/api/content/al7ya_welamal?limit=24"
   linkTo="/al7ya_welamal"
 />
-
 */}
+
   <OurPicks
        title="فقرات قصيرة"
       />

@@ -42,7 +42,7 @@
 
 </Link>
 
-          {/* الروابط */}
+         
           <nav className="main-nav" aria-label="روابط الموقع">
             <Link to="/articles" className="nav-link">مقالات</Link>
             <Link to="/programs" className="nav-link">برامجنا</Link>
@@ -52,15 +52,15 @@
             
           </nav>
 
-          {/* زر البث (صورة) */}
+          {}
           <Link to="/vedio-audio-live" className="live-btn" aria-label="البث المباشر">
             <img src={LiveButtonImg} alt="البث المباشر" />
           </Link>
 
-          {/* مسافة مرنة تدفع اليسار/الشمال */}
+          {}
           <div className="spacer" />
 
-          {/* البحث */}
+          {}
           <form className="search" role="search" onSubmit={handleSearchSubmit} dir="ltr">
             <FiSearch className="search-icon" />
             <input
@@ -111,6 +111,7 @@
             <Link to="/articles" className="drawer-link" onClick={()=>setOpen(false)}>مقالات</Link>
             <Link to="/programs" className="drawer-link" onClick={()=>setOpen(false)}>برامجنا</Link>
             <Link to="/AngelsPage" className="drawer-link" onClick={()=>setOpen(false)}>رسالة الملائكة الثلاث</Link>      
+
 
 <div
   className="drawer-link"

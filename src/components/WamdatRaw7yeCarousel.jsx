@@ -41,8 +41,8 @@ export default function WamdatRaw7yeCarousel({
   title = "ومضات روحية",
   perView = 4,
   step = 1,
-  apiUrl = "/api/content/Wamdat-Raw7ye?limit=24",
-  linkTo = "/Wamdat-Raw7ye",
+  apiUrl = "/api/content/wamdat_raw7ye?limit=24",
+  linkTo = "/wamdat_raw7ye",
 }) {
   const [raw, setRaw] = useState([]);
   const [loading, setLoading] = useState(true);
