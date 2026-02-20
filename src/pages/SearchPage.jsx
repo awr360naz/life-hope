@@ -1,8 +1,8 @@
-// src/pages/SearchPage.jsx
+
 import React, { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 
-// نفس الدالة اللي بتستعمليها بمحلّات ثانية
+
 function toYouTubeId(urlOrId = "") {
   if (!urlOrId) return "";
   if (/^[a-zA-Z0-9_-]{10,15}$/.test(urlOrId)) return urlOrId;
@@ -31,12 +31,12 @@ export default function SearchPage() {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
 
-  // مزامنة حقل الإدخال مع الـ URL
+  
   useEffect(() => {
     setQ(term);
   }, [term]);
 
-  // استدعاء /api/search كل ما تتغيّر الكلمة في الـ URL
+  
   useEffect(() => {
     if (!term) {
       setResults([]);
@@ -98,7 +98,7 @@ export default function SearchPage() {
   }
 
   function buildUrl(it) {
-    if (it.url) return it.url; // جاي جاهز من الباكند
+    if (it.url) return it.url; 
 
     switch (it.type) {
       case "article":
@@ -106,7 +106,7 @@ export default function SearchPage() {
       case "program":
         return it.slug ? `/programs/${it.slug}` : `/programs/${it.id}`;
       case "short":
-        // صفحة الفقرات القصيرة عندك هي /shorts
+        
         return it.id ? `/shorts?focus=${it.id}` : "/shorts";
       case "cami":
         return it.id
@@ -123,7 +123,7 @@ function getThumbSrc(it) {
   const isShortLike = it.type === "short" || it.type === "cami";
 
   if (isShortLike) {
-    // نعتمد بالأساس على youtube_id اللي جهّزناه من الباكند
+    
     const raw =
       it.youtube_id ||
       it._ytid ||
@@ -139,7 +139,7 @@ function getThumbSrc(it) {
     }
   }
 
-  // باقي الأنواع → استعمل cover_url من الباكند
+ 
   if (it.cover_url) return it.cover_url;
 
   return null;
@@ -228,7 +228,7 @@ function getThumbSrc(it) {
                       background: "#fff",
                     }}
                   >
-                    {/* الصورة */}
+                  
                     <div
                       style={{
                         width: "100%",
@@ -252,7 +252,7 @@ function getThumbSrc(it) {
                       )}
                     </div>
 
-                    {/* النص */}
+                  
                     <div style={{ padding: 12 }}>
                       <div
                         style={{

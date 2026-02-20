@@ -86,17 +86,17 @@ export default function ProgramDetail() {
       "برنامج كل شهر أربع حكايات": <KolShahr4_7kayatCarousel />,
       "كل شهر أربع حكايات": <KolShahr4_7kayatCarousel />,
 
-      // ✅ ومضات روحية (أضفنا الشكل بعد normalization)
+     
       "برنامج ومضات روحية": <WamdatRaw7yeCarousel />,
       "ومضات روحية": <WamdatRaw7yeCarousel />,
       "برنامج ومضات روحيه": <WamdatRaw7yeCarousel />,
       "ومضات روحيه": <WamdatRaw7yeCarousel />,
 
-      // ✅ الحياة والأمل (أضفنا كل الاحتمالات)
       "برنامج الحياة والامل": <Al7yaWelamalCarousel />,
       "الحياة والامل": <Al7yaWelamalCarousel />,
       "برنامج الحياه والامل": <Al7yaWelamalCarousel />,
       "الحياه والامل": <Al7yaWelamalCarousel />,
+    
     }),
     []
   );
@@ -160,4 +160,14 @@ export default function ProgramDetail() {
       </section>
     </main>
   );
+  
 }
+
+
+
+
+
+
+
+
+

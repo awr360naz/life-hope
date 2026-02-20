@@ -171,5 +171,10 @@ router.get("/", async (req: Request, res: Response) => {
     return res.status(500).json({ ok: false, error: e?.message || String(e) });
   }
 });
-
+router.post("/refresh-cache", async (req, res) => {
+  memCache.items = [];
+  memCache.updatedAt = 0;
+  try { fs.unlinkSync(CACHE_FILE); } catch {}
+  res.json({ ok: true });
+});
 export default router;

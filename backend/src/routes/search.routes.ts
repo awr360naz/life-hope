@@ -1,10 +1,10 @@
-// src/routes/search.ts
+
 import { Router, Request, Response } from "express";
 import { getSupabase } from "../supabaseClient.js";
 
 const router = Router();
 
-// normalize عربي
+
 const AR_TATWEEL = /\u0640/g;
 const AR_DIACRITICS = /[\u064B-\u065F\u0670]/g;
 const norm = (s: string) =>
@@ -17,11 +17,11 @@ const norm = (s: string) =>
     .replace(/ى/g, "ي")
     .trim();
 
-// إزالة HTML
+
 const stripHtml = (s: string) =>
   (s || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 
-// نحاول نلقط الصورة من أي حقل ممكن
+
 const coverFrom = (r: any) => {
   const direct =
     r?.cover_url ??
@@ -41,7 +41,7 @@ const coverFrom = (r: any) => {
 
   if (direct) return direct;
 
-  // هيوستيك: أول سترينغ شكله رابط صورة
+ 
   for (const v of Object.values(r || {})) {
     if (typeof v !== "string") continue;
     const s = v.trim();
@@ -64,7 +64,7 @@ type ResultType = "article" | "program" | "short" | "cami" | "quiz";
 
 function extractYouTubeId(raw: string = ""): string {
   if (!raw) return "";
-  // لو أصلاً id جاهز
+ 
   if (/^[a-zA-Z0-9_-]{10,15}$/.test(raw)) return raw;
 
   try {
@@ -78,7 +78,7 @@ function extractYouTubeId(raw: string = ""): string {
     const v = u.searchParams.get("v");
     if (v) return v;
   } catch {
-    // لو مش URL حنحاول بالريجيكس
+    
   }
 
   const m = raw.match(
@@ -88,7 +88,7 @@ function extractYouTubeId(raw: string = ""): string {
 }
 function youtubeIdFromRecord(r: any): string {
   if (!r) return "";
-  // نمشي على كل القيم النصية في السجل، ونمسك أول وحدة فيها يوتيوب
+  
   for (const v of Object.values(r)) {
     if (typeof v !== "string") continue;
     if (!v) continue;
@@ -104,33 +104,33 @@ function expandSearchPatterns(rawQ: string): string[] {
   const trimmed = rawQ.trim();
   if (!trimmed) return [];
 
-  // النسخة العادية + المطبّعة
+
   const qNorm = norm(trimmed);
   variants.add(trimmed);
   variants.add(qNorm);
 
-  // ة ↔ ه في نهاية الكلمة
+  
   const taToHa = trimmed.replace(/ة(\s|$)/g, "ه$1");
   variants.add(taToHa);
   const haToTa = trimmed.replace(/ه(\s|$)/g, "ة$1");
   variants.add(haToTa);
 
-  // أ،إ،آ → ا (زيادةً على اللي عملناه بالـ norm)
+  
   variants.add(trimmed.replace(/[أإآ]/g, "ا"));
 
-  // بداية الكلمة: ا → أ (عشان "اسئلة" يلقط "أسئلة")
+
   variants.add(trimmed.replace(/\bا/g, "أ"));
 
-  // ى ↔ ي
+ 
   variants.add(trimmed.replace(/ى/g, "ي"));
   variants.add(trimmed.replace(/ي/g, "ى"));
 
-  // ترتيب وتنظيف
+
   const final = Array.from(variants)
     .map((s) => s.replace(/\s+/g, " ").trim())
     .filter(Boolean);
 
-  // نحولها لصيغة %pattern%
+
   return Array.from(new Set(final)).map((s) => `%${s}%`);
 }
 
@@ -161,7 +161,7 @@ router.get("/search", async (req: Request, res: Response) => {
   }
 
   const mapRecord = (r: any, type: ResultType) => {
-    // عنوان مع fallback حسب النوع (البرامج خاصةً)
+  
  let title = r?.title ?? "";
 if (!title && type === "program") {
   title =
@@ -187,7 +187,7 @@ if (!title && type === "program") {
       snippet = snippet.slice(title.length).trim();
     }
 
-    // المهم هنا: ننشر كل r عشان تضل حقول youtube_id/… موجودة
+
     const base: any = {
       ...r,
       id: r?.id ?? null,
@@ -201,7 +201,7 @@ if (!title && type === "program") {
       category: "",
     };
 
-    // 👈 توليد صورة يوتيوب للشورت + كامي حتى لو ما عرفنا اسم الحقل
+
     if (type === "short" || type === "cami") {
       if (!base.youtube_id) {
         const yRaw =
@@ -215,7 +215,7 @@ if (!title && type === "program") {
           "";
         let yid = extractYouTubeId(String(yRaw));
         if (!yid) {
-          // نحاول نلقطها من أي حقل فيه youtube داخل السجل
+         
           yid = youtubeIdFromRecord(r);
         }
         if (yid) {

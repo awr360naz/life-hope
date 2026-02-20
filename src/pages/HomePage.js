@@ -194,43 +194,47 @@ export default function HomePage() {
   limit={48}
 />
 <br></br>
-<MrayaAlrohCarousel
-  title="مرايا الروح"
-  apiUrl="/api/content/mraya-alroh?limit=24"
-  linkTo="/mraya-alroh"
-/>
-<br></br>
 <SehaAfdalCarousel
   title="صحة افضل لحياة افضل"
   apiUrl="/api/content/seha-afdal?limit=24"
   linkTo="/seha-afdal"
 />
-<br></br>
-<SbahAlkherCarousel
-  title= " صباح الخير مع ايات "
-  apiUrl="/api/content/sbah-alkher?limit=24"
-  linkTo="/sbah-alkher"
-/>
+
 <br></br>
 <KolShahr4_7kayatCarousel
   title="كل شهر اربع حكايات"
   apiUrl="/api/content/kol-shahr-4-7kayat?limit=24"
   linkTo="/kol-shahr-4-7kayat"
 />
-  {/*  
+<MrayaAlrohCarousel
+  title="مرايا الروح"
+  apiUrl="/api/content/mraya-alroh?limit=24"
+  linkTo="/mraya-alroh"
+/>
+<br></br>
+
+<SbahAlkherCarousel
+  title= " صباح الخير مع ايات "
+  apiUrl="/api/content/sbah-alkher?limit=24"
+  linkTo="/sbah-alkher"
+/>
+<br></br>
+
+ 
 <br></br>
 <WamdatRaw7yeCarousel
   title="ومضات روحية"
   apiUrl="/api/content/wamdat_raw7ye?limit=24"
   linkTo="/wamdat_raw7ye"
 />
+
 <br></br>
 <Al7yaWelamalCarousel
   title="الحياة والامل"
   apiUrl="/api/content/al7ya_welamal?limit=24"
   linkTo="/al7ya_welamal"
 />
-*/}
+
 
   <OurPicks
        title="فقرات قصيرة"
@@ -241,3 +245,4 @@ export default function HomePage() {
     </main>
   );
 }
+
