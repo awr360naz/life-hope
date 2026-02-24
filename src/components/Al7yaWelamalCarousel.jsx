@@ -43,6 +43,7 @@ export default function Al7yaWelamalCarousel({
   step = 1,
   apiUrl = "/api/content/al7ya_welamal?limit=24",
   linkTo = "/al7ya_welamal",
+  className = ""
 }) {
   const [raw, setRaw] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -120,7 +121,8 @@ export default function Al7yaWelamalCarousel({
 
   return (
     <section
-      className="programs-section shorts-like-programs cami-prophecies-section"
+      className={`programs-section shorts-like-programs cami-prophecies-section ${className}`}
+
       dir="rtl"
       aria-labelledby="Al7ya-Welamal-title"
     >

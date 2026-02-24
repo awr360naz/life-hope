@@ -43,6 +43,7 @@ export default function MrayaAlrohCarousel({
   step = 1,
   apiUrl = "/api/content/mraya-alroh?limit=24",
   linkTo = "/mraya-alroh",
+  className = ""
 }) {
   const [raw, setRaw] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -113,7 +114,10 @@ export default function MrayaAlrohCarousel({
   const onCardClick = (it) => setPlayer({ open: true, item: it });
 
   return (
-    <section className="programs-section shorts-like-programs cami-prophecies-section" dir="rtl" aria-labelledby="mraya-alroh-title">
+    <section
+     className={`programs-section shorts-like-programs cami-prophecies-section ${className}`}
+    dir="rtl"
+     aria-labelledby="mraya-alroh-title">
       <div className="programs-header">
         <h2 id="mraya-alroh-title" className="programs-title">{title}</h2>
         {linkTo && <Link to={linkTo} className="programs-viewall">عرض الكل</Link>}

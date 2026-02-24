@@ -43,6 +43,7 @@ export default function WamdatRaw7yeCarousel({
   step = 1,
   apiUrl = "/api/content/wamdat_raw7ye?limit=24",
   linkTo = "/wamdat_raw7ye",
+  className = ""
 }) {
   const [raw, setRaw] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -120,7 +121,7 @@ export default function WamdatRaw7yeCarousel({
 
   return (
     <section
-      className="programs-section shorts-like-programs cami-prophecies-section"
+       className={`programs-section shorts-like-programs cami-prophecies-section ${className}`}
       dir="rtl"
       aria-labelledby="Wamdat-Raw7ye-title"
     >
@@ -130,7 +131,7 @@ export default function WamdatRaw7yeCarousel({
         </h2>
         {linkTo && (
           <Link to={linkTo} className="programs-viewall">
-            عرض الكل
+          عرض الكل
           </Link>
         )}
       </div>
@@ -214,3 +215,6 @@ export default function WamdatRaw7yeCarousel({
     </section>
   );
 }
+
+
+

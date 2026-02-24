@@ -1,11 +1,11 @@
-// src/components/ShortSegmentsCarousel.jsx
+
 import React, { useEffect, useRef, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import "./ShortSegmentsCarousel.css";
 import ResilientThumb from "./ResilientThumb";
 import ShortsegSafePlayerModal from "./ShortsegSafePlayerModal";
 
-// === نفس الـ helpers تبع صفحة الشورتس ===============================
+
 function toYouTubeId(urlOrId = "") {
   if (!urlOrId) return "";
   if (/^[a-zA-Z0-9_-]{10,15}$/.test(urlOrId)) return urlOrId;
@@ -38,20 +38,21 @@ function useResponsivePerView(defaultPerView = 4) {
   return pv;
 }
 
-// === component ==========================================================
+
 export default function ShortSegmentsCarousel({
   title = "فقرات قصيرة",
   perView = 4,
   step = 1,
   apiUrl = "/api/content/short-segments?limit=24",
   linkTo = "/shorts",
+  className = ""
 }) {
   const [raw, setRaw] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
   const [index, setIndex] = useState(0);
 
-  // مودال المُشغِّل (نخزّن العنصر كاملًا)
+
   const [player, setPlayer] = useState({ open: false, item: null });
 
   const visible = useResponsivePerView(perView);
@@ -72,7 +73,7 @@ export default function ShortSegmentsCarousel({
         let list = [];
         try { list = await tryFetch(apiUrl); }
         catch {
-          // جسر توافق مع مسار قديم
+     
           list = await tryFetch("/api/short-segments?limit=24");
         }
         setRaw(list);
@@ -84,7 +85,7 @@ export default function ShortSegmentsCarousel({
     })();
   }, [apiUrl]);
 
-  // طبعنة مثل الصفحة: نضيف _ytid
+
   const items = useMemo(() => {
     return raw
       .map((it) => {
@@ -98,18 +99,18 @@ export default function ShortSegmentsCarousel({
       .filter(Boolean);
   }, [raw]);
 
-  // اربطي المؤشّر لما يتغيّر المرئي
+
   useEffect(() => {
     const max = Math.max(0, items.length - visible);
     if (index > max) setIndex(max);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
   }, [visible, items.length]);
 
   const maxIndex = Math.max(0, items.length - visible);
   const canPrev = items.length > visible && index > 0;
   const canNext = items.length > visible && index < maxIndex;
 
-  // نفس حساب “برامجنا”: عرض الكرت + الفجوة
+
   const goToIndex = (nextIdx) => {
     const track = trackRef.current;
     if (!track) return;
@@ -127,8 +128,9 @@ export default function ShortSegmentsCarousel({
   const onCardClick = (it) => setPlayer({ open: true, item: it });
 
   return (
-    // نستخدم نفس حاوية “برامجنا” حرفيًا
-    <section className="programs-section shorts-like-programs" dir="rtl" aria-labelledby="shorts-title">
+   
+    <section className="programs-section shorts-like-programs"
+     dir="rtl" aria-labelledby="shorts-title">
       <div className="programs-header">
         <h2 id="shorts-title" className="programs-title">{title}</h2>
         {linkTo && <Link to={linkTo} className="programs-viewall">عرض الكل</Link>}
@@ -189,7 +191,7 @@ export default function ShortSegmentsCarousel({
         )}
       </div>
 
-      {/* ===== مودال آمن مع fallback للصورة + زر Play ===== */}
+     
       <ShortsegSafePlayerModal
         open={!!player.open}
         item={player.item}

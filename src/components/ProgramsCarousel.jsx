@@ -1,15 +1,16 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, forwardRef } from "react";
 import "./ProgramsCarousel.css";
 import { Link } from "react-router-dom";
 
-
-export default function ProgramsCarousel({
+const ProgramsCarousel = forwardRef(({
   title = "برامجنا",
   perView = 4,
   step = 1,
   apiUrl = "/api/content/programs",
-   linkTo = "/programs",
-}) {
+  linkTo = "/programs",
+  className = ""
+}, ref) => {
+
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -21,13 +22,26 @@ export default function ProgramsCarousel({
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch(`${apiUrl}?limit=24`, { headers: { Accept: "application/json" } });
+        const res = await fetch(`${apiUrl}?limit=24`, {
+          headers: { Accept: "application/json" }
+        });
+
         const text = await res.text();
-        let data = null; try { data = text ? JSON.parse(text) : null; } catch {}
-        if (!res.ok) throw new Error(data?.error || data?.message || text || `HTTP ${res.status}`);
-        const arr = Array.isArray(data?.programs) ? data.programs : Array.isArray(data) ? data : [];
+        let data = null;
+        try { data = text ? JSON.parse(text) : null; } catch {}
+
+        if (!res.ok)
+          throw new Error(data?.error || data?.message || text || `HTTP ${res.status}`);
+
+        const arr = Array.isArray(data?.programs)
+          ? data.programs
+          : Array.isArray(data)
+          ? data
+          : [];
+
         const normalized = arr.map(normalizeProgram).filter(Boolean);
         setItems(normalized);
+
       } catch (e) {
         setError(String(e?.message || e));
       } finally {
@@ -35,7 +49,6 @@ export default function ProgramsCarousel({
       }
     })();
   }, [apiUrl]);
-
 
   useEffect(() => {
     const max = Math.max(0, items.length - visible);
@@ -46,36 +59,43 @@ export default function ProgramsCarousel({
   const canPrev = items.length > visible && index > 0;
   const canNext = items.length > visible && index < maxIndex;
 
-const goToIndex = (nextIdx) => {
-  const track = scrollRef.current;
-  if (!track) return;
+  const goToIndex = (nextIdx) => {
+    const track = scrollRef.current;
+    if (!track) return;
 
-  const card = track.querySelector(".program-card");
-  if (!card) return;
+    const card = track.querySelector(".program-card");
+    if (!card) return;
 
-  const cardStyle = getComputedStyle(card);
-  const gap = parseInt(cardStyle.marginRight) || 12;
-  const cardWidth = card.offsetWidth + gap;
+    const cardStyle = getComputedStyle(card);
+    const gap = parseInt(cardStyle.marginRight) || 12;
+    const cardWidth = card.offsetWidth + gap;
 
+    const delta = (nextIdx - index) * cardWidth;
 
-  const delta = (nextIdx - index) * cardWidth;
+    track.scrollBy({ left: -delta, behavior: "smooth" });
 
-  
-  track.scrollBy({ left: -delta, behavior: "smooth" });
-
-
-  const clamped = Math.max(0, Math.min(maxIndex, nextIdx));
-  setIndex(clamped);
-};
+    const clamped = Math.max(0, Math.min(maxIndex, nextIdx));
+    setIndex(clamped);
+  };
 
   return (
-    <section className="programs-section" dir="rtl" aria-labelledby="programs-title">
-        <div className="programs-header">
-              <h2 id="pr-title" className="programs-title">{title}</h2>
-           
-              {linkTo && <Link to={linkTo} className="programs-viewall">عرض الكل </Link>}
-            </div>
-    
+    <section
+      ref={ref}
+      className={`programs-section ${className}`}
+      dir="rtl"
+      aria-labelledby="programs-title"
+    >
+      <div className="programs-header">
+        <h2 id="pr-title" className="programs-title">
+          {title}
+        </h2>
+
+        {linkTo && (
+          <Link to={linkTo} className="programs-viewall">
+            عرض الكل
+          </Link>
+        )}
+      </div>
 
       <div className={`carousel ${loading ? "is-loading" : ""}`}>
         {error && <div className="carousel-error">خطأ: {error}</div>}
@@ -90,7 +110,6 @@ const goToIndex = (nextIdx) => {
 
         {!loading && !error && items.length > 0 && (
           <div className="carousel-viewport">
-            {}
             <div
               ref={scrollRef}
               className="carousel-track"
@@ -100,6 +119,7 @@ const goToIndex = (nextIdx) => {
               {items.map((it) => {
                 const slugOrId = it.slug || it.id || it.day;
                 const img = it.cover_url || it.image_url || "";
+
                 return (
                   <article key={slugOrId} className="program-card">
                     <Link
@@ -118,7 +138,6 @@ const goToIndex = (nextIdx) => {
                             />
                           )}
                         </div>
-                
                       </div>
                     </Link>
                   </article>
@@ -126,7 +145,6 @@ const goToIndex = (nextIdx) => {
               })}
             </div>
 
-            {/* أزرار التنقل */}
             <button
               type="button"
               className="nav-btn nav-prev"
@@ -150,15 +168,20 @@ const goToIndex = (nextIdx) => {
         )}
 
         {!loading && !error && items.length === 0 && (
-          <div className="carousel-empty">لا يوجد برامج لعرضها.</div>
+          <div className="carousel-empty">
+            لا يوجد برامج لعرضها.
+          </div>
         )}
       </div>
     </section>
   );
-}
+});
+
+export default ProgramsCarousel;
 
 function useResponsivePerView(defaultPerView = 4) {
   const [pv, setPv] = useState(defaultPerView);
+
   useEffect(() => {
     const update = () => {
       const w = window.innerWidth;
@@ -166,20 +189,25 @@ function useResponsivePerView(defaultPerView = 4) {
       else if (w < 960) setPv(3);
       else setPv(defaultPerView);
     };
+
     update();
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
   }, [defaultPerView]);
+
   return pv;
 }
 
 function normalizeProgram(p) {
   if (!p) return null;
+
   const id = p.id ?? p.program_id ?? null;
   const title = p.title ?? p.name ?? "";
   const cover_url = p.cover_url ?? p.coverUrl ?? p.cover_image ?? "";
-  const image_url = p.image_url ?? p.image ?? p.thumbnail ?? cover_url ?? "";
+  const image_url =
+    p.image_url ?? p.image ?? p.thumbnail ?? cover_url ?? "";
   const slug = p.slug ?? p.handle ?? null;
   const day = p.day ?? null;
+
   return { id, title, cover_url, image_url, slug, day };
 }

@@ -43,6 +43,7 @@ export default function SehaAfdalCarousel({
   step = 1,
   apiUrl = "/api/content/seha-afdal?limit=24",
   linkTo = "/seha-afdal",
+   className = ""
 }) {
   const [raw, setRaw] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -114,7 +115,10 @@ export default function SehaAfdalCarousel({
   const onCardClick = (it) => setPlayer({ open: true, item: it });
 
   return (
-    <section className="programs-section shorts-like-programs cami-prophecies-section" dir="rtl" aria-labelledby="seha-afdal-title">
+    <section   className={`programs-section shorts-like-programs cami-prophecies-section ${className}`}
+     dir="rtl" 
+     aria-labelledby="seha-afdal-title"
+     >
       <div className="programs-header">
         <h2 id="seha-afdal-title" className="programs-title">{title}</h2>
         {linkTo && <Link to={linkTo} className="programs-viewall">عرض الكل</Link>}

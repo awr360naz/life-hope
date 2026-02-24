@@ -43,6 +43,7 @@ export default function ThtSaqfWahdCarousel({
   step = 1,
   apiUrl = "/api/content/tht-saqf-wahd?limit=24",
   linkTo = "/tht-saqf-wahd",
+  className = ""
 }) {
   const [raw, setRaw] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -120,7 +121,7 @@ export default function ThtSaqfWahdCarousel({
 
   return (
     <section
-      className="programs-section shorts-like-programs cami-prophecies-section"
+      className={`programs-section shorts-like-programs cami-prophecies-section ${className}`}
       dir="rtl"
       aria-labelledby="tht-saqf-wahd-title"
     >

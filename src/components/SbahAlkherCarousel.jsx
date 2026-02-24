@@ -43,6 +43,7 @@ export default function SbahAlkherCarousel({
   step = 1,
   apiUrl = "/api/content/sbah-alkher?limit=24",
   linkTo = "/sbah-alkher",
+  className = ""
 }) {
   const [raw, setRaw] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -114,7 +115,7 @@ export default function SbahAlkherCarousel({
   const onCardClick = (it) => setPlayer({ open: true, item: it });
 
   return (
-    <section className="programs-section shorts-like-programs cami-prophecies-section" dir="rtl" aria-labelledby="sbah-alkher-title">
+    <section className={`programs-section shorts-like-programs cami-prophecies-section ${className}`} dir="rtl" aria-labelledby="sbah-alkher-title">
       <div className="programs-header">
         <h2 id="sbah-alkher-title" className="programs-title">{title}</h2>
         {linkTo && <Link to={linkTo} className="programs-viewall">عرض الكل</Link>}

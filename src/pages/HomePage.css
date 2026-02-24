@@ -925,3 +925,26 @@ main.homepage-rtl > section.shortsegs-section .shortsegs-arrow.next { left:  6px
     display: none;
   }
 }
+.reveal {
+  opacity: 0;
+  transform: translateY(60px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+
+  /* أهم سطرين 👇 */
+  width: 100%;
+}
+
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+.scroll-animate {
+  opacity: 0;
+  transform: translateY(50px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.scroll-animate.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}

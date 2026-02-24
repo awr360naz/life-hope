@@ -23,7 +23,7 @@ import SbahAlkherCarousel from "../components/SbahAlkherCarousel";
 import KolShahr4_7kayatCarousel from "../components/KolShahr4_7kayatCarousel";
 import WamdatRaw7yeCarousel from "../components/WamdatRaw7yeCarousel";
 import Al7yaWelamalCarousel from "../components/Al7yaWelamalCarousel";
-
+import useScrollReveal from "./useScrollReveal";
 
 
 
@@ -75,6 +75,24 @@ export default function HomePage() {
       .catch((e) => setErr(e.message))
       .finally(() => setLoading(false));
   }, []);
+  useEffect(() => {
+  const elements = document.querySelectorAll(".scroll-animate");
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("in-view");
+        }
+      });
+    },
+    { threshold: 0.15 }
+  );
+
+  elements.forEach((el) => observer.observe(el));
+
+  return () => observer.disconnect();
+}, []);
 
   
   useEffect(() => {
@@ -176,12 +194,16 @@ export default function HomePage() {
 
 <br></br><br></br><br></br><br></br>
 
-   <ProgramsCarousel title="برامجنا" />
+   <ProgramsCarousel title="برامجنا" 
+   className="scroll-animate"
+   />
    <br></br>
- <CamiPropheciesCarousel />
+ <CamiPropheciesCarousel 
+ className="scroll-animate"
+ />
   <br></br>
 <ThtSaqfWahdCarousel
-
+className="scroll-animate"
 />
  <br></br>
 
@@ -192,47 +214,38 @@ export default function HomePage() {
   apiUrl="/api/content/short-segments"
   toAllHref="/shorts"
   limit={48}
+  className="scroll-animate"
 />
 <br></br>
 <SehaAfdalCarousel
-  title="صحة افضل لحياة افضل"
-  apiUrl="/api/content/seha-afdal?limit=24"
-  linkTo="/seha-afdal"
+
+  className="scroll-animate"
 />
 
 <br></br>
 <KolShahr4_7kayatCarousel
-  title="كل شهر اربع حكايات"
-  apiUrl="/api/content/kol-shahr-4-7kayat?limit=24"
-  linkTo="/kol-shahr-4-7kayat"
+  className="scroll-animate"
+
 />
 <MrayaAlrohCarousel
-  title="مرايا الروح"
-  apiUrl="/api/content/mraya-alroh?limit=24"
-  linkTo="/mraya-alroh"
+className="scroll-animate"
 />
 <br></br>
 
 <SbahAlkherCarousel
-  title= " صباح الخير مع ايات "
-  apiUrl="/api/content/sbah-alkher?limit=24"
-  linkTo="/sbah-alkher"
+ className="scroll-animate"
 />
 <br></br>
 
  
 <br></br>
 <WamdatRaw7yeCarousel
-  title="ومضات روحية"
-  apiUrl="/api/content/wamdat_raw7ye?limit=24"
-  linkTo="/wamdat_raw7ye"
+className="scroll-animate"
 />
 
 <br></br>
 <Al7yaWelamalCarousel
-  title="الحياة والامل"
-  apiUrl="/api/content/al7ya_welamal?limit=24"
-  linkTo="/al7ya_welamal"
+className="scroll-animate"
 />
 
 

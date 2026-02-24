@@ -1,4 +1,3 @@
-// src/components/CamiPropheciesCarousel.jsx
 import React, { useEffect, useRef, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import "./ShortSegmentsCarousel.css";
@@ -43,6 +42,7 @@ export default function CamiPropheciesCarousel({
   step = 1,
   apiUrl = "/api/content/cami-prophecies?limit=24",
   linkTo = "/cami-prophecies",
+  className = ""
 }) {
   const [raw, setRaw] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -131,11 +131,11 @@ const items = useMemo(
   const onCardClick = (it) => setPlayer({ open: true, item: it });
 
   return (
-    <section
-      className="programs-section shorts-like-programs cami-prophecies-section"
-      dir="rtl"
-      aria-labelledby="cami-prophecies-title"
-    >
+ <section
+  className={`programs-section shorts-like-programs cami-prophecies-section ${className}`}
+  dir="rtl"
+  aria-labelledby="cami-prophecies-title"
+>
       <div className="programs-header">
         <h2 id="cami-prophecies-title" className="programs-title">
           {title}
