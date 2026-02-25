@@ -24,7 +24,7 @@ import KolShahr4_7kayatCarousel from "../components/KolShahr4_7kayatCarousel";
 import WamdatRaw7yeCarousel from "../components/WamdatRaw7yeCarousel";
 import Al7yaWelamalCarousel from "../components/Al7yaWelamalCarousel";
 import useScrollReveal from "./useScrollReveal";
-
+import VisitorCounter from "./VisitorCounter";
 
 
 export default function HomePage() { 
@@ -252,7 +252,7 @@ className="scroll-animate"
   <OurPicks
        title="فقرات قصيرة"
       />
-
+ <VisitorCounter />
 
 
     </main>

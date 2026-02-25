@@ -26,7 +26,8 @@ import sbahAlkherRouter from "./routes/sbahAlkher.js";
 import kolShahr4_7kayatRouter from "./routes/kolShahr4_7kayat.js";
 import wamdat_raw7ye from "./routes/wamdat_raw7ye.js";
 import al7ya_welamal from "./routes/al7ya_welamal.js";
- 
+import counterRoutes from "./routes/counter.routes.js";
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -138,7 +139,7 @@ app.use("/api/content/sbah-alkher", sbahAlkherRouter);
 app.use("/api/content/kol-shahr-4-7kayat", kolShahr4_7kayatRouter);
 app.use("/api/content/wamdat_raw7ye", wamdat_raw7ye);
 app.use("/api/content/al7ya_welamal", al7ya_welamal);
-
+app.use("/api/counter", counterRoutes);
 
 const PROGRAMS_TABLE = process.env.PROGRAMS_TABLE || "programs";
 const THIRD_TABLE = process.env.THIRD_FRAME_TABLE || "home_third_frame_items";
