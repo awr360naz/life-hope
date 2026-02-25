@@ -42,51 +42,51 @@ const styles = {
   wrapper: {
     width: "100%",
     marginTop: "40px",
-    padding: "0 20px",
+    padding: "0 16px",
+    display: "flex",
+    justifyContent: "center", // هذا أهم سطر
+    boxSizing: "border-box",
   },
 
   card: {
     display: "flex",
     alignItems: "center",
-    justifyContent: "center", 
-    gap: "15px",
-    padding: "18px 28px",
+    justifyContent: "center",
+    gap: "12px",
+    padding: "16px 20px",
     borderRadius: "14px",
     background: "linear-gradient(135deg, #0f172a, #1e293b)",
     color: "#fff",
     boxShadow: "0 10px 25px rgba(0,0,0,0.25)",
-    width: "100%",          
-    maxWidth: "500px",     
-    margin: "0 auto",      
+
+    width: "100%",
+    maxWidth: "420px", // مناسب للموبايل
+    boxSizing: "border-box",
   },
 
   icon: {
-    fontSize: "28px",
+    fontSize: "24px",
     background: "rgba(255,255,255,0.1)",
-    padding: "10px",
+    padding: "8px",
     borderRadius: "10px",
+    flexShrink: 0, // يمنع القص
   },
 
   content: {
     display: "flex",
     flexDirection: "column",
-    alignItems: "flex-end",
-  },
-
-  label: {
-    fontSize: "12px",
-    opacity: 0.7,
+    alignItems: "center", // بالنص بدل flex-end
+    textAlign: "center",
   },
 
   number: {
-    fontSize: "26px",
+    fontSize: "24px",
     fontWeight: "bold",
     color: "#36eb16",
   },
 
   sub: {
     fontSize: "18px",
-    opacity: 0.8,
+    opacity: 0.9,
   },
-  
 };
