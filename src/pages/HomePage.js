@@ -202,11 +202,18 @@ export default function HomePage() {
  className="scroll-animate"
  />
   <br></br>
-<ThtSaqfWahdCarousel
+  <MrayaAlrohCarousel
 className="scroll-animate"
 />
  <br></br>
-
+<Al7yaWelamalCarousel
+className="scroll-animate"
+/>
+ <br></br>
+<WamdatRaw7yeCarousel
+className="scroll-animate"
+/>
+ <br></br>
       <ShortSegmentsCarousel
   title="فقرات قصيرة"
   perView={5}
@@ -227,9 +234,7 @@ className="scroll-animate"
   className="scroll-animate"
 
 />
-<MrayaAlrohCarousel
-className="scroll-animate"
-/>
+
 <br></br>
 
 <SbahAlkherCarousel
@@ -237,20 +242,15 @@ className="scroll-animate"
 />
 <br></br>
 
+<ThtSaqfWahdCarousel
+className="scroll-animate"
+/>
  
 <br></br>
-<WamdatRaw7yeCarousel
-className="scroll-animate"
-/>
-
-<br></br>
-<Al7yaWelamalCarousel
-className="scroll-animate"
-/>
 
 
   <OurPicks
-       title="فقرات قصيرة"
+       title="اختيارتنا"
       />
  <VisitorCounter />
 
