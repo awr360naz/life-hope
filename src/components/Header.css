@@ -38,7 +38,8 @@
  
 }
 .hamburger span {
-  display: block;
+ display: block;
+  width: 100%;
   height: 2px;
   border-radius: 2px;
   background: #000;
@@ -193,38 +194,38 @@
   .live-btn {
     display: none !important;
   }
-/* تابلت فقط: بين 768px و 992px */
+
 @media (min-width: 768px) and (max-width: 992px) {
-  /* خليه يرجع يشبه الديسكتوب */
+ 
 
   .header-inner {
     padding-inline-start: 6%;
     padding-inline-end: 6%;
-    height: 100px !important;   /* نفس الديسكتوب تقريبا */
+    height: 100px !important;  
     display: flex;
     align-items: center;
     gap: 0.5rem;
     direction: rtl;
   }
 
-  /* ارجع فعّل المين منيو وزر اللايف */
+
   .main-nav,
   .live-btn {
     display: inline-flex !important;
   }
 
-  /* خبّي الهامبرغر عالتابلت */
+
   .hamburger {
     display: none !important;
   }
 
-  /* رجّع الـ spacer يشتغل عشان العناصر تتمدد صح */
+
   .spacer {
     display: block !important;
     flex: 1 1 auto;
   }
 
-  /* كبر شوية حقل البحث عالتابلت */
+ 
   .search {
     width: 200px;
     height: 32px;
@@ -292,6 +293,7 @@
   .search-input { font-size: 12.5px; }
   .header-logo { height: 44px; }
   .hamburger { width: 22px; height: 16px; }
+  
 }
 
 
@@ -321,7 +323,7 @@
   padding-block: 0 !important;
 }
 
-/* من 768 لحد 1024 = تابلت */
+
 @media (min-width: 768px) and (max-width: 1024px) {
   .page-container,
   .app,
@@ -330,17 +332,10 @@
     max-width: 100% !important;
     width: 100% !important;
     margin-inline: 0 !important;
-    padding-inline: 0 !important;  /* لو في padding زيادة */
+    padding-inline: 0 !important;  
   }
 }
-/* =========================
-   FORCE Hamburger visibility
-   - Tablet PORTRAIT: Mobile layout
-   - Mobile LANDSCAPE: Mobile layout (حتى لو العرض كبير)
-   ضع هذا آخر الملف لضمان إنه يغلب أي تعارض
-========================= */
 
-/* 1) Tablet Portrait = مثل الموبايل */
 @media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
   .hamburger { display: inline-flex !important; }
   .main-nav, .live-btn { display: none !important; }
@@ -352,9 +347,7 @@
   }
 }
 
-/* 2) Mobile Landscape = مثل الموبايل
-   (معظم الموبايلات باللاندسكيب ارتفاعها صغير ~ 360-450px)
-*/
+
 @media (orientation: landscape) and (max-height: 500px) {
   .hamburger { display: inline-flex !important; }
   .main-nav, .live-btn { display: none !important; }

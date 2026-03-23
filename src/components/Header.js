@@ -9,6 +9,7 @@
     const [query, setQuery] = useState("");
     const navigate = useNavigate();
     const [showQuizMenu, setShowQuizMenu] = useState(false);
+    const [ShowProgrmasMenu, setShowProgrmasMenu]=useState(false);
 
 
     const handleSearchSubmit = (e) => {
@@ -146,6 +147,31 @@
     </Link>
   </div>
 )}
+{/*
+<div
+className="darwer-link"
+style={{cursor :"pointer"}}
+onClick={() =>ShowProgrmasMenu((v) => !v)}
+>
+شاهد برامجنا
+</div>
+{ShowProgrmasMenu &&(
+  <div className="programs-submenu">
+    <Link 
+    to={"/cami-prophecies"}
+    className="drawer-sub-item"
+    onClick={() => {
+      setOpen(false);
+      setShowProgrmasMenu(false);
+    } }
+    >
+      فتح نبؤات
+    </Link>
+  </div>
+
+
+)}
+*/}
 
 
 

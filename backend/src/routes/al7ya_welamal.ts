@@ -70,8 +70,8 @@ async function queryTry(opts: {
 
   if (opts.orderBy === "sort") {
     q = q
-      .order("sort", { ascending: true, nullsFirst: false })
-      .order("id", { ascending: true });
+      .order("sort", { ascending: false, nullsFirst: false })
+      .order("id", { ascending: false });
   } else if (opts.orderBy) {
     q = q.order(opts.orderBy as any, { ascending: false });
   }
