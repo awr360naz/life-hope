@@ -210,7 +210,7 @@ export default function SbahAlkherPage() {
 
   return (
     <div className="cami-page wrap">
-      <h2 className="cami-heading"> " صباح الخير مع ايات "</h2>
+      <h2 className="cami-heading">  صباح الخير مع ايات </h2>
 
       {loading && <p>جار التحميل...</p>}
       {err && <p className="cami-error">صار خطأ: {err}</p>}

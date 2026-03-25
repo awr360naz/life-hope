@@ -23,6 +23,7 @@
       <header className="header" dir="rtl">
         <div className="header-inner">
           {/* همبرغر */}
+          
           <button
             className={`hamburger ${open ? "is-open" : ""}`}
             aria-label="فتح القائمة"
@@ -108,10 +109,115 @@
         <div className={`drawer ${open ? "drawer--open" : ""}`} onClick={() => setOpen(false)}>
           <nav className="drawer-panel" onClick={(e)=>e.stopPropagation()}>
             <Link to="/" className="drawer-link" onClick={()=>setOpen(false)}>الصفحه الرئيسية</Link>
-            <Link to="/about" className="drawer-link" onClick={()=>setOpen(false)}>قصتنا</Link>
+            {/*
+              <div
+              className="drawer-link"
+              style={{ cursor: "pointer" }}
+              onClick={() => setShowProgrmasMenu((v) => !v)}
+                  >
+              شاهد برامجنا
+                  </div>
+
+                        {ShowProgrmasMenu && (
+                          <div className="programs-submenu">
+                            <Link
+                              to="cami-prophecies"
+                              className="drawer-sub-item"
+                              onClick={() => {
+                                setOpen(false);
+                                setShowProgrmasMenu(false);
+                              }}
+                            >
+                            فتح نبؤات
+                            </Link>
+
+                            <Link
+                              to="mraya-alroh"
+                              className="drawer-sub-item"
+                              onClick={() =>{
+                                setOpen(false);
+                                setShowProgrmasMenu(false);
+                              }}
+                            >
+                              مرايا الروح
+                            </Link>
+
+
+                            <Link
+                            to="al7ya_welamal"
+                            className="drawer-sub-item"
+                            onClick={() =>{
+                              setOpen(false);
+                              setShowProgrmasMenu(false);
+                            }}
+                            >
+                              الحياة والامل
+                            </Link>
+
+                            <Link
+                            to="wamdat_raw7ye"
+                            className="drawer-sub-item"
+                            onClick={() =>{
+                              setOpen(false);
+                              setShowProgrmasMenu(false);
+                            }}
+                            >
+                              ومضات روحية
+                            </Link>
+
+                            <Link
+                            to="seha-afdal"
+                            className="drawer-sub-item"
+                            onClick={() =>{
+                              setOpen(false);
+                              setShowProgrmasMenu(false);
+                            }}
+                            >
+                              صحة افضل لحياة افضل
+                            </Link>
+
+                            <Link
+                            to="kol-shahr-4-7kayat"
+                            className="drawer-sub-item"
+                            onClick={() =>{
+                              setOpen(false);
+                              setShowProgrmasMenu(false);
+                            }}
+                            >
+                              كل شهر اربع حكايات
+                            </Link>
+
+                            <Link
+                            to="sbah-alkher"
+                            className="drawer-sub-item"
+                            onClick={() =>{
+                              setOpen(false);
+                              setShowProgrmasMenu(false);
+                            }}
+                            >
+                              صباح الخير مع ايات
+                            </Link>
+
+                            <Link
+                            to="tht-saqf-wahd"
+                            className="drawer-sub-item"
+                            onClick={() =>{
+                              setOpen(false);
+                              setShowProgrmasMenu(false);
+                            }}
+                            >
+                              تحت سقف واحد
+                            </Link>
+
+
+                          </div>
+                        )}
+  */}
             <Link to="/articles" className="drawer-link" onClick={()=>setOpen(false)}>مقالات</Link>
+            <Link to="/AngelsPage" className="drawer-link" onClick={()=>setOpen(false)}>رسالة الملائكة الثلاث</Link>  
+            <Link to="/about" className="drawer-link" onClick={()=>setOpen(false)}>قصتنا</Link> 
             <Link to="/programs" className="drawer-link" onClick={()=>setOpen(false)}>برامجنا</Link>
-            <Link to="/AngelsPage" className="drawer-link" onClick={()=>setOpen(false)}>رسالة الملائكة الثلاث</Link>      
+                
 
 
 <div
@@ -147,31 +253,8 @@
     </Link>
   </div>
 )}
-{/*
-<div
-className="darwer-link"
-style={{cursor :"pointer"}}
-onClick={() =>ShowProgrmasMenu((v) => !v)}
->
-شاهد برامجنا
-</div>
-{ShowProgrmasMenu &&(
-  <div className="programs-submenu">
-    <Link 
-    to={"/cami-prophecies"}
-    className="drawer-sub-item"
-    onClick={() => {
-      setOpen(false);
-      setShowProgrmasMenu(false);
-    } }
-    >
-      فتح نبؤات
-    </Link>
-  </div>
 
 
-)}
-*/}
 
 
 
