@@ -24,20 +24,36 @@ export default function ResilientThumb({ item, className = "", alt = "" }) {
     [item]
   );
 
-  const candidates = useMemo(() => {
-    if (!ytid) return [];
-    return [
-      `https://i.ytimg.com/vi_webp/${ytid}/maxresdefault.webp`,
-      `https://i.ytimg.com/vi/${ytid}/maxresdefault.jpg`,
-      `https://i.ytimg.com/vi_webp/${ytid}/hqdefault.webp`,
-      `https://i.ytimg.com/vi/${ytid}/hqdefault.jpg`,
-      `https://i.ytimg.com/vi/${ytid}/mqdefault.jpg`,
-      `https://i.ytimg.com/vi/${ytid}/default.jpg`,
-    ];
-  }, [ytid]);
+const candidates = useMemo(() => {
+  const dbThumb =
+    item.thumbnail ||
+    item.thumb ||
+    item.image ||
+     item.thumb_url ||
+    item.thumbnail_url;
+    
+
+  const ytThumbs = ytid
+    ? [
+        `https://i.ytimg.com/vi_webp/${ytid}/maxresdefault.webp`,
+        `https://i.ytimg.com/vi/${ytid}/maxresdefault.jpg`,
+        `https://i.ytimg.com/vi_webp/${ytid}/hqdefault.webp`,
+        `https://i.ytimg.com/vi/${ytid}/hqdefault.jpg`,
+        `https://i.ytimg.com/vi/${ytid}/mqdefault.jpg`,
+        `https://i.ytimg.com/vi/${ytid}/default.jpg`,
+      ]
+    : [];
+
+  return dbThumb ? [dbThumb, ...ytThumbs] : ytThumbs;
+}, [item, ytid]);
 
   const [idx, setIdx] = useState(0);
   const src = candidates[idx] || "";
+   console.log("ITEM:", item);
+  console.log("DB THUMB:", item.thumbnail);
+  console.log("YOUTUBE ID:", ytid);
+  console.log("FINAL SRC:", src);
+  console.log("KEYS:", Object.keys(item));
 
   useEffect(() => setIdx(0), [candidates.join("|")]);
 
