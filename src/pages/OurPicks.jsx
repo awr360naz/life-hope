@@ -295,7 +295,7 @@ export default function OurPicks() {
           </FrameBox>
 
           {/* صورة 16:9 */}
-          <FrameBox title="مقال" className={`picks-area-image ${imageSrc ? "" : "is-disabled"}`}>
+          <FrameBox title="أسألة للمتابعين" className={`picks-area-image ${imageSrc ? "" : "is-disabled"}`}>
           
             <a className="picks-link" href={imageHref} target="_blank" rel="noopener noreferrer">
               <div className="picks-media" style={{ aspectRatio: "16 /12 " }}>
