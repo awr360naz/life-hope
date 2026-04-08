@@ -282,21 +282,10 @@ export default function OurPicks() {
         </div>
 
         <div className="picks-layout">
-          {/* فيديو 16:9 */}
-          <FrameBox title="فيديو" className={`picks-area-video ${vid ? "" : "is-disabled"}`}>
-            <div className="picks-media media-16x9">
-              {vidId ? <YtThumb id={vidId} alt="video" /> : <img src={PLACEHOLDER_SVG} alt="" />}
-              <PlayButton onClick={() => openInNew(videoHref)} label="تشغيل الفيديو" />
-                
-            </div>
- <p>حلقة فصح خاصه مع مرفت اشقر</p>
-            <div className="picks-info">
-            
-            </div>
-          </FrameBox>
+     
 
           {/* صورة 16:9 */}
-          <FrameBox title="مقال" className={`picks-area-image ${imageSrc ? "" : "is-disabled"}`}>
+          <FrameBox title="محتوى متنوع" className={`picks-area-image ${imageSrc ? "" : "is-disabled"}`}>
           
             <a className="picks-link" href={imageHref} target="_blank" rel="noopener noreferrer">
               <div className="picks-media" style={{ aspectRatio: "16 /12 " }}>
@@ -309,6 +298,20 @@ export default function OurPicks() {
             <div className="picks-info">
               
              
+            </div>
+          </FrameBox>
+               {/* فيديو 16:9 */}
+          <FrameBox title="فيديو"  className={`picks-area-video ${vid ? "" : "is-disabled"}`}>
+     
+          
+            <div className="picks-media media-16x9">
+              {vidId ? <YtThumb id={vidId} alt="video" /> : <img src={PLACEHOLDER_SVG} alt="" />}
+              <PlayButton onClick={() => openInNew(videoHref)} label="تشغيل الفيديو" />
+                
+            </div>
+ <div className="videotag"><b >حلقة فصح خاصه مع مرفت اشقر</b></div>
+            <div className="picks-info">
+            
             </div>
           </FrameBox>
 

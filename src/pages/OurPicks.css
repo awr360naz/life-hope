@@ -25,6 +25,7 @@
   grid-template-columns: 1fr;
 }
 
+
 /* تابلت */
 @media (min-width: 700px){
   .picks-layout{
@@ -37,8 +38,9 @@
   .picks-layout{
     grid-template-columns: 1fr 0.9fr 1.35fr;
     grid-template-areas:
-      "video short meditation"
-      "image short meditation";
+    "image short meditation"
+      "video short meditation";
+      
     align-items: stretch;
   }
   .picks-area-video{ grid-area: video; }
@@ -120,6 +122,9 @@
 }
 
 /* ===================== Info (زي جدول/لايف ستايل بسيط) ===================== */
+.videotag{
+padding: 6px 2px 1px;
+}
 .picks-info{
   padding: 10px 10px 12px;
 }
