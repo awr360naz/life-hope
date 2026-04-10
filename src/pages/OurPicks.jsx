@@ -305,11 +305,16 @@ export default function OurPicks() {
      
           
             <div className="picks-media media-16x9">
-              {vidId ? <YtThumb id={vidId} alt="video" /> : <img src={PLACEHOLDER_SVG} alt="" />}
+              {vidId ? <YtThumb id={vidId} alt="video" /> : <img src={PLACEHOLDER_SVG} alt="video_title" />}
               <PlayButton onClick={() => openInNew(videoHref)} label="تشغيل الفيديو" />
                 
             </div>
- <div className="videotag"><b >حلقة فصح خاصه مع مرفت اشقر</b></div>
+{/*
+              <div className="videotag">
+                <b >حلقة فصح خاصه مع مرفت اشقر</b>
+                </div>
+*/
+}
             <div className="picks-info">
             
             </div>

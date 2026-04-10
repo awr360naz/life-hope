@@ -37,7 +37,7 @@ function cleanRedirect(raw = "") {
           if (/^https?:\/\//i.test(out)) return out.trim();
         }
       }
-      // ما قدرنا نطلع الهدف الحقيقي → لا ترجع رابط Google ناقص
+   
       return "";
     }
 
@@ -47,7 +47,7 @@ function cleanRedirect(raw = "") {
         const dec = safeDecode(q);
         if (/^https?:\/\//i.test(dec)) return dec.trim();
       }
-      // search بدون هدف صريح → لا ترجع Google
+
       return "";
     }
 
@@ -109,7 +109,7 @@ function normalizeRowSafe(it, idx, debug) {
       if (debug) console.error(`[our-picks] clean ${f} failed at row`, idx, it?.id, e);
       out[f] = it[f] || "";
     }
-    if (isGoogleHost(out[f])) out[f] = ""; // لا ترجع google redirect أبدًا
+    if (isGoogleHost(out[f])) out[f] = "";
   }
 
   try {
@@ -120,13 +120,13 @@ function normalizeRowSafe(it, idx, debug) {
   }
 
   try {
-    out._videoId = toYouTubeId(out.video) || null;
+    out._videoId = toYouTubeId(out.video) || toYouTubeId(out.video_title)|| null;
   } catch (e) {
     if (debug) console.error("[our-picks] toYouTubeId video failed at row", idx, it?.id, e);
     out._videoId = null;
   }
 
-  // رابط الصورة الخارجي النظيف
+
   out._imageLinkClean = out.image_link && !isGoogleHost(out.image_link) ? out.image_link : "";
 
   return out;
@@ -139,7 +139,7 @@ router.get("/", async (req, res) => {
   try {
     const { data, error } = await sb
       .from("our_picks")
-      .select("id, title, image, image_link, shorts_link, short_image, video, sort, published, updated_at")
+      .select("id, title, image, image_link, shorts_link, short_image, video , video_title , sort, published, updated_at")
       .eq("published", true)
       .order("sort", { ascending: true })
       .order("id", { ascending: true });
@@ -156,7 +156,7 @@ router.get("/", async (req, res) => {
         safe.push(normalizeRowSafe(src[i], i, debug));
       } catch (e) {
         if (debug) console.error("[our-picks] normalize crash at row", i, src[i]?.id, e, src[i]);
-        // تخطّى الصف المعطّل بدل ما يوقع الراوتر كله
+      
       }
     }
 
