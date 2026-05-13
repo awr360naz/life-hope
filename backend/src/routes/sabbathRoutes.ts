@@ -41,10 +41,7 @@ router.get("/sabbath-weeks/:weekSlug/meta", async (req: Request, res: Response) 
   res.json({ ok: true, item: data });
 });
 
-/**
- * GET /api/content/sabbath-lessons/:lessonSlug
- * يعيد بيانات درس محدد (للعنوان في الأعلى + الوصف القصير + الطويل للبوب-أب)
- */
+
 router.get("/sabbath-lessons/:lessonSlug", async (req: Request, res: Response) => {
   const supa = getSupabase();
   const { data, error } = await supa
@@ -59,10 +56,7 @@ router.get("/sabbath-lessons/:lessonSlug", async (req: Request, res: Response) =
   res.json({ ok: true, item: data });
 });
 
-/**
- * GET /api/content/sabbath-lessons/:lessonSlug/weeks
- * يعيد أسابيع الدرس (مثال: 11 أكتوبر – 17 أكتوبر)
- */
+
 router.get("/sabbath-lessons/:lessonSlug/weeks", async (req: Request, res: Response) => {
   const supa = getSupabase();
 
@@ -88,10 +82,7 @@ router.get("/sabbath-lessons/:lessonSlug/weeks", async (req: Request, res: Respo
   res.json({ ok: true, items: data });
 });
 
-/**
- * GET /api/content/sabbath-weeks/:weekSlug/items
- * يعيد كروت عناصر الأسبوع (image,title,subtitle)
- */
+
 router.get("/sabbath-weeks/:weekSlug/items", async (req: Request, res: Response) => {
   const supa = getSupabase();
 
@@ -117,10 +108,7 @@ router.get("/sabbath-weeks/:weekSlug/items", async (req: Request, res: Response)
   res.json({ ok: true, items: data });
 });
 
-/**
- * GET /api/content/sabbath-items/:itemSlug
- * يعيد بيانات عنصر مفصّل (لصفحة “عبور نهر الأردن” مثلاً)
- */
+
 router.get("/sabbath-items/:itemSlug", async (req: Request, res: Response) => {
   const supa = getSupabase();
   const { data, error } = await supa
@@ -135,10 +123,7 @@ router.get("/sabbath-items/:itemSlug", async (req: Request, res: Response) => {
   res.json({ ok: true, item: data });
 });
 
-/**
- * GET /api/content/sabbath-weeks/:weekSlug/neighbors?item=:itemSlug
- * السابق/التالي داخل نفس الأسبوع
- */
+
 router.get("/sabbath-weeks/:weekSlug/neighbors", async (req: Request, res: Response) => {
   const supa = getSupabase();
   const itemSlug = String(req.query.item || "");

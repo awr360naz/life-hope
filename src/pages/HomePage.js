@@ -25,7 +25,8 @@ import WamdatRaw7yeCarousel from "../components/WamdatRaw7yeCarousel";
 import Al7yaWelamalCarousel from "../components/Al7yaWelamalCarousel";
 import useScrollReveal from "./useScrollReveal";
 import VisitorCounter from "./VisitorCounter";
-
+import SabbathShortsCarousel from "../components/SabbathShortsCarousel";
+import PropheciesCarousel from "../components/PropheciesCarousel";
 
 export default function HomePage() { 
   useEffect(() => {
@@ -161,6 +162,7 @@ export default function HomePage() {
   </section>
 
   {/* ===== الإطار 3: رسالة الملائكة الثلاث (ثابت بدل البوب اب) ===== */}
+  
   <section className="text-frame frame-3 angels-frame" dir="rtl">
     <div className="angels-card">
       <div className="angels-media">
@@ -223,6 +225,12 @@ className="scroll-animate"
   limit={48}
   className="scroll-animate"
 />
+ <br></br>
+<SabbathShortsCarousel />
+
+ <br></br>
+<PropheciesCarousel />
+
 <br></br>
 <SehaAfdalCarousel
 
@@ -252,7 +260,8 @@ className="scroll-animate"
   <OurPicks
        title="اختيارتنا"
       />
- <VisitorCounter />
+ <VisitorCounter
+ />
 
 
     </main>

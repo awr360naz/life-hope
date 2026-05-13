@@ -309,12 +309,8 @@ export default function OurPicks() {
               <PlayButton onClick={() => openInNew(videoHref)} label="تشغيل الفيديو" />
                 
             </div>
-{/*
-              <div className="videotag">
-                <b >حلقة فصح خاصه مع مرفت اشقر</b>
-                </div>
-*/
-}
+
+            
             <div className="picks-info">
             
             </div>

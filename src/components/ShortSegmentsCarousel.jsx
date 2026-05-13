@@ -93,7 +93,7 @@ export default function ShortSegmentsCarousel({
           it.youtube_id ||
           toYouTubeId(it.youtube_url || it.url || it.video_url || it.short_url || it.id || it.slug || "");
         if (!id) return null;
-        const title = it.title || "فقرة قصيرة";
+        const title = it.title || "";
         return { ...it, _ytid: id, _title: title, _key: it.id || it.slug || id };
       })
       .filter(Boolean);
@@ -105,6 +105,8 @@ export default function ShortSegmentsCarousel({
     if (index > max) setIndex(max);
     
   }, [visible, items.length]);
+
+  
 
   const maxIndex = Math.max(0, items.length - visible);
   const canPrev = items.length > visible && index > 0;
@@ -129,7 +131,8 @@ export default function ShortSegmentsCarousel({
 
   return (
    
-    <section className="programs-section shorts-like-programs"
+   <section
+  className={`programs-section shorts-like-programs ${className}`}
      dir="rtl" aria-labelledby="shorts-title">
       <div className="programs-header">
         <h2 id="shorts-title" className="programs-title">{title}</h2>

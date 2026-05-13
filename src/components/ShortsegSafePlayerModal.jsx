@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import "./ShortsegSafePlayerModal.css";
+import { createPortal } from "react-dom";
 
 /** ========== Helpers ========== */
 function toYouTubeIdSafe(idOrUrl = "") {
@@ -136,78 +137,104 @@ export default function ShortsegSafePlayerModal({
     };
   }, [open, loaded]);
 
+  
+
   const onIframeLoad = () => setLoaded(true);
 
-  // ✅ 1) امنع الإغلاق لو في Fullscreen (ESC بيطلع fullscreen بس ما بسكّر المودال)
+
   const isInFullscreen = () => {
     if (typeof document === "undefined") return false;
     return !!document.fullscreenElement;
   };
 
-  // ✅ 2) اغلق فقط إذا الكبس كان فعلًا على الخلفية (مش من داخل المحتوى)
+
   const onBackdropClick = (e) => {
-    // إذا في fullscreen: لا نغلق
+   
     if (isInFullscreen()) return;
 
-    // اغلق فقط إذا الهدف هو الخلفية نفسها (وليس عنصر داخلها)
+
     if (e.target !== e.currentTarget) return;
 
     onClose();
   };
 
-  // ✅ 3) ESC ذكي: إذا مش fullscreen → ممكن تسكير (اختياري)
-  // إذا بدك ESC ما يسكر أبدًا حتى خارج fullscreen: احذف هذا اليوزإفكت.
+  
   useEffect(() => {
     if (!open) return;
 
     const onKeyDown = (e) => {
       if (e.key !== "Escape") return;
 
-      // إذا في fullscreen → خلي المتصفح يطلع من fullscreen فقط
+     
       if (isInFullscreen()) return;
 
-      // خارج fullscreen: سكّر المودال (تقدر تعطلها إذا بدك)
+      
       onClose();
     };
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [open, onClose]);
+useEffect(() => {
+  if (!open) return;
 
-  if (!open) return null;
+  document.body.style.overflow = "hidden";
 
-  return (
-    <div className="shortsegmodal-backdrop" onClick={onBackdropClick} role="dialog" aria-modal="true">
-      <div className="shortsegmodal-content" ref={modalRef}>
-        {!!vidId && !showFallback ? (
-          <div className="shortsegmodal-frame">
-            <iframe
-              ref={iframeRef}
-              src={embedUrl}
-              title={title}
-              allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-              allowFullScreen
-              loading="eager"
-              onLoad={onIframeLoad}
-            />
-          </div>
-        ) : (
-          <a
-            className="shortsegmodal-fallback"
-            href={pageUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+  return () => {
+    document.body.style.overflow = "";
+  };
+}, [open]);
+  
+if (!open) return null;
+
+return createPortal(
+  <div
+    className="shortsegmodal-backdrop"
+    onClick={onBackdropClick}
+    role="dialog"
+    aria-modal="true"
+  >
+    <div className="shortsegmodal-content" ref={modalRef}>
+
+      {!!vidId && !showFallback ? (
+        <div className="shortsegmodal-frame">
+          <iframe
+            ref={iframeRef}
+            src={embedUrl}
             title={title}
-          >
-            <img src={thumbUrl} alt={title} className="shortsegmodal-thumb" />
-            <span className="shortsegmodal-play" aria-hidden></span>
-          </a>
-        )}
+            allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+            allowFullScreen
+            loading="eager"
+            onLoad={onIframeLoad}
+          />
+        </div>
+      ) : (
+        <a
+          className="shortsegmodal-fallback"
+          href={pageUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          title={title}
+        >
+          <img
+            src={thumbUrl}
+            alt={title}
+            className="shortsegmodal-thumb"
+          />
+        </a>
+      )}
 
-        <button type="button" className="shortsegmodal-close" onClick={onClose} aria-label="إغلاق">
-          ✕
-        </button>
-      </div>
+      <button
+        type="button"
+        className="shortsegmodal-close"
+        onClick={onClose}
+        aria-label="إغلاق"
+      >
+        ✕
+      </button>
+
     </div>
-  );
+  </div>,
+  document.body
+);
 }

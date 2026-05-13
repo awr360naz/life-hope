@@ -1,10 +1,10 @@
-/* ===== برامجنا فقط ===== */
+
 .programs-section .carousel-viewport {
   position: relative;
   overflow: hidden;
 }
 
-/* مسار السك롤 */
+
 .programs-section .carousel-track {
   --gap: 12px;
   --edge: 12px;
@@ -20,11 +20,11 @@
 }
 .programs-section .carousel-track::-webkit-scrollbar { display: none; }
 
-/* حجم الكرت – نفس مقاس كروت المقالات تقريبًا */
+
 .programs-section .program-card {
-  flex: 0 0 220px;         /* العرض الثابت */
+  flex: 0 0 220px;         
   max-width: 220px;
-  min-height: 140px;       /* عدّلي لو بدك */
+  min-height: 140px;      
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,.08);
@@ -36,9 +36,9 @@
 .programs-section .card-link { display: flex; flex: 1; text-decoration: none; color: inherit; }
 .programs-section .program-inner { display: flex; flex-direction: column; width: 100%; }
 
-/* صورة الكرت */
+
 .programs-section .program-image-wrap {
-  aspect-ratio: 16 / 9;   /* بتعطي نفس ارتفاع المقالات تقريبًا */
+  aspect-ratio: 16 / 9;   
   background: #eee;
   overflow: hidden;
 }
@@ -49,18 +49,18 @@
   display: block;
 }
 
-/* عنوان الكرت */
+
 .programs-section .program-card-title {
   font-weight: 700;
   font-size: 16px;
   margin: 8px 10px 12px;
-  text-align: right;          /* RTL */
+  text-align: right;    
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* أزرار التالي/السابق – ظاهرات بالكامل ومش مقطوشات */
+
 .programs-section .nav-btn {
   position: absolute;
   top: 50%;
@@ -78,7 +78,7 @@
 .programs-section .nav-next { left: 6px; }
 .programs-section .nav-btn:disabled { opacity: .4; cursor: default; }
 
-/* هيكل التحميل (اختياري) */
+
 .programs-section .carousel-skeleton {
   display: grid;
   grid-auto-flow: column;
@@ -93,16 +93,16 @@
   background-size: 200% 100%;
   animation: progShimmer 1.2s linear infinite;
 }
-/* 1) نحطّ قسم برامجنا بنفس سنتر صفحة المقالات */
+
 .programs-section {
-  /* استعملي نفس عرض الكونتينر تبع المقالات لو عندك متغيّر جاهز */
-  max-width: 1100px;   /* أو القيمة اللي بتستعمليها بالمقالات */
-  margin-inline: auto; /* يوسّط كل القسم */
+ 
+  max-width: 1100px;   
+  margin-inline: auto; 
 }
 
-/* 2) عنوان وبرابط "برامجنا" يبقوا نفس لون الثيم—مش أزرق ومش تحته خط */
+
 .programs-section .programs-title {
-  text-align: right; /* زي المقالات (RTL) */
+  text-align: right; 
   margin: 0 0 10px;
 }
 .programs-section .programs-link {
@@ -113,19 +113,19 @@
   color: inherit;
   text-decoration: none;
 }
-/* لو بتشوفي هالة زرقا حوالين الرابط عند التركيز */
+
 .programs-section .programs-link:focus {
-  outline: 2px solid #bbb; /* أو الغيها: outline: none; (بس الأحسن نسيّب فارقة وصول) */
+  outline: 2px solid #bbb; 
   border-radius: 6px;
 }
 
-/* 3) الأسهم تتموضع عند حواف أول/آخر كرت، مش ملزوقة على حافة الفيو بورت */
+
 .programs-section .carousel-viewport {
-  position: relative;   /* للأسهم المطلقة */
+  position: relative;  
   overflow: hidden;
 }
 
-/* المسار أصلاً فيه --edge و --gap، منستفيد منهم */
+
 .programs-section .nav-btn {
   position: absolute;
   top: 50%;
@@ -137,19 +137,18 @@
   cursor: pointer;
 }
 
-/* نحط السهم اليمين (السابق) عند حافة أول كرت: */
+
 .programs-section .nav-prev {
   right: calc(var(--edge, 12px) + 2px);
 }
-/* والسهم الشمال (التالي) عند حافة آخر كرت: */
+
 .programs-section .nav-next {
   left: calc(var(--edge, 12px) + 2px);
 }
 
 .programs-section .nav-btn:disabled { opacity: .4; cursor: default; }
 
-/* 4) كروت البرامج نفس حجم المقالات (زي ما ثبتنا قبل) */
-/* الكرت ياخذ ربع المساحة بالضبط */
+
 .programs-section .program-card {
   flex: 0 0 calc((100% - (var(--gap) * 3) - (var(--edge) * 2)) / 4);
   max-width: calc((100% - (var(--gap) * 3) - (var(--edge) * 2)) / 4);
@@ -162,7 +161,7 @@
 }
 
 
-/* تأكيد: الروابط داخل الكرت ما تغيّر اللون */
+
 .programs-section .card-link {
   display: flex; flex: 1;
   color: inherit; text-decoration: none;
@@ -170,36 +169,36 @@
 .programs-section .card-link:focus {
   outline: 2px solid #bbb; border-radius: 10px;
 }
-/* ========== برامجنا بنفس ستايل المقالات ========== */
 
-/* نفس .carousel-viewport */
+
+
 .programs-section .carousel-viewport {
   position: relative;
   overflow: hidden;
 }
 
-/* نفس .carousel-track */
+
 .programs-section .carousel-track {
-  --gap: 12px;    /* المسافة بين الكروت */
-  --edge: 12px;   /* حافة يمين/يسار المسار */
+  --gap: 12px;    
+  --edge: 12px;  
 
   display: flex;
   flex-wrap: nowrap;
   align-items: stretch;
 
-  /* المسار هو اللي بيسكرول */
+
   overflow-x: auto;
   scroll-behavior: smooth;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
 
   gap: var(--gap);
-  padding-inline: var(--edge);         /* حافة تمنع قصّ أول/آخر كرت */
-  scroll-padding-inline: var(--edge);  /* السناب يحتسب الحافة */
+  padding-inline: var(--edge);        
+  scroll-padding-inline: var(--edge); 
 }
 .programs-section .carousel-track::-webkit-scrollbar { display: none; }
 
-/* عرض الكرت = (100% - مجموع الفراغات) / عدد الظاهر (نفس المقالات) */
+
 .programs-section .program-card {
   flex: 0 0 calc(
     (100% - ( (var(--perView, 4) - 1) * var(--gap, 12px) ))
@@ -210,10 +209,7 @@
   cursor: pointer;
 }
 
-/* الإطار الأبيض (نفس .article-inner) */
 
-
-/* صورة (نفس .article-image-wrap / .article-image) */
 .programs-section .program-image-wrap {
   aspect-ratio: 16 / 9;
   overflow: hidden;
@@ -226,7 +222,7 @@
   display: block;
 }
 
-/* عنوان RTL (نفس .article-card-title) */
+
 .programs-section .program-card-title {
   font-size: 14px;
   font-weight: 600;
@@ -236,7 +232,7 @@
   direction: rtl;
 }
 
-/* روابط نفس المقالات */
+
 .programs-section .programs-link,
 .programs-section .card-link {
   color: inherit;
@@ -247,8 +243,7 @@
   text-decoration: none;
 }
 
-/* ===== الأسهم نفس المقالات تماماً ===== */
-/* ملاحظة: لو عندك .nav-btn عامة للمقالات، هالمجموعة تضمن نفس الشكل داخل برامجنا */
+
 .programs-section .nav-btn {
   position: absolute; 
   top: 50%; 
@@ -269,7 +264,7 @@
 .programs-section .nav-next { inset-inline-end: 6px; }
 .programs-section .nav-btn:disabled { opacity: .35; cursor: default; }
 
-/* موبايل */
+
 @media (max-width: 600px) {
   .programs-section .program-card { flex-basis: 180px; max-width: 180px; min-height: 130px; }
 }
@@ -279,7 +274,6 @@
   100% { background-position: -200% 0; }
 }
 
-/* موبايل: كرت أصغر شوي */
 @media (max-width: 600px) {
   .programs-section .program-card,
   .programs-section .skeleton-card {
@@ -298,22 +292,18 @@
   display: flex;
   align-items: center;
 }
-/* ===== موبايل: بدون أسهم، سحب باللمس فقط ===== */
+
 @media (max-width: 768px) {
-  /* أخفي أزرار التالي/السابق */
+ 
   .programs-section .nav-btn {
     display: none !important;
     pointer-events: none !important;
   }
 
-  /* فعّل سحب أفقي سلس + عطّل الارتداد */
-
-
-  /* إخفاء سكرول بار */
   .programs-section .carousel-track::-webkit-scrollbar { display: none; }
   .programs-section .carousel-track { scrollbar-width: none; }
 
-  /* حواف ومسافات لطيفة على الموبايل */
+
   .programs-section .carousel-track {
     --edge: 10px;
     --gap: 10px;
@@ -321,7 +311,7 @@
     gap: var(--gap);
   }
 
-  /* نفس حجم الكرت اللي كنتِ معتمدتُه للموبايل */
+  
   .programs-section .program-card,
   .programs-section .skeleton-card {
     flex: 0 0 180px;

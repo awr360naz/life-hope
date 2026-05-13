@@ -47,7 +47,10 @@
   .picks-area-image{ grid-area: image; }
   .picks-area-short{ grid-area: short; }
   .picks-area-meditation{ grid-area: meditation; }
+ 
 }
+
+
 
 /* ===================== Frame style (نفس اللي فوق) ===================== */
 .picks-frame{
@@ -123,7 +126,7 @@
 
 /* ===================== Info (زي جدول/لايف ستايل بسيط) ===================== */
 .videotag{
-padding: 6px 2px 1px;
+padding: 1px 2px 1px;
 }
 .picks-info{
   padding: 10px 10px 12px;

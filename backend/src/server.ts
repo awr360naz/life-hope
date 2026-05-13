@@ -27,6 +27,8 @@ import kolShahr4_7kayatRouter from "./routes/kolShahr4_7kayat.js";
 import wamdat_raw7ye from "./routes/wamdat_raw7ye.js";
 import al7ya_welamal from "./routes/al7ya_welamal.js";
 import counterRoutes from "./routes/counter.routes.js";
+import sabbathShortsRouter from "./routes/sabbathShorts.routes.js";
+import propheciesRouter from "./routes/prophecies.routes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -120,6 +122,8 @@ app.get("/api/content/about", async (_req, res) => {
 app.use(articlesRouter);
 app.use(categoriesRouter);
 app.use(shortSegmentsRouter);
+app.use(sabbathShortsRouter);
+app.use(propheciesRouter);
 app.use("/api/content/our-picks", ourPicksRouter);
 app.use("/api/content/quizzes", quizzesRouter);
 app.use("/api/content", sabbathRoutes);
@@ -130,8 +134,8 @@ app.use("/api/cami-prophecies", camiPropheciesRouter); // alias قديم
 app.use("/api/content/programs", programsTodayRouter);
 app.use("/api/programs", programsTodayRouter);
 
-// 👇 آخر واحد يكون searchRouter
-app.use("/api", searchRouter);
+
+
 app.use("/api/content/tht-saqf-wahd", thtSaqfWahdRouter);
 app.use("/api/content/mraya-alroh", mrayaAlrohRouter);
 app.use("/api/content/seha-afdal", sehaAfdalRouter);
@@ -140,7 +144,7 @@ app.use("/api/content/kol-shahr-4-7kayat", kolShahr4_7kayatRouter);
 app.use("/api/content/wamdat_raw7ye", wamdat_raw7ye);
 app.use("/api/content/al7ya_welamal", al7ya_welamal);
 app.use("/api/counter", counterRoutes);
-
+app.use("/api/search", searchRouter);
 const PROGRAMS_TABLE = process.env.PROGRAMS_TABLE || "programs";
 const THIRD_TABLE = process.env.THIRD_FRAME_TABLE || "home_third_frame_items";
 const PROGRAMS_CATALOG_TABLE = process.env.PROGRAMS_CATALOG_TABLE || "programs_catalog";
