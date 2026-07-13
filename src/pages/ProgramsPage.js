@@ -2,22 +2,20 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import "./ProgramsPage.css";
 
-/**
- * المطلوب:
- * - موبايل: عامود واحد + عرض كل العناصر (بدون افتراضية/تقطيع) حتى لو الجهاز أفقي.
- * - ديسكتوب: تقليل الفراغ العمودي فعليًا.
- */
+
 
 export default function ProgramsPage() {
   const [items, setItems] = useState([]);
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // إعدادات الكروت/الشبكة
-  const CARD_W = 260;   // عرض الكرت
-  const IMG_H  = 180;   // ارتفاع صورة الكرت
-  const CARD_H = 192;   // ✅ ارتفاع الكرت الفعلي تقريبًا (180 صورة + 12 هامش/هواء بسيط)
-  const GAP    = 8;     // ✅ فجوة أصغر حقيقية
+const CARD_W = 260;
+
+
+const IMG_H = Math.round(CARD_W * 7.884 / 5.239);
+
+const CARD_H = IMG_H;
+const GAP = 8;  
   const BUFFER_ROWS = 3;
 
   const gridRef = useRef(null);
@@ -28,12 +26,12 @@ export default function ProgramsPage() {
     perRow: 1,
     rowHeight: CARD_H + GAP,
     gridTopOnPage: 0,
-    isMobile: false,   // ✅ نمط الموبايل (نلغي الافتراضية ونعرِض الكل)
+    isMobile: false,   
   });
 
   const [windowState, setWindowState] = useState({ startRow: 0, endRow: 0 });
 
-  /* جلب البيانات */
+
 useEffect(() => {
   setLoading(true);
   setItems([]);
@@ -62,21 +60,20 @@ useEffect(() => {
         ? data
         : [];
 
-      // 🔍 شوف شو جاي من السيرفر
-            // 🔍 شوف شو جاي من السيرفر
+    
       console.log(
         "PROGRAMS FROM API:",
         arr.map((p) => ({ id: p.id, sort_order: p.sort_order }))
       );
 
-      // ✅ تنظيف + ترتيب:
+ 
       const cleaned = arr
         .filter(Boolean)
         .map((p) => {
-          // حوّل sort_order لرقم، ولو فاضي/NULL خليه رقم كبير عشان يروح آخر اشي
+      
           let so = p.sort_order;
           if (so === null || so === undefined || so === "") {
-            so = 999999; // يروح آخر القائمة
+            so = 999999; 
           }
           const num = Number(so);
           return { ...p, sort_order: Number.isFinite(num) ? num : 999999 };
@@ -100,7 +97,7 @@ useEffect(() => {
 
 
 
-  /* أدوات مساعدة */
+
   const getPageScrollY = () =>
     window.pageYOffset || document.documentElement.scrollTop || 0;
 
@@ -115,7 +112,7 @@ useEffect(() => {
     return top;
   };
 
-  /* تحديث القياسات */
+  
   useLayoutEffect(() => {
     const updateLayout = () => {
       const grid = gridRef.current;
@@ -124,13 +121,12 @@ useEffect(() => {
       const width = grid.clientWidth;
       const height = window.innerHeight;
 
-      // نعتبر الموبايل لكل الشاشات اللمسية/العرض الأصغر نسبيًا
-      // حتى لو قلبتِ الهاتف أفقي: نظل موبايل
-      const mobileBreakpoint = 1024; // ✅ أعلى من 768 حتى لما تقلبِ التليفون يظل عامود واحد
+
+      const mobileBreakpoint = 1024; 
       const isMobile = window.innerWidth <= mobileBreakpoint || matchMedia("(pointer: coarse)").matches;
 
       let perRow = Math.max(1, Math.floor((width + GAP) / (CARD_W + GAP)));
-      if (isMobile) perRow = 1; // ✅ قفل عامود واحد
+      if (isMobile) perRow = 1; 
 
       const rowHeight = CARD_H + GAP;
       const gridTopOnPage = computeGridTopOnPage(grid);
@@ -146,12 +142,12 @@ useEffect(() => {
       window.removeEventListener("resize", updateLayout);
       ro.disconnect();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
   }, []);
 
-  /* تمرير الصفحة (للديسكتوب فقط؛ الموبايل نعرض الكل) */
+
   useEffect(() => {
-    if (layout.isMobile) return; // ✅ لا افتراضية/لا slicing على الموبايل
+    if (layout.isMobile) return; 
 
     let ticking = false;
     const onScroll = () => {
@@ -189,13 +185,13 @@ useEffect(() => {
     );
   }
 
-  /* حسابات الديسكتوب (الموبايل ما يحتاجها) */
+ 
   const total = items.length;
   const { perRow, rowHeight, isMobile } = layout;
   const itemsPerRow = Math.max(1, perRow);
 
   if (isMobile) {
-    // ✅ موبايل: عامود واحد + عرض جميع العناصر + لا ارتفاع ثابت + لا translateY
+   
     return (
       <main dir="rtl" className="programs-main">
         {loading && <div className="programs-loading">جارٍ التحميل…</div>}
@@ -228,7 +224,7 @@ useEffect(() => {
     );
   }
 
-  // ✅ ديسكتوب: افتراضية عادية لكن مع CARD_H واقعي و GAP صغير
+
   const totalRows = Math.max(1, Math.ceil(total / itemsPerRow));
   const totalHeight = totalRows * rowHeight;
 
@@ -279,12 +275,12 @@ useEffect(() => {
   );
 }
 
-/* ========== الكرت ========== */
+
 const Card = React.memo(function Card({ href, title, img, CARD_W, CARD_H, IMG_H }) {
   return (
     <Link to={href} className="card-link">
       <article className="pc-card" style={{ width: CARD_W, height: CARD_H }}>
-        <div className="image-wrap" style={{ height: IMG_H }}>
+        <div className="image-wrap">
           {img ? (
             <img
               src={img}

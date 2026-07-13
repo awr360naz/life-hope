@@ -6,63 +6,64 @@
   --brand: #7A5B3A;
 }
 
-/* الحاوية العامة */
+
 .programs-main {
   max-width: 1200px;
   margin: 2rem auto;
   padding: 0 1rem;
   background: transparent;
-  /* مساحة أمان قبل الفوتر */
+
   padding-bottom: 24px;
 }
 
-/* حالات */
+
 .programs-loading {
   text-align: center;
   margin: 12px 0;
 }
 
-/* غلاف الشبكة */
+
 .programs-grid-wrapper {
   position: relative;
 }
 
-/* اللست ذات الارتفاع الكلي (لديسكتوب فقط) */
+
 .programs-list {
   position: relative;
   contain: layout paint;
 }
 
-/* النافذة الظاهرة (لديسكتوب فقط) */
+
 .programs-visible-window {
   position: absolute;
   inset: 0;
   will-change: transform;
 }
 
-/* شبكة العناصر */
+
 .programs-grid {
   display: grid;
-  gap: 8px; /* = GAP */
-  justify-content: space-between;
+  gap: 8px; 
+  column-gap: 20px;
+  justify-content: start;
   padding: 0 4px;
 }
 
-/* نسخة الموبايل: نثبت عمود واحد وتوسيط العنصر */
+
 .programs-grid-mobile {
   grid-template-columns: 1fr !important;
   justify-content: center;
   justify-items: center;
 }
 
-/* رابط الكرت */
+
 .card-link {
   text-decoration: none;
   color: inherit;
   display: block;
 }
 
-/* الكرت — بدون “بياض” */
+
 .pc-card {
   background: transparent !important;
   border: 0 !important;
@@ -75,7 +76,7 @@
   flex-direction: column;
 }
 
-/* الصورة */
+
 .image-wrap {
   width: 100%;
   background: #f4f4f4;
@@ -96,12 +97,12 @@
   font-size: .9rem;
 }
 
-/* جسم الكرت (فارغ حسب الكود) */
+
 .pc-card-body {
-  padding: 0; /* بدون حشوة للتزامن مع CARD_H الواقعي */
+  padding: 0;
 }
 
-/* ضمان الموبايل حتى بالأفقي */
+
 @media (max-width: 1024px), (pointer: coarse) {
   .programs-grid {
     grid-template-columns: 1fr !important;
@@ -109,15 +110,27 @@
     justify-items: center;
   }
   .pc-card {
-    width: 260px !important; /* = CARD_W */
+    width: 260px !important;
   }
 
-  /* لا أي قيود تمنع ظهور الفوتر */
+  
   .programs-grid-wrapper,
   .programs-list,
   .programs-visible-window {
     overflow: visible !important;
     max-height: none !important;
-    position: static !important; /* يلغي التمركز المطلق للموبايل */
+    position: static !important; 
   }
+}
+.image-wrap {
+  width: 100%;
+  aspect-ratio: 5.239 / 7.884;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.image-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }

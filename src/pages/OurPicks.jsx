@@ -318,7 +318,9 @@ export default function OurPicks() {
 
           {/* شورت 9:16 */}
           <FrameBox title="فقرة قصيرة" className={`picks-area-short ${short ? "" : "is-disabled"}`}>
+          
             <div className="picks-media media-9x16">
+              
               {short && short._shortImg && isDirectImage(short._shortImg) ? (
                 <img src={short._shortImg} alt={short?.title || "short"} loading="eager" decoding="async" />
               ) : shortId ? (
