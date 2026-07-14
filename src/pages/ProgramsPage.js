@@ -8,8 +8,8 @@ export default function ProgramsPage() {
   const [items, setItems] = useState([]);
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(true);
-
-const CARD_W = 260;
+const MOBILE = window.innerWidth <= 1024;
+const CARD_W = MOBILE ? 110 : 260;
 
 
 const IMG_H = Math.round(CARD_W * 7.884 / 5.239);
@@ -125,8 +125,13 @@ useEffect(() => {
       const mobileBreakpoint = 1024; 
       const isMobile = window.innerWidth <= mobileBreakpoint || matchMedia("(pointer: coarse)").matches;
 
-      let perRow = Math.max(1, Math.floor((width + GAP) / (CARD_W + GAP)));
-      if (isMobile) perRow = 1; 
+let perRow;
+
+if (isMobile) {
+  perRow = 3;
+} else {
+  perRow = Math.max(1, Math.floor((width + GAP) / (CARD_W + GAP)));
+}
 
       const rowHeight = CARD_H + GAP;
       const gridTopOnPage = computeGridTopOnPage(grid);
@@ -190,39 +195,6 @@ useEffect(() => {
   const { perRow, rowHeight, isMobile } = layout;
   const itemsPerRow = Math.max(1, perRow);
 
-  if (isMobile) {
-   
-    return (
-      <main dir="rtl" className="programs-main">
-        {loading && <div className="programs-loading">جارٍ التحميل…</div>}
-        <div ref={gridRef} className="programs-grid-wrapper">
-          <div
-            className="programs-grid programs-grid-mobile"
-            style={{ gridTemplateColumns: `1fr` }}
-          >
-            {items.map((p, i) => {
-              if (!p || typeof p !== "object") return null;
-              const slugOrId = p.slug || p.id || p.day || `i-${i}`;
-              const img = p.cover_url || p.image_url || p.thumbnail || p.image;
-              const title = p.title || p.name || "— بدون عنوان —";
-              const href = `/programs/${encodeURIComponent(slugOrId)}`;
-              return (
-                <Card
-                  key={slugOrId}
-                  href={href}
-                  title={title}
-                  img={img}
-                  CARD_W={CARD_W}
-                  CARD_H={CARD_H}
-                  IMG_H={IMG_H}
-                />
-              );
-            })}
-          </div>
-        </div>
-      </main>
-    );
-  }
 
 
   const totalRows = Math.max(1, Math.ceil(total / itemsPerRow));
@@ -244,10 +216,13 @@ useEffect(() => {
       <div ref={gridRef} className="programs-grid-wrapper">
         <div className="programs-list" style={{ height: totalHeight }}>
           <div className="programs-visible-window" style={{ transform: `translateY(${translateY}px)` }}>
-            <div
-              className="programs-grid"
-              style={{ gridTemplateColumns: `repeat(${itemsPerRow}, ${CARD_W}px)` }}
-            >
+          <div
+  className="programs-grid"
+  style={{
+    gridTemplateColumns: `repeat(${itemsPerRow}, ${CARD_W}px)`,
+    justifyContent: "center",
+  }}
+>
               {visibleItems.map((p, i) => {
                 if (!p || typeof p !== "object") return null;
                 const idx = sliceStart + i;

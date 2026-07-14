@@ -50,11 +50,6 @@
 }
 
 
-.programs-grid-mobile {
-  grid-template-columns: 1fr !important;
-  justify-content: center;
-  justify-items: center;
-}
 
 
 .card-link {
@@ -103,25 +98,7 @@
 }
 
 
-@media (max-width: 1024px), (pointer: coarse) {
-  .programs-grid {
-    grid-template-columns: 1fr !important;
-    justify-content: center;
-    justify-items: center;
-  }
-  .pc-card {
-    width: 260px !important;
-  }
 
-  
-  .programs-grid-wrapper,
-  .programs-list,
-  .programs-visible-window {
-    overflow: visible !important;
-    max-height: none !important;
-    position: static !important; 
-  }
-}
 .image-wrap {
   width: 100%;
   aspect-ratio: 5.239 / 7.884;
@@ -133,4 +110,13 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+
+@media (max-width: 1024px), (pointer: coarse) {
+  .programs-grid-mobile {
+    justify-content: center;
+    padding-inline: 16px;
+    box-sizing: border-box;
+  }
 }
