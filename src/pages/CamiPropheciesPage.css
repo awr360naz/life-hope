@@ -9,7 +9,6 @@
   margin: 8px 0 16px;
 }
 
-/* الشبكة */
 .cami-grid {
   --gap: 12px;
   display: grid;
@@ -18,7 +17,7 @@
   justify-content: center;
 }
 
-/* الكرت */
+
 .cami-card {
   display: flex;
   flex-direction: column;
@@ -39,7 +38,7 @@
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
-/* الصورة 16:9 */
+
 .cami-thumb {
   position: relative;
   aspect-ratio: 16 / 9;
@@ -53,7 +52,7 @@
   display: block;
 }
 
-/* أيقونة تشغيل */
+
 .cami-play {
   position: absolute;
   inset-inline-start: 10px;
@@ -68,7 +67,7 @@
   font-size: 14px;
 }
 
-/* النص */
+
 .cami-body {
   padding: 10px 12px 14px;
 }
@@ -85,12 +84,12 @@
   word-break: break-word;
 }
 
-/* Error */
+
 .cami-error {
   color: #b30000;
 }
 
-/* الترقيم */
+
 .cami-pager {
   display: flex;
   justify-content: space-between;

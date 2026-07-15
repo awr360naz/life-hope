@@ -1,11 +1,9 @@
-/* الحاوية العامة */
 .cats-main {
   max-width: 1200px;
   margin: 2rem auto;
   padding: 0 1rem;
 }
 
-/* حالات */
 .cats-loading,
 .cats-error,
 .cats-empty {
@@ -13,36 +11,28 @@
   text-align: center;
 }
 
-/* منطقة التمرير */
-.cats-scroller {
-  height: 80vh;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  border-radius: 12px;
-  background: transparent;
-  will-change: transform;
-}
 
-/* شبكة البطاقات (المسافات ثابتة مثل كودك) */
+
 .cats-grid {
   display: grid;
-  
   justify-content: space-between;
   padding: 0 4px;
+  gap: 16px;
 }
 
-/* رابط الكرت */
 .card-link {
   text-decoration: none;
   color: inherit;
   display: block;
 }
 
+.category-card {
+  overflow: hidden;
+}
 
-
-/* صورة الكرت */
 .image-wrap {
   width: 100%;
+  height: 391px;
   background: #f4f4f4;
   overflow: hidden;
   border-radius: 10px;
@@ -63,30 +53,30 @@
   font-size: .9rem;
 }
 
-
-/* ============ نسخة الموبايل ============ */
-/* على الشاشات الصغيرة: عمود واحد والكرت بالنص بدون ما نغيّر المقاسات */
 @media (max-width: 768px) {
-  .cats-grid {
-    /* نخليها عمود واحد */
-    grid-template-columns: 1fr !important;
-    /* نخلي العناصر بالنص */
-    justify-content: center;
-    justify-items: center;
-  }
+ .cats-grid {
+  grid-template-columns: repeat(3, 1fr) !important;
+  justify-content: center;
+  justify-items: center;
+}
 
-  .category-card {
-    /* نفس عرض الكرت الأصلي (CARD_W = 260px) */
-    width: 260px !important;
-  }
-   .cats-scroller{
+.category-card {
+  width: 100% !important;
+  max-width: 110px;
+  height: auto !important;
+}
+
+.image-wrap {
+  height: 166px !important; /* يحافظ على نفس النسبة 5.239 : 7.884 */
+}
+
+  .cats-scroller {
     height: auto !important;
     max-height: none !important;
     overflow: visible !important;
   }
 
-  /* مساحة أمان بسيطة قبل الفوتر */
-  .cats-main{
+  .cats-main {
     padding-bottom: 10px;
   }
 }
