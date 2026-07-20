@@ -16,9 +16,9 @@ router.get("/sabbath-lessons", async (_req: Request, res: Response) => {
   const supa = getSupabase();
   const { data, error } = await supa
     .from("sabbath_lessons")
-    .select("slug,title,subtitle,image,sort_num,created_at,published")
+    .select("slug,title,subtitle,image,sort,created_at,published")
     .eq("published", true)
-    .order("sort_num", { ascending: true })
+    .order("sort", { ascending: true })
     .order("created_at", { ascending: false });
 
   if (error) return err(res, 500, error.message);

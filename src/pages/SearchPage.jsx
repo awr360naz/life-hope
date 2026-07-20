@@ -1,258 +1,680 @@
+import React, {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
-import React, { useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
-
+import {
+  Link,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 
 function toYouTubeId(urlOrId = "") {
-  if (!urlOrId) return "";
-  if (/^[a-zA-Z0-9_-]{10,15}$/.test(urlOrId)) return urlOrId;
+  const raw = String(urlOrId || "").trim();
+
+  if (!raw) return "";
+
+  if (/^[a-zA-Z0-9_-]{10,15}$/.test(raw)) {
+    return raw;
+  }
+
   try {
-    const u = new URL(urlOrId);
-    if (u.hostname.includes("youtu.be")) return u.pathname.split("/")[1] || "";
-    if (u.pathname.startsWith("/shorts/"))
-      return u.pathname.split("/")[2] || "";
-    const v = u.searchParams.get("v");
-    if (v) return v;
-    const m = urlOrId.match(
-      /[?&]v=([^&#]+)|youtu\.be\/([^?#/]+)|shorts\/([^?#/]+)/
-    );
-    return m ? m[1] || m[2] || m[3] : "";
+    const url = new URL(raw);
+
+    if (url.hostname.includes("youtu.be")) {
+      return url.pathname.split("/")[1] || "";
+    }
+
+    if (url.pathname.startsWith("/shorts/")) {
+      return url.pathname.split("/")[2] || "";
+    }
+
+    if (url.pathname.startsWith("/embed/")) {
+      return url.pathname.split("/")[2] || "";
+    }
+
+    return url.searchParams.get("v") || "";
   } catch {
-    return "";
+    const match = raw.match(
+      /[?&]v=([^&#]+)|youtu\.be\/([^?#/]+)|shorts\/([^?#/]+)|embed\/([^?#/]+)/
+    );
+
+    return match
+      ? match[1] || match[2] || match[3] || match[4] || ""
+      : "";
   }
 }
 
-export default function SearchPage() {
-  const [sp, setSp] = useSearchParams();
-  const term = (sp.get("q") || "").trim();
+function getTypeLabel(type) {
+  switch (type) {
+    case "article":
+      return "مقال";
 
-  const [q, setQ] = useState(term);
-  const [results, setResults] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [err, setErr] = useState("");
+    case "program":
+      return "برامجنا";
 
-  
-  useEffect(() => {
-    setQ(term);
-  }, [term]);
+    case "short":
+      return "مقاطع قصيرة";
 
-  
-  useEffect(() => {
-    if (!term) {
-      setResults([]);
-      return;
-    }
+    case "cami":
+      return "نبوّات كامي";
 
-    const ctrl = new AbortController();
+    case "video":
+      return "فيديو";
 
-    (async () => {
-      setLoading(true);
-      setErr("");
-      try {
-        const res = await fetch(
-          `/api/search?q=${encodeURIComponent(term)}&limit=50`,
-          {
-            headers: { Accept: "application/json" },
-            signal: ctrl.signal,
-          }
-        );
+    case "quiz":
+      return "اختبار";
 
-        if (!res.ok) {
-          throw new Error("فشل البحث");
-        }
+    case "sabbath-lesson":
+      return "درس السبت";
 
-        const json = await res.json();
-        setResults(Array.isArray(json) ? json : []);
-      } catch (e) {
-        if (e.name === "AbortError") return;
-        setErr(e?.message || "فشل البحث");
-      } finally {
-        setLoading(false);
-      }
-    })();
+    case "sabbath-week":
+      return "أسبوع من دروس السبت";
 
-    return () => ctrl.abort();
-  }, [term]);
+    case "sabbath-item":
+      return "موضوع من دروس السبت";
 
-  function onSubmit(e) {
-    e.preventDefault();
-    const t = q.trim();
-    setSp(t ? { q: t } : {});
+    case "page":
+      return "صفحة";
+
+    default:
+      return "";
+  }
+}
+
+function buildUrl(item) {
+  if (item?.url) {
+    return item.url;
   }
 
-  function getTypeLabel(type) {
-    switch (type) {
-      case "article":
-        return "مقال";
-      case "program":
-        return "برامجنا";
-      case "short":
-        return "مقاطع قصيرة";
-      case "cami":
-        return "نبوّات كامي";
-      case "quiz":
-        return "اختبار";
-      default:
-        return "";
-    }
+  switch (item?.type) {
+    case "article":
+      return item.slug
+        ? `/articles/${item.slug}`
+        : "/articles";
+
+    case "program":
+      return item.slug
+        ? `/programs/${item.slug}`
+        : "/programs";
+
+    case "short":
+      return item.id
+        ? `/shorts?focus=${item.id}`
+        : "/shorts";
+
+    case "cami":
+      return item.id
+        ? `/cami-prophecies?video=${item.id}`
+        : "/cami-prophecies";
+
+    case "quiz":
+      return item.slug
+        ? `/quiz/${item.slug}`
+        : "/quiz";
+
+    case "sabbath-lesson":
+      return item.slug
+        ? `/sabbath-lessons/${item.slug}`
+        : "/sabbath-lessons";
+
+    case "sabbath-week":
+      return item.slug
+        ? `/sabbath-weeks/${item.slug}`
+        : "/sabbath-lessons";
+
+    case "sabbath-item":
+      return item.slug
+        ? `/sabbath-items/${item.slug}`
+        : "/sabbath-lessons";
+
+    default:
+      return "/";
+  }
+}
+
+function getThumbSrc(item) {
+  if (item?.cover_url) {
+    return item.cover_url;
   }
 
-  function buildUrl(it) {
-    if (it.url) return it.url; 
+  const raw =
+    item?.youtube_id ||
+    item?._ytid ||
+    item?.youtube_url ||
+    item?.video_url ||
+    item?.short_url ||
+    "";
 
-    switch (it.type) {
-      case "article":
-        return it.slug ? `/articles/${it.slug}` : `/articles/${it.id}`;
-      case "program":
-        return it.slug ? `/programs/${it.slug}` : `/programs/${it.id}`;
-      case "short":
-        
-        return it.id ? `/shorts?focus=${it.id}` : "/shorts";
-      case "cami":
-        return it.id
-          ? `/cami-prophecies?video=${it.id}`
-          : "/cami-prophecies";
-      case "quiz":
-        return it.slug ? `/quiz/${it.slug}` : `/quiz/${it.id}`;
-      default:
-        return "#";
-    }
+  const youtubeId = toYouTubeId(raw);
+
+  if (youtubeId) {
+    return `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`;
   }
-
-function getThumbSrc(it) {
-  const isShortLike = it.type === "short" || it.type === "cami";
-
-  if (isShortLike) {
-    
-    const raw =
-      it.youtube_id ||
-      it._ytid ||
-      it.youtube_url ||
-      it.url ||
-      it.video_url ||
-      it.short_url ||
-      "";
-
-    const yid = toYouTubeId(String(raw));
-    if (yid) {
-      return `https://i.ytimg.com/vi/${yid}/hqdefault.jpg`;
-    }
-  }
-
- 
-  if (it.cover_url) return it.cover_url;
 
   return null;
 }
 
+export default function SearchPage() {
+  const [searchParams, setSearchParams] =
+    useSearchParams();
 
+  const navigate = useNavigate();
+
+  const termFromUrl = (
+    searchParams.get("q") || ""
+  ).trim();
+
+  const [q, setQ] = useState(termFromUrl);
+  const [searchedTerm, setSearchedTerm] =
+    useState(termFromUrl);
+
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] =
+    useState("");
+
+  const [inputFocused, setInputFocused] =
+    useState(false);
+
+  const inputWrapperRef = useRef(null);
+
+  useEffect(() => {
+    setQ(termFromUrl);
+    setSearchedTerm(termFromUrl);
+  }, [termFromUrl]);
+
+  /**
+   * البحث التلقائي بعد 300ms من توقف الكتابة.
+   */
+  useEffect(() => {
+    const value = q.trim();
+
+    if (!value) {
+      setResults([]);
+      setSearchedTerm("");
+      setLoading(false);
+      setErrorMessage("");
+
+      setSearchParams({}, { replace: true });
+
+      return;
+    }
+
+    const controller = new AbortController();
+
+    const timer = window.setTimeout(async () => {
+      setLoading(true);
+      setErrorMessage("");
+
+      try {
+        const response = await fetch(
+          `/api/search?q=${encodeURIComponent(
+            value
+          )}&limit=50`,
+          {
+            headers: {
+              Accept: "application/json",
+            },
+            signal: controller.signal,
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("فشل البحث");
+        }
+
+        const json = await response.json();
+
+        setResults(
+          Array.isArray(json) ? json : []
+        );
+
+        setSearchedTerm(value);
+
+        /**
+         * نحدث الرابط بدون إضافة history جديدة
+         * مع كل حرف.
+         */
+        setSearchParams(
+          { q: value },
+          { replace: true }
+        );
+      } catch (error) {
+        if (error?.name === "AbortError") {
+          return;
+        }
+
+        setErrorMessage(
+          error?.message || "فشل البحث"
+        );
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
+      }
+    }, 300);
+
+    return () => {
+      window.clearTimeout(timer);
+      controller.abort();
+    };
+  }, [q, setSearchParams]);
+
+  /**
+   * إغلاق الاقتراحات عند الضغط خارج مربع البحث.
+   */
+  useEffect(() => {
+    function onDocumentMouseDown(event) {
+      if (
+        inputWrapperRef.current &&
+        !inputWrapperRef.current.contains(
+          event.target
+        )
+      ) {
+        setInputFocused(false);
+      }
+    }
+
+    document.addEventListener(
+      "mousedown",
+      onDocumentMouseDown
+    );
+
+    return () => {
+      document.removeEventListener(
+        "mousedown",
+        onDocumentMouseDown
+      );
+    };
+  }, []);
+
+  const suggestions = useMemo(
+    () => results.slice(0, 8),
+    [results]
+  );
+
+  const showSuggestions =
+    inputFocused &&
+    q.trim().length > 0 &&
+    (loading || suggestions.length > 0);
+
+  function onSubmit(event) {
+    event.preventDefault();
+
+    const value = q.trim();
+
+    if (!value) {
+      setSearchParams({});
+      setResults([]);
+      return;
+    }
+
+    setInputFocused(false);
+
+    setSearchParams({ q: value });
+
+    /**
+     * إبقاء المستخدم في صفحة البحث.
+     */
+    navigate(
+      `/search?q=${encodeURIComponent(value)}`
+    );
+  }
+
+  function openSuggestion(item) {
+    setInputFocused(false);
+
+    navigate(buildUrl(item));
+  }
 
   return (
-    <div className="search-page" dir="rtl" style={{ padding: 16 }}>
-      <h1 style={{ marginBottom: 12 }}>بحث</h1>
+    <div
+      className="search-page"
+      dir="rtl"
+      style={{
+        padding: 16,
+        maxWidth: 1200,
+        margin: "0 auto",
+      }}
+    >
+      <h1 style={{ marginBottom: 12 }}>
+        بحث
+      </h1>
 
-      <form
-        onSubmit={onSubmit}
-        style={{ display: "flex", gap: 8, marginBottom: 16 }}
+      <div
+        ref={inputWrapperRef}
+        style={{
+          position: "relative",
+          marginBottom: 16,
+          zIndex: 20,
+        }}
       >
-        <input
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder="اكتب كلمة البحث…"
+        <form
+          onSubmit={onSubmit}
           style={{
-            flex: 1,
-            padding: "10px 12px",
-            borderRadius: 8,
-            border: "1px solid #ddd",
-          }}
-        />
-        <button
-          type="submit"
-          style={{
-            padding: "8px 14px",
-            borderRadius: 8,
-            border: "none",
-            background: "#3b82f6",
-            color: "#fff",
-            fontWeight: 600,
-            cursor: "pointer",
             display: "flex",
-            alignItems: "center",
-            gap: 6,
+            gap: 8,
           }}
         >
-          <span style={{ fontSize: 16 }}>🔍</span>
-          <span>ابحث</span>
-        </button>
-      </form>
+          <input
+            value={q}
+            onChange={(event) =>
+              setQ(event.target.value)
+            }
+            onFocus={() =>
+              setInputFocused(true)
+            }
+            placeholder="اكتب كلمة البحث…"
+            autoComplete="off"
+            style={{
+              flex: 1,
+              minWidth: 0,
+              padding: "11px 12px",
+              borderRadius: 8,
+              border: "1px solid #ddd",
+              outline: "none",
+              fontSize: 16,
+            }}
+          />
 
-      {loading && <div>جاري التحميل…</div>}
-      {err && <div style={{ color: "crimson" }}>خطأ: {err}</div>}
+          <button
+            type="submit"
+            style={{
+              padding: "8px 14px",
+              borderRadius: 8,
+              border: "none",
+              background: "#3b82f6",
+              color: "#fff",
+              fontWeight: 600,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              whiteSpace: "nowrap",
+            }}
+          >
+            <span style={{ fontSize: 16 }}>
+              🔍
+            </span>
 
-      {!loading && !err && term && results.length === 0 && (
+            <span>ابحث</span>
+          </button>
+        </form>
+
+        {showSuggestions && (
+          <div
+            style={{
+              position: "absolute",
+              top: "calc(100% + 6px)",
+              right: 0,
+              left: 0,
+              border: "1px solid #e5e7eb",
+              borderRadius: 10,
+              background: "#fff",
+              boxShadow:
+                "0 12px 30px rgba(0,0,0,0.12)",
+              overflow: "hidden",
+              maxHeight: 430,
+              overflowY: "auto",
+            }}
+          >
+            {loading && (
+              <div
+                style={{
+                  padding: 14,
+                  color: "#666",
+                }}
+              >
+                جاري البحث…
+              </div>
+            )}
+
+            {!loading &&
+              suggestions.map((item) => {
+                const title =
+                  item.title || "";
+
+                const label =
+                  item.category ||
+                  getTypeLabel(item.type);
+
+                const thumbSrc =
+                  getThumbSrc(item);
+
+                return (
+                  <button
+                    type="button"
+                    key={`suggestion-${item.type}-${item.source}-${item.id}-${item.slug || ""}`}
+                    onClick={() =>
+                      openSuggestion(item)
+                    }
+                    style={{
+                      width: "100%",
+                      border: "none",
+                      borderBottom:
+                        "1px solid #f1f1f1",
+                      background: "#fff",
+                      padding: 10,
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 10,
+                      textAlign: "right",
+                    }}
+                  >
+              <div
+  style={{
+    width: 64,
+    minHeight: 45,
+    maxHeight: 75,
+    borderRadius: 7,
+    overflow: "hidden",
+    flexShrink: 0,
+    background: "#f3f4f6",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  }}
+>
+                      {thumbSrc ? (
+                        <img
+                          src={thumbSrc}
+                          alt=""
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit:
+                              "cover",
+                            display: "block",
+                          }}
+                        />
+                      ) : (
+                        <div
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            display: "grid",
+                            placeItems:
+                              "center",
+                            fontSize: 19,
+                          }}
+                        >
+                          🔎
+                        </div>
+                      )}
+                    </div>
+
+                    <div
+                      style={{
+                        minWidth: 0,
+                        flex: 1,
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontWeight: 700,
+                          fontSize: 14,
+                          overflow: "hidden",
+                          textOverflow:
+                            "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {title}
+                      </div>
+
+                      <div
+                        style={{
+                          fontSize: 12,
+                          opacity: 0.65,
+                          marginTop: 3,
+                        }}
+                      >
+                        {label}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+
+            {!loading &&
+              q.trim() &&
+              suggestions.length === 0 && (
+                <div
+                  style={{
+                    padding: 14,
+                    color: "#666",
+                  }}
+                >
+                  لا توجد اقتراحات.
+                </div>
+              )}
+          </div>
+        )}
+      </div>
+
+      {loading && (
         <div style={{ marginBottom: 12 }}>
-          لا توجد نتائج لـ “{term}”. جرّب جزءًا من الكلمة أو كلمة من العنوان.
+          جاري التحميل…
         </div>
       )}
 
-      {!loading && !err && (
+      {errorMessage && (
+        <div
+          style={{
+            color: "crimson",
+            marginBottom: 12,
+          }}
+        >
+          خطأ: {errorMessage}
+        </div>
+      )}
+
+      {!loading &&
+        !errorMessage &&
+        searchedTerm &&
+        results.length === 0 && (
+          <div style={{ marginBottom: 12 }}>
+            لا توجد نتائج لـ “
+            {searchedTerm}”. جرّب جزءًا من
+            الكلمة أو كلمة من العنوان.
+          </div>
+        )}
+
+      {!errorMessage && (
         <>
-          {term && (
-            <div style={{ marginBottom: 8 }}>النتائج: {results.length}</div>
+          {searchedTerm && (
+            <div
+              style={{
+                marginBottom: 8,
+              }}
+            >
+              النتائج: {results.length}
+            </div>
           )}
 
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
+              gridTemplateColumns:
+                "repeat(auto-fill, minmax(240px, 1fr))",
               gap: 12,
             }}
           >
-            {results.map((it) => {
-              const to = buildUrl(it);
-              const label = it.category || getTypeLabel(it.type);
-              const title = it.title || "";
-              const thumbSrc = getThumbSrc(it);
+            {results.map((item) => {
+              const to = buildUrl(item);
+
+              const label =
+                item.category ||
+                getTypeLabel(item.type);
+
+              const title =
+                item.title || "";
+
+              const thumbSrc =
+                getThumbSrc(item);
 
               return (
                 <Link
-                  key={`${it.type}-${it.id}-${it.slug || ""}`}
+                  key={`${item.type}-${item.source}-${item.id}-${item.slug || ""}`}
                   to={to}
-                  style={{ textDecoration: "none", color: "inherit" }}
+                  style={{
+                    textDecoration: "none",
+                    color: "inherit",
+                  }}
                 >
-                  <div
+                  <article
                     style={{
-                      border: "1px solid #eee",
+                      height: "100%",
+                      border:
+                        "1px solid #eee",
                       borderRadius: 12,
                       overflow: "hidden",
                       background: "#fff",
+                      transition:
+                        "transform 0.15s ease, box-shadow 0.15s ease",
                     }}
                   >
-                  
-                    <div
-                      style={{
-                        width: "100%",
-                        aspectRatio: "16/9",
-                        overflow: "hidden",
-                        background: "#f7f7f7",
-                      }}
-                    >
-                      {thumbSrc && (
-                        <img
-                          src={thumbSrc}
-                          alt={title || ""}
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                            display: "block",
-                          }}
-                          loading="lazy"
-                        />
-                      )}
-                    </div>
+             <div
+  style={{
+    width: "100%",
+    minHeight: 140,
+    maxHeight: 360,
+    overflow: "hidden",
+    background: "#f7f7f7",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  }}
+>
+  {thumbSrc ? (
+    <img
+      src={thumbSrc}
+      alt={title}
+      style={{
+        width: "100%",
+        height: "auto",
+        maxHeight: 360,
+        objectFit: "contain",
+        display: "block",
+      }}
+      loading="lazy"
+    />
+  ) : (
+    <span
+      style={{
+        fontSize: 32,
+        opacity: 0.45,
+      }}
+    >
+      🔎
+    </span>
+  )}
+</div>
 
-                  
                     <div style={{ padding: 12 }}>
                       <div
                         style={{
@@ -273,8 +695,27 @@ function getThumbSrc(it) {
                       >
                         {title}
                       </div>
+
+                      {item.snippet && (
+                        <div
+                          style={{
+                            fontSize: 13,
+                            lineHeight: 1.6,
+                            opacity: 0.72,
+                            display:
+                              "-webkit-box",
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient:
+                              "vertical",
+                            overflow:
+                              "hidden",
+                          }}
+                        >
+                          {item.snippet}
+                        </div>
+                      )}
                     </div>
-                  </div>
+                  </article>
                 </Link>
               );
             })}

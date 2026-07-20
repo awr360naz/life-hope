@@ -1,399 +1,963 @@
-
-import { Router, Request, Response } from "express";
+import { Router, type Request, type Response } from "express";
 import { getSupabase } from "../supabaseClient.js";
 
 const router = Router();
 
+/* =========================================================
+   Types
+========================================================= */
+
+type SearchResultType =
+  | "article"
+  | "program"
+  | "short"
+  | "cami"
+  | "video"
+  | "quiz"
+  | "sabbath-lesson"
+  | "sabbath-week"
+  | "sabbath-item"
+  | "page";
+
+type SearchSource = {
+  table: string;
+  fields: string[];
+  type: SearchResultType;
+  category: string;
+  basePath: string;
+
+  /**
+   * true:
+   * نضيف published = true
+   *
+   * false:
+   * لا نفحص published
+   */
+  published?: boolean;
+
+  /**
+   * طريقة بناء الرابط:
+   * slug = /page/slug
+   * query-video = /page?video=id
+   * query-focus = /page?focus=id
+   * base = /page
+   */
+  urlMode?: "slug" | "query-video" | "query-focus" | "base";
+};
+
+/* =========================================================
+   Arabic normalization
+========================================================= */
 
 const AR_TATWEEL = /\u0640/g;
 const AR_DIACRITICS = /[\u064B-\u065F\u0670]/g;
-const norm = (s: string) =>
-  (s || "")
+
+function normalizeArabic(value: string): string {
+  return String(value || "")
     .replace(AR_TATWEEL, "")
     .replace(AR_DIACRITICS, "")
     .replace(/[أإآ]/g, "ا")
-    .replace(/ؤ|ئ/g, "ء")
+    .replace(/[ؤئ]/g, "ء")
     .replace(/ة/g, "ه")
     .replace(/ى/g, "ي")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+}
+
+function stripHtml(value: string): string {
+  return String(value || "")
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/\s+/g, " ")
     .trim();
+}
 
+/**
+ * نحذف الرموز التي قد تكسر صيغة PostgREST الخاصة بـ .or()
+ */
+function safeSearchValue(value: string): string {
+  return String(value || "")
+    .replace(/[(),]/g, " ")
+    .replace(/[%_]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
 
-const stripHtml = (s: string) =>
-  (s || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+function createSearchVariants(rawQuery: string): string[] {
+  const raw = safeSearchValue(rawQuery);
+  if (!raw) return [];
 
+  const variants = new Set<string>();
 
-const coverFrom = (r: any) => {
-  const direct =
-    r?.cover_url ??
-    r?.thumbnail_url ??
-    r?.thumb_url ??
-    r?.image_url ??
-    r?.poster_url ??
-    r?.banner_url ??
-    r?.img ??
-    r?.image ??
-    r?.preview_url ??
-    r?.preview ??
-    r?.thumbnail ??
-    r?.thumb ??
-    r?.poster ??
-    null;
+  variants.add(raw);
+  variants.add(normalizeArabic(raw));
 
-  if (direct) return direct;
+  variants.add(raw.replace(/[أإآ]/g, "ا"));
+  variants.add(raw.replace(/ة/g, "ه"));
+  variants.add(raw.replace(/ه/g, "ة"));
+  variants.add(raw.replace(/ى/g, "ي"));
 
- 
-  for (const v of Object.values(r || {})) {
-    if (typeof v !== "string") continue;
-    const s = v.trim();
-    if (!s) continue;
-    if (
-      s.startsWith("http") &&
-      (s.includes(".jpg") ||
-        s.includes(".jpeg") ||
-        s.includes(".png") ||
-        s.includes(".webp") ||
-        s.includes("supabase.co/storage"))
-    ) {
-      return s;
-    }
-  }
-  return null;
-};
+  return Array.from(variants)
+    .map((value) => value.trim())
+    .filter(Boolean)
+    .slice(0, 5);
+}
 
-type ResultType = "article" | "program" | "short" | "cami" | "quiz";
+/* =========================================================
+   YouTube + images
+========================================================= */
 
-function extractYouTubeId(raw: string = ""): string {
+function extractYouTubeId(rawValue: string = ""): string {
+  const raw = String(rawValue || "").trim();
+
   if (!raw) return "";
- 
-  if (/^[a-zA-Z0-9_-]{10,15}$/.test(raw)) return raw;
+
+  if (/^[a-zA-Z0-9_-]{10,15}$/.test(raw)) {
+    return raw;
+  }
 
   try {
-    const u = new URL(raw);
-    if (u.hostname.includes("youtu.be")) {
-      return u.pathname.split("/")[1] || "";
+    const url = new URL(raw);
+
+    if (url.hostname.includes("youtu.be")) {
+      return url.pathname.split("/")[1] || "";
     }
-    if (u.pathname.startsWith("/shorts/")) {
-      return u.pathname.split("/")[2] || "";
+
+    if (url.pathname.startsWith("/shorts/")) {
+      return url.pathname.split("/")[2] || "";
     }
-    const v = u.searchParams.get("v");
-    if (v) return v;
+
+    if (url.pathname.startsWith("/embed/")) {
+      return url.pathname.split("/")[2] || "";
+    }
+
+    const videoId = url.searchParams.get("v");
+
+    if (videoId) {
+      return videoId;
+    }
   } catch {
-    
+    // القيمة قد تكون رابطًا ناقصًا أو ID
   }
 
-  const m = raw.match(
-    /[?&]v=([^&#]+)|youtu\.be\/([^?#/]+)|shorts\/([^?#/]+)/
+  const match = raw.match(
+    /[?&]v=([^&#]+)|youtu\.be\/([^?#/]+)|shorts\/([^?#/]+)|embed\/([^?#/]+)/
   );
-  return m ? (m[1] || m[2] || m[3]) : "";
+
+  return match
+    ? match[1] || match[2] || match[3] || match[4] || ""
+    : "";
 }
-function youtubeIdFromRecord(r: any): string {
-  if (!r) return "";
-  
-  for (const v of Object.values(r)) {
-    if (typeof v !== "string") continue;
-    if (!v) continue;
-    if (v.includes("youtube.com") || v.includes("youtu.be") || v.includes("shorts/")) {
-      const id = extractYouTubeId(v);
-      if (id) return id;
+
+function youtubeIdFromRecord(record: Record<string, any>): string {
+  const directValues = [
+    record?.youtube_id,
+    record?.youtube_url,
+    record?.video_url,
+    record?.short_url,
+    record?.thumb_url,
+    record?.url,
+  ];
+
+  for (const value of directValues) {
+    if (typeof value !== "string" || !value.trim()) continue;
+
+    const videoId = extractYouTubeId(value);
+
+    if (videoId) {
+      return videoId;
     }
   }
+
+  for (const value of Object.values(record || {})) {
+    if (typeof value !== "string") continue;
+
+    if (
+      !value.includes("youtube.com") &&
+      !value.includes("youtu.be") &&
+      !value.includes("/shorts/")
+    ) {
+      continue;
+    }
+
+    const videoId = extractYouTubeId(value);
+
+    if (videoId) {
+      return videoId;
+    }
+  }
+
   return "";
 }
-function expandSearchPatterns(rawQ: string): string[] {
-  const variants = new Set<string>();
-  const trimmed = rawQ.trim();
-  if (!trimmed) return [];
 
+function coverFromRecord(record: Record<string, any>): string | null {
+  const possibleValues = [
+    record?.cover_url,
+    record?.thumbnail_url,
+    record?.thumb_url,
+    record?.image_url,
+    record?.poster_url,
+    record?.banner_url,
+    record?.preview_url,
+    record?.image,
+    record?.img,
+    record?.thumbnail,
+    record?.thumb,
+    record?.poster,
+  ];
 
-  const qNorm = norm(trimmed);
-  variants.add(trimmed);
-  variants.add(qNorm);
+  for (const value of possibleValues) {
+    if (typeof value !== "string" || !value.trim()) {
+      continue;
+    }
 
-  
-  const taToHa = trimmed.replace(/ة(\s|$)/g, "ه$1");
-  variants.add(taToHa);
-  const haToTa = trimmed.replace(/ه(\s|$)/g, "ة$1");
-  variants.add(haToTa);
+    const cleanValue = value.trim();
 
-  
-  variants.add(trimmed.replace(/[أإآ]/g, "ا"));
+    // إذا القيمة رابط يوتيوب، حوّلها إلى رابط صورة يوتيوب
+    const youtubeId = extractYouTubeId(cleanValue);
 
+    if (youtubeId) {
+      return `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`;
+    }
 
-  variants.add(trimmed.replace(/\bا/g, "أ"));
-
- 
-  variants.add(trimmed.replace(/ى/g, "ي"));
-  variants.add(trimmed.replace(/ي/g, "ى"));
-
-
-  const final = Array.from(variants)
-    .map((s) => s.replace(/\s+/g, " ").trim())
-    .filter(Boolean);
-
-
-  return Array.from(new Set(final)).map((s) => `%${s}%`);
-}
-
-
-router.get("/search", async (req: Request, res: Response) => {
-  const supabase = getSupabase();
-  const rawQ = (req.query.q ?? "").toString().trim();
-  const limit = Math.min(
-    parseInt((req.query.limit ?? "20") as string, 10) || 20,
-    50
-  );
-  const debug = String(req.query.debug || "") === "1";
-
-  const qNorm = norm(rawQ);
-  const pats = expandSearchPatterns(rawQ);
-
-
-  const dbg: any = { q: rawQ, pats, steps: [], errors: [] };
-
-  if (!rawQ || !supabase) {
-    if (debug)
-      return res.json({
-        ...dbg,
-        note: "no query or no supabase",
-        results: [],
-      });
-    return res.json([]);
+    // إذا رابط صورة عادي، رجّعه كما هو
+    return cleanValue;
   }
 
-  const mapRecord = (r: any, type: ResultType) => {
-  
- let title = r?.title ?? "";
-if (!title && type === "program") {
-  title =
-    r?.name ||
-    r?.name_ar ||
-    r?.title_ar ||
-    r?.program_name ||
-    r?.program_title ||
+  // ابحث عن رابط يوتيوب في باقي بيانات السجل
+  const youtubeId = youtubeIdFromRecord(record);
+
+  if (youtubeId) {
+    return `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`;
+  }
+
+  return null;
+}
+function mapRecord(
+  record: Record<string, any>,
+  source: SearchSource
+): Record<string, any> {
+  const youtubeId = youtubeIdFromRecord(record);
+  const coverUrl = coverFromRecord(record);
+
+  let title = recordTitle(record);
+
+  if (!title && source.type === "sabbath-week") {
+    title = "أسبوع من دروس السبت";
+  }
+
+  return {
+    id:
+      record?.id ??
+      record?.slug ??
+      `${source.table}-${Math.random().toString(36).slice(2)}`,
+
+    type: source.type,
+    category: source.category,
+    title,
+    slug: record?.slug ?? null,
+    snippet: recordSnippet(record),
+    cover_url: coverUrl,
+    youtube_id: youtubeId || null,
+
+    created_at:
+      record?.created_at ??
+      record?.published_at ??
+      record?.updated_at ??
+      null,
+
+    url: buildResultUrl(source, record),
+    source: source.table,
+  };
+}
+
+/* =========================================================
+   Search sources
+========================================================= */
+
+const SEARCH_SOURCES: SearchSource[] = [
+  {
+    table: "programs_catalog",
+    fields: [
+      "title",
+      "name",
+      "name_ar",
+      "title_ar",
+      "program_name",
+      "program_title",
+    ],
+    type: "program",
+    category: "برامجنا",
+    basePath: "/programs",
+    published: false,
+    urlMode: "slug",
+  },
+
+  {
+    table: "cami_videos",
+    fields: ["title"],
+    type: "cami",
+    category: "نبوّات كامي",
+    basePath: "/cami-prophecies",
+    published: true,
+    urlMode: "query-video",
+  },
+
+  {
+    table: "mraya_alroh",
+    fields: ["title"],
+    type: "video",
+    category: "مرايا الروح",
+    basePath: "/mraya-alroh",
+    published: true,
+    urlMode: "query-video",
+  },
+
+  {
+    table: "al7ya_welamal",
+    fields: ["title"],
+    type: "video",
+    category: "الحياة والأمل",
+    basePath: "/al7ya_welamal",
+    published: true,
+    urlMode: "query-video",
+  },
+
+  {
+    table: "wamdat_raw7ey",
+    fields: ["title"],
+    type: "video",
+    category: "ومضات روحية",
+    basePath: "/wamdat_raw7ye",
+    published: true,
+    urlMode: "query-video",
+  },
+
+  {
+    table: "short_segments",
+    fields: ["title"],
+    type: "short",
+    category: "مقاطع قصيرة",
+    basePath: "/shorts",
+    published: true,
+    urlMode: "query-focus",
+  },
+
+{
+  table: "sabbath_shorts",
+  fields: ["title"],
+  type: "video",
+  category: "فقرات السبت القصيرة",
+  basePath: "/sabbath-shorts",
+  published: true,
+  urlMode: "query-focus",
+},
+
+{
+  table: "prophecies",
+  fields: ["title"],
+  type: "video",
+  category: "النبوات",
+  basePath: "/prophecies",
+  published: true,
+  urlMode: "query-focus",
+},
+
+  {
+    table: "seha_afdal",
+    fields: ["title"],
+    type: "video",
+    category: "صحة أفضل",
+    basePath: "/seha-afdal",
+    published: true,
+    urlMode: "query-video",
+  },
+
+  {
+    table: "kol_shahr_4_7kayat",
+    fields: ["title"],
+    type: "video",
+    category: "كل شهر أربع حكايات",
+    basePath: "/kol-shahr-4-7kayat",
+    published: true,
+    urlMode: "query-video",
+  },
+
+  {
+    table: "sbah_alkher",
+    fields: ["title"],
+    type: "video",
+    category: "صباح الخير",
+    basePath: "/sbah-alkher",
+    published: true,
+    urlMode: "query-video",
+  },
+
+  {
+    table: "tht_saqf_wahd",
+    fields: ["title"],
+    type: "video",
+    category: "تحت سقف واحد",
+    basePath: "/tht-saqf-wahd",
+    published: true,
+    urlMode: "query-video",
+  },
+
+  {
+    table: "articles",
+    fields: ["title"],
+    type: "article",
+    category: "مقال",
+    basePath: "/articles",
+    published: true,
+    urlMode: "slug",
+  },
+
+  {
+    table: "quizzes",
+    fields: ["title"],
+    type: "quiz",
+    category: "اختبار",
+    basePath: "/quiz",
+    published: true,
+    urlMode: "slug",
+  },
+
+  {
+    table: "sabbath_lessons",
+    fields: ["title"],
+    type: "sabbath-lesson",
+    category: "درس السبت",
+    basePath: "/sabbath-lessons",
+    published: true,
+    urlMode: "slug",
+  },
+
+  {
+    table: "sabbath_weeks",
+    fields: ["subtitle"],
+    type: "sabbath-week",
+    category: "أسبوع من دروس السبت",
+    basePath: "/sabbath-weeks",
+    published: true,
+    urlMode: "slug",
+  },
+
+  {
+    table: "sabbath_items",
+    fields: ["title"],
+    type: "sabbath-item",
+    category: "موضوع من دروس السبت",
+    basePath: "/sabbath-items",
+    published: true,
+    urlMode: "slug",
+  },
+];
+
+/* =========================================================
+   Static pages
+========================================================= */
+
+const STATIC_PAGES = [
+  {
+    id: "page-programs",
+    title: "برامجنا",
+    category: "صفحة",
+    url: "/programs",
+    aliases: ["برامج", "برنامج", "برامجنا"],
+  },
+  {
+    id: "page-cami",
+    title: "نبوّات كامي",
+    category: "صفحة",
+    url: "/cami-prophecies",
+    aliases: ["كامي", "نبوات كامي", "نبوّات كامي"],
+  },
+  {
+    id: "page-mraya",
+    title: "مرايا الروح",
+    category: "صفحة",
+    url: "/mraya-alroh",
+    aliases: ["مرايا الروح", "مرايا", "الروح"],
+  },
+  {
+    id: "page-life-hope",
+    title: "الحياة والأمل",
+    category: "صفحة",
+    url: "/al7ya_welamal",
+    aliases: ["الحياة والامل", "الحياة والأمل", "الامل"],
+  },
+  {
+    id: "page-wamdat",
+    title: "ومضات روحية",
+    category: "صفحة",
+    url: "/wamdat_raw7ye",
+    aliases: ["ومضات", "ومضات روحية", "ومضة روحية"],
+  },
+  {
+    id: "page-shorts",
+    title: "مقاطع قصيرة",
+    category: "صفحة",
+    url: "/shorts",
+    aliases: ["مقاطع قصيرة", "فقرات قصيرة", "شورتس"],
+  },
+  {
+    id: "page-sabbath-shorts",
+    title: "فقرات السبت القصيرة",
+    category: "صفحة",
+    url: "/sabbath-shorts",
+    aliases: ["السبت القصيرة", "فقرات السبت", "سبت"],
+  },
+  {
+    id: "page-prophecies",
+    title: "النبوات",
+    category: "صفحة",
+    url: "/prophecies",
+    aliases: ["نبوات", "النبوات", "نبوءات"],
+  },
+  {
+    id: "page-health",
+    title: "صحة أفضل",
+    category: "صفحة",
+    url: "/seha-afdal",
+    aliases: ["صحة", "صحه", "صحة أفضل", "صحه افضل"],
+  },
+  {
+    id: "page-stories",
+    title: "كل شهر أربع حكايات",
+    category: "صفحة",
+    url: "/kol-shahr-4-7kayat",
+    aliases: ["حكايات", "اربع حكايات", "أربع حكايات"],
+  },
+  {
+    id: "page-morning",
+    title: "صباح الخير",
+    category: "صفحة",
+    url: "/sbah-alkher",
+    aliases: ["صباح الخير", "صباح"],
+  },
+  {
+    id: "page-one-roof",
+    title: "تحت سقف واحد",
+    category: "صفحة",
+    url: "/tht-saqf-wahd",
+    aliases: ["تحت سقف واحد", "سقف واحد"],
+  },
+  {
+    id: "page-articles",
+    title: "المقالات",
+    category: "صفحة",
+    url: "/articles",
+    aliases: ["مقالات", "المقالات", "مقال"],
+  },
+  {
+    id: "page-quizzes",
+    title: "اختبر معلوماتك",
+    category: "صفحة",
+    url: "/quiz",
+    aliases: ["اختبار", "اختبارات", "كويز", "اختبر معلوماتك"],
+  },
+  {
+    id: "page-health-quizzes",
+    title: "اختبارات الصحة",
+    category: "صفحة",
+    url: "/quizzes/health",
+    aliases: ["اختبارات الصحة", "اختبار صحة", "كويز صحة"],
+  },
+  {
+    id: "page-christian-quizzes",
+    title: "اختبارات مسيحية",
+    category: "صفحة",
+    url: "/quizzes/christian",
+    aliases: ["اختبارات مسيحية", "اختبار مسيحي", "كويز مسيحي"],
+  },
+  {
+    id: "page-prayer",
+    title: "اطلب صلاة",
+    category: "طلب صلاة",
+    url: "/prayer-request",
+    aliases: [
+      "طلب صلاة",
+      "اطلب صلاة",
+      "صلاة",
+      "صلاه",
+      "صلولي",
+      "صلوا لي",
+      "صليلي",
+      "صلّيلي",
+      "بحاجة لصلاة",
+      "احتاج صلاة",
+      "بدي صلاة",
+      "اريد صلاة",
+      "أريد صلاة",
+    ],
+  },
+  {
+    id: "page-sabbath-lessons",
+    title: "دروس السبت",
+    category: "صفحة",
+    url: "/sabbath-lessons",
+    aliases: [
+      "دروس السبت",
+      "درس السبت",
+      "مدرسة السبت",
+      "مدرسه السبت",
+    ],
+  },
+];
+
+/* =========================================================
+   Helpers
+========================================================= */
+
+function recordTitle(record: Record<string, any>): string {
+  return String(
+    record?.title ??
+      record?.name ??
+      record?.name_ar ??
+      record?.title_ar ??
+      record?.program_name ??
+      record?.program_title ??
+      record?.subtitle ??
+      record?.note ??
+      ""
+  ).trim();
+}
+
+function recordSnippet(record: Record<string, any>): string {
+  const raw =
+    record?.excerpt ??
+    record?.description ??
+    record?.subtitle ??
+    record?.short_desc ??
+    record?.long_desc ??
+    record?.note ??
+    record?.content ??
+    record?.content_html ??
     "";
+
+  return stripHtml(String(raw)).slice(0, 170);
+}
+
+function buildResultUrl(
+  source: SearchSource,
+  record: Record<string, any>
+): string {
+  const id = record?.id;
+  const slug = record?.slug;
+
+  switch (source.urlMode) {
+    case "slug":
+      if (slug) {
+        return `${source.basePath}/${encodeURIComponent(String(slug))}`;
+      }
+
+      if (id) {
+        return `${source.basePath}/${encodeURIComponent(String(id))}`;
+      }
+
+      return source.basePath;
+
+    case "query-video": {
+      if (
+        source.table === "sabbath_shorts" ||
+        source.table === "prophecies"
+      ) {
+        const youtubeId = youtubeIdFromRecord(record);
+
+        if (youtubeId) {
+          return `${source.basePath}?video=${encodeURIComponent(youtubeId)}`;
+        }
+      }
+
+      if (id !== undefined && id !== null) {
+        return `${source.basePath}?video=${encodeURIComponent(String(id))}`;
+      }
+
+      return source.basePath;
+    }
+
+  case "query-focus":
+  if (id !== undefined && id !== null) {
+    return `${source.basePath}?focus=${encodeURIComponent(String(id))}`;
+  }
+
+  return source.basePath;
+
+    case "base":
+    default:
+      return source.basePath;
+  }
 }
 
 
-    const rawText =
-      (typeof r?.excerpt === "string" && r.excerpt) ||
-      (typeof r?.description === "string" && r.description) ||
-      (typeof r?.content_html === "string" && stripHtml(r.content_html)) ||
-      (typeof r?.content === "string" && stripHtml(r.content)) ||
-      "";
+function deduplicateResults(results: Record<string, any>[]) {
+  const seen = new Set<string>();
 
-    let snippet = rawText.slice(0, 160);
+  return results.filter((result) => {
+    const key = [
+      result.type,
+      result.source,
+      result.id ?? "",
+      result.slug ?? "",
+      result.url ?? "",
+    ].join("|");
 
-    if (title && snippet.startsWith(title)) {
-      snippet = snippet.slice(title.length).trim();
+    if (seen.has(key)) {
+      return false;
     }
 
+    seen.add(key);
+    return true;
+  });
+}
 
-    const base: any = {
-      ...r,
-      id: r?.id ?? null,
-      type,
-      slug: r?.slug ?? null,
-      title,
-      snippet,
-      cover_url: coverFrom(r),
-      created_at: r?.created_at ?? r?.published_at ?? null,
-      url: null as string | null,
-      category: "",
-    };
+function matchStaticPages(query: string) {
+  const normalizedQuery = normalizeArabic(query);
 
+  if (!normalizedQuery) return [];
 
-    if (type === "short" || type === "cami") {
-      if (!base.youtube_id) {
-        const yRaw =
-          r?.youtube_id ||
-          r?.youtube_url ||
-          r?.url ||
-          r?.video_url ||
-          r?.short_url ||
-          r?.id ||
-          r?.slug ||
-          "";
-        let yid = extractYouTubeId(String(yRaw));
-        if (!yid) {
-         
-          yid = youtubeIdFromRecord(r);
-        }
-        if (yid) {
-          base.youtube_id = yid;
-        }
-      }
+  return STATIC_PAGES.filter((page) => {
+    const values = [page.title, ...page.aliases];
 
-      if (!base.cover_url && base.youtube_id) {
-        base.cover_url = `https://i.ytimg.com/vi/${base.youtube_id}/hqdefault.jpg`;
-      }
-    }
+    return values.some((value) => {
+      const normalizedValue = normalizeArabic(value);
 
-
-
-    switch (type) {
-      case "article":
-        base.category = "مقال";
-        base.url = base.slug
-          ? `/articles/${base.slug}`
-          : base.id
-          ? `/articles/${base.id}`
-          : null;
-        break;
-
-      case "program":
-        base.category = "برامجنا";
-        base.url = base.slug
-          ? `/programs/${base.slug}`
-          : base.id
-          ? `/programs/${base.id}`
-          : null;
-        break;
-
-      case "short":
-        base.category = "مقاطع قصيرة";
-        // مهم: مسار صفحة الفقرات القصيرة عندك هو /shorts
-        base.url = base.id ? `/shorts?focus=${base.id}` : null;
-        break;
-
-      case "cami":
-        base.category = "نبوّات كامي";
-        base.url = base.id ? `/cami-prophecies?video=${base.id}` : null;
-        break;
-
-      case "quiz":
-        base.category = "اختبار";
-        base.url = base.slug
-          ? `/quiz/${base.slug}`
-          : base.id
-          ? `/quiz/${base.id}`
-          : null;
-        break;
-    }
-
-    return base;
-  };
-
-async function tryIlike(table: string, field: string, type: ResultType) {
-  try {
-    let acc: any[] = [];
-    for (const p of pats) {
-      // شلنا .order("created_at") عشان ما نوقع لو الجدول ما فيه هيك عمود
-      const r = await supabase
-        .from(table)
-        .select("*")
-        .ilike(field, p);
-
-      if (r.error) throw r.error;
-      acc = acc.concat(r.data || []);
-    }
-
-    dbg.steps.push({ table, field, count: acc.length });
-    return acc.map((x) => mapRecord(x, type));
-  } catch (e: any) {
-    dbg.errors.push({
-      table,
-      field,
-      message: String(e?.message || e),
+      return (
+        normalizedValue.includes(normalizedQuery) ||
+        normalizedQuery.includes(normalizedValue)
+      );
     });
+  }).map((page) => ({
+    id: page.id,
+    type: "page" as const,
+    category: page.category,
+    title: page.title,
+    slug: null,
+    snippet: "",
+    cover_url: null,
+    youtube_id: null,
+    created_at: null,
+    url: page.url,
+    source: "static-page",
+  }));
+}
+
+/* =========================================================
+   Database search
+========================================================= */
+
+async function searchField(
+  source: SearchSource,
+  field: string,
+  variants: string[],
+  perFieldLimit: number,
+  debugErrors: any[]
+): Promise<Record<string, any>[]> {
+  const supabase = getSupabase();
+
+  try {
+    const orFilter = variants
+      .map((variant) => `${field}.ilike.%${variant}%`)
+      .join(",");
+
+    let query = supabase
+      .from(source.table)
+      .select("*")
+      .or(orFilter)
+      .limit(perFieldLimit);
+
+    if (source.published) {
+      query = query.eq("published", true);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      throw error;
+    }
+
+    return (data ?? []).map((record: any) =>
+      mapRecord(record, source)
+    );
+  } catch (error: any) {
+    debugErrors.push({
+      table: source.table,
+      field,
+      message: error?.message || String(error),
+    });
+
     return [];
   }
 }
 
+async function searchSource(
+  source: SearchSource,
+  variants: string[],
+  perFieldLimit: number,
+  debugErrors: any[]
+): Promise<Record<string, any>[]> {
+  /**
+   * كل حقل لوحده:
+   * إذا field غير موجود بالجدول، باقي الحقول يظلوا شغالين.
+   */
+  const fieldResults = await Promise.all(
+    source.fields.map((field) =>
+      searchField(
+        source,
+        field,
+        variants,
+        perFieldLimit,
+        debugErrors
+      )
+    )
+  );
 
-  let articles: any[] = [];
-  let programs: any[] = [];
-  let shorts: any[] = [];
-  let cami: any[] = [];
-  let quizzes: any[] = [];
-
-  // === مقالات: فقط العنوان ===
-  articles = articles.concat(await tryIlike("articles", "title", "article"));
-
-const programFields = [
-  "title",
-  "name",
-  "name_ar",
-  "title_ar",
-  "program_name",
-  "program_title",
-  // شلنا description و content عشان ما نبحثش في نص الحلقة
-];
-
-for (const field of programFields) {
-  const found = await tryIlike("programs_catalog", field, "program");
-  programs = programs.concat(found);
+  return deduplicateResults(fieldResults.flat());
 }
 
+/* =========================================================
+   Ranking
+========================================================= */
 
+function resultScore(
+  result: Record<string, any>,
+  rawQuery: string
+): number {
+  const query = normalizeArabic(rawQuery);
+  const title = normalizeArabic(result?.title || "");
+  const category = normalizeArabic(result?.category || "");
 
+  let score = 100;
 
-
-  // مقاطع قصيرة
-  shorts = shorts.concat(
-    await tryIlike("short_segments", "title", "short")
-  );
-  if (shorts.length === 0) {
-    shorts = shorts.concat(
-      await tryIlike("short_segments", "description", "short")
-    );
+  if (title === query) {
+    score -= 80;
+  } else if (title.startsWith(query)) {
+    score -= 60;
+  } else if (title.includes(query)) {
+    score -= 45;
   }
 
-  // كامي
-  cami = cami.concat(await tryIlike("cami_videos", "title", "cami"));
-  if (cami.length === 0) {
-    cami = cami.concat(
-      await tryIlike("cami_videos", "description", "cami")
-    );
+  if (category === query) {
+    score -= 25;
+  } else if (category.includes(query)) {
+    score -= 15;
   }
 
-  // كويز
-  quizzes = quizzes.concat(await tryIlike("quizzes", "title", "quiz"));
-  if (quizzes.length === 0) {
-    quizzes = quizzes.concat(
-      await tryIlike("quizzes", "description", "quiz")
-    );
+  if (result.source === "static-page") {
+    score -= 20;
   }
 
-  let merged: any[] = [
-    ...articles,
-    ...programs,
-    ...shorts,
-    ...cami,
-    ...quizzes,
-  ];
+  return score;
+}
 
-  // 🧹 إزالة التكرار: نفس (type + id + slug) ما يرجعش أكثر من مرة
-  const seen = new Set<string>();
-  merged = merged.filter((item) => {
-    const key = `${item.type}-${item.id ?? ""}-${item.slug ?? ""}`;
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
+/* =========================================================
+   GET /api/search
+========================================================= */
 
-  const qLower = rawQ.toLowerCase();
-  merged = merged
-    .sort((a, b) => {
-      const at = (a.title || "").toLowerCase().includes(qLower) ? 0 : 1;
-      const bt = (b.title || "").toLowerCase().includes(qLower) ? 0 : 1;
-      if (at !== bt) return at - bt;
+router.get("/search", async (req: Request, res: Response) => {
+  const rawQuery = String(req.query.q ?? "").trim();
 
-      const ad = String(a.created_at || "");
-      const bd = String(b.created_at || "");
-      if (ad !== bd) return bd.localeCompare(ad);
+  const requestedLimit =
+    Number.parseInt(String(req.query.limit ?? "20"), 10) || 20;
 
-      return (a.title || "").localeCompare(b.title || "", "ar");
-    })
-    .slice(0, limit);
+  const limit = Math.min(Math.max(requestedLimit, 1), 50);
 
+  const debug = String(req.query.debug ?? "") === "1";
 
-  return debug
-    ? res.json({
-        ...dbg,
-        counts: { merged: merged.length },
-        results: merged,
+  if (!rawQuery) {
+    return debug
+      ? res.json({
+          query: rawQuery,
+          results: [],
+          errors: [],
+        })
+      : res.json([]);
+  }
+
+  /**
+   * حرف واحد بالعربي قد يعطي نتائج كثيرة جدًا.
+   * حاليًا نسمح من حرف واحد، ويمكن تغييره إلى 2.
+   */
+  const variants = createSearchVariants(rawQuery);
+
+  if (!variants.length) {
+    return res.json([]);
+  }
+
+  const errors: any[] = [];
+
+  try {
+    const perFieldLimit = Math.min(Math.max(limit, 8), 20);
+
+    const databaseGroups = await Promise.all(
+      SEARCH_SOURCES.map((source) =>
+        searchSource(
+          source,
+          variants,
+          perFieldLimit,
+          errors
+        )
+      )
+    );
+
+    const staticResults = matchStaticPages(rawQuery);
+
+    let results = deduplicateResults([
+      ...staticResults,
+      ...databaseGroups.flat(),
+    ]);
+
+    results = results
+      .filter((result) => result.title || result.url)
+      .sort((a, b) => {
+        const scoreDifference =
+          resultScore(a, rawQuery) - resultScore(b, rawQuery);
+
+        if (scoreDifference !== 0) {
+          return scoreDifference;
+        }
+
+        const dateA = String(a.created_at || "");
+        const dateB = String(b.created_at || "");
+
+        if (dateA !== dateB) {
+          return dateB.localeCompare(dateA);
+        }
+
+        return String(a.title || "").localeCompare(
+          String(b.title || ""),
+          "ar"
+        );
       })
-    : res.json(merged);
+      .slice(0, limit);
+
+    if (debug) {
+      return res.json({
+        query: rawQuery,
+        variants,
+        count: results.length,
+        errors,
+        results,
+      });
+    }
+
+    return res.json(results);
+  } catch (error: any) {
+    console.error("Search route error:", error);
+
+    return res.status(500).json({
+      error: "تعذّر تنفيذ البحث",
+      details:
+        process.env.NODE_ENV === "development"
+          ? error?.message || String(error)
+          : undefined,
+    });
+  }
 });
 
 export default router;
