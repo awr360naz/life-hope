@@ -14,12 +14,14 @@
     "dotenv": "^17.2.1",
     "express": "^4.19.2",
     "morgan": "^1.10.0",
+    "multer": "^2.2.0",
     "nodemailer": "^7.0.6",
     "openai": "^6.16.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
+    "@types/multer": "^2.2.0",
     "@types/node": "^20.19.13",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",

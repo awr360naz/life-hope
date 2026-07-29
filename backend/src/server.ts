@@ -29,6 +29,7 @@ import counterRoutes from "./routes/counter.routes.js";
 import sabbathShortsRouter from "./routes/sabbathShorts.routes.js";
 import propheciesRouter from "./routes/prophecies.routes.js";
 import searchRoutes from "./routes/search.routes.js";
+import storyRoutes from "./routes/storyRoutes.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -144,6 +145,8 @@ app.use("/api/content/wamdat_raw7ye", wamdat_raw7ye);
 app.use("/api/content/al7ya_welamal", al7ya_welamal);
 app.use("/api/counter", counterRoutes);
 app.use("/api", searchRoutes);
+app.use("/api/content/stories", storyRoutes);
+
 const PROGRAMS_TABLE = process.env.PROGRAMS_TABLE || "programs";
 const THIRD_TABLE = process.env.THIRD_FRAME_TABLE || "home_third_frame_items";
 const PROGRAMS_CATALOG_TABLE = process.env.PROGRAMS_CATALOG_TABLE || "programs_catalog";

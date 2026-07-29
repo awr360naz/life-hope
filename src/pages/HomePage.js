@@ -27,7 +27,7 @@ import useScrollReveal from "./useScrollReveal";
 import VisitorCounter from "./VisitorCounter";
 import SabbathShortsCarousel from "../components/SabbathShortsCarousel";
 import PropheciesCarousel from "../components/PropheciesCarousel";
-
+import Stories from "../components/stories/Stories.tsx";
 export default function HomePage() { 
   useEffect(() => {
     document.title = "AWR360ARABIC – الصفحة الرئيسية";
@@ -122,6 +122,8 @@ export default function HomePage() {
   return (
     
     <main className="homepage-rtl">
+
+
       
   <div className="frames-center">
 
@@ -195,7 +197,9 @@ export default function HomePage() {
 
 
 <br></br><br></br><br></br><br></br>
-
+{/*
+ <Stories />
+*/}
    <ProgramsCarousel title="برامجنا" 
    className="scroll-animate"
    />
@@ -262,9 +266,11 @@ className="scroll-animate"
       />
  <VisitorCounter
  />
+  
 
 
     </main>
   );
+  
 }
 

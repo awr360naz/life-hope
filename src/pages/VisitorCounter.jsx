@@ -44,7 +44,7 @@ const styles = {
     marginTop: "40px",
     padding: "0 16px",
     display: "flex",
-    justifyContent: "center", // هذا أهم سطر
+    justifyContent: "center", 
     boxSizing: "border-box",
   },
 
@@ -60,7 +60,7 @@ const styles = {
     boxShadow: "0 10px 25px rgba(0,0,0,0.25)",
 
     width: "100%",
-    maxWidth: "420px", // مناسب للموبايل
+    maxWidth: "420px", 
     boxSizing: "border-box",
   },
 
@@ -69,13 +69,13 @@ const styles = {
     background: "rgba(255,255,255,0.1)",
     padding: "8px",
     borderRadius: "10px",
-    flexShrink: 0, // يمنع القص
+    flexShrink: 0, 
   },
 
   content: {
     display: "flex",
     flexDirection: "column",
-    alignItems: "center", // بالنص بدل flex-end
+    alignItems: "center",
     textAlign: "center",
   },
 

@@ -6,7 +6,7 @@ import ResilientThumb from "../components/ResilientThumb";
 import ShortsegSafePlayerModal from "../components/ShortsegSafePlayerModal";
 
 const PAGE_SIZE = 15;
-const MAX_PAGES = 2;
+const MAX_PAGES = 4;
 const LS_KEY = "thtSaqfWahd_cache_v1";
 
 function uniqBy(arr, keyFn) {

@@ -50,6 +50,7 @@ router.get("/sabbath-lessons/:lessonSlug", async (req: Request, res: Response) =
     .eq("slug", req.params.lessonSlug)
     .limit(1)
     .maybeSingle();
+     
 
   if (error) return err(res, 500, error.message);
   if (!data || data.published === false) return err(res, 404, "not_found");

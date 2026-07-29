@@ -44,7 +44,8 @@ const mailText = [
   message,
   "",
   "— أُرسل من نموذج طلب الصلاة على موقع صوت الحياة والأمل —",
-].filter(Boolean).join("\n"); // filter(Boolean) عشان يشيل السطر الفاضي لو ما في contactInfo
+].filter(Boolean).join("\n"); 
+
 
 
    await transporter.sendMail({
@@ -60,6 +61,8 @@ const mailText = [
     console.error("Prayer Request Error:", err);
     res.status(500).json({ error: "تعذّر إرسال الطلب." });
   }
+
+
 });
 
 export default router;
