@@ -6,7 +6,6 @@ import ResilientThumb from "../components/ResilientThumb";
 import ShortsegSafePlayerModal from "../components/ShortsegSafePlayerModal";
 
 const PAGE_SIZE = 15;
-const MAX_PAGES = 2;
 const LS_KEY = "sbahAlkher_cache_v1";
 
 function uniqBy(arr, keyFn) {
@@ -69,7 +68,6 @@ export default function SbahAlkherPage() {
   useEffect(() => {
     let alive = true;
     const ac = new AbortController();
-    const need = MAX_PAGES * PAGE_SIZE;
 
     const tryFetch = async (url) => {
       const res = await fetch(url, {
@@ -95,7 +93,7 @@ export default function SbahAlkherPage() {
 
     const fetchFast = async () => {
       const cb = Date.now();
-      const url = `/api/content/sbah-alkher?limit=${need}&_cb=${cb}`;
+      const url = `/api/content/sbah-alkher?_cb=${cb}`;
 
       const fresh = await tryFetch(url);
 
@@ -110,7 +108,7 @@ export default function SbahAlkherPage() {
       merged = uniqBy(merged, (x) => x._ytid);
       merged = sortByDbSort(merged);
 
-      return merged.slice(0, need);
+      return merged;
     };
 
     (async () => {
@@ -168,7 +166,11 @@ export default function SbahAlkherPage() {
   }, [items]);
 
   const ordered = useMemo(() => sortByDbSort(normalized), [normalized]);
-  const totalPages = MAX_PAGES;
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(ordered.length / PAGE_SIZE)
+  );
 
   useEffect(() => {
     if (page > totalPages) setPage(totalPages);

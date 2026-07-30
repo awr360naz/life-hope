@@ -75,64 +75,75 @@ const normalize = (
   video_url: r.video_url ?? r.url ?? null,
 });
 
+const DB_PAGE_SIZE = 1000;
+
 async function queryTry(opts: {
   withPublished?: boolean;
   orderBy?: "published_at" | "created_at" | "id";
-  limit: number;
 }): Promise<ProphecyItem[]> {
   const sb = getSupabase();
 
-  let q = sb.from("prophecies").select("*");
+  const allRows: ProphecyItem[] = [];
 
-  if (opts.withPublished) {
-    q = q.eq("published", true);
+  let from = 0;
+
+  while (true) {
+    let q = sb.from("prophecies").select("*");
+
+    if (opts.withPublished) {
+      q = q.eq("published", true);
+    }
+
+    if (opts.orderBy) {
+      q = q.order(opts.orderBy as any, {
+        ascending: false,
+      });
+    }
+
+    const { data, error } = await q.range(
+      from,
+      from + DB_PAGE_SIZE - 1
+    );
+
+    if (error) throw error;
+
+    const rows = (data ?? []).map(normalize);
+
+    allRows.push(...rows);
+
+    if (rows.length < DB_PAGE_SIZE) {
+      break;
+    }
+
+    from += DB_PAGE_SIZE;
   }
 
-  if (opts.orderBy) {
-    q = q.order(opts.orderBy as any, {
-      ascending: false,
-    });
-  }
-
-  const { data, error } = await q.limit(
-    opts.limit
-  );
-
-  if (error) throw error;
-
-  return (data ?? []).map(normalize);
+  return allRows;
 }
 
-async function fetchWithFallback(
-  limit: number
-): Promise<ProphecyItem[]> {
+async function fetchWithFallback(): Promise<ProphecyItem[]> {
   const attempts: Array<
     Parameters<typeof queryTry>[0]
   > = [
     {
       withPublished: true,
       orderBy: "published_at",
-      limit,
     },
     {
       withPublished: true,
       orderBy: "created_at",
-      limit,
     },
     {
       withPublished: true,
       orderBy: "id",
-      limit,
     },
     {
       withPublished: false,
       orderBy: "created_at",
-      limit,
     },
     {
       withPublished: false,
       orderBy: "id",
-      limit,
     },
   ];
 
@@ -151,18 +162,7 @@ async function fetchWithFallback(
 
 router.get(
   "/api/content/prophecies",
-  async (req: Request, res: Response) => {
-    const limit = Math.min(
-      Math.max(
-        parseInt(
-          String(req.query.limit ?? "48"),
-          10
-        ) || 48,
-        1
-      ),
-      48
-    );
-
+  async (_req: Request, res: Response) => {
     const fresh =
       now() - memCache.updatedAt <
       memCache.ttlMs;
@@ -179,15 +179,12 @@ router.get(
 
         return res.json({
           ok: true,
-          items: memCache.items.slice(
-            0,
-            limit
-          ),
+          items: memCache.items,
         });
       }
 
       const items =
-        await fetchWithFallback(limit);
+        await fetchWithFallback();
 
       if (items.length > 0) {
         memCache.items = items;
@@ -216,10 +213,7 @@ router.get(
 
         return res.json({
           ok: true,
-          items: diskItems.slice(
-            0,
-            limit
-          ),
+          items: diskItems,
         });
       }
 

@@ -61,7 +61,7 @@ const now = () => Date.now();
 async function queryTry(opts: {
   withPublished?: boolean;
   orderBy?: "sort" | "published_at" | "created_at" | "id";
-  limit: number;
+ 
 }): Promise<ThtVideo[]> {
   const sb = getSupabase();
 
@@ -71,68 +71,69 @@ async function queryTry(opts: {
 
 if (opts.orderBy === "sort") {
     q = q
-      .order("sort", { ascending: false, nullsFirst: false }) // صرنا بالعكس
-      .order("id", { ascending: false }); // كمان بالعكس
+      .order("sort", { ascending: false, nullsFirst: false }) 
+      .order("id", { ascending: false }); 
 } else if (opts.orderBy) {
-    q = q.order(opts.orderBy as any, { ascending: true }); // إذا بدك تصاعدي حسب العمود
+    q = q.order(opts.orderBy as any, { ascending: true });
 }
 
 
-  const { data, error } = await q.limit(opts.limit);
+ const { data, error } = await q;
   if (error) throw error;
 
   return (data ?? []).map((r: any) => ({ ...r }));
 }
 
-async function fetchWithFallback(limit: number): Promise<ThtVideo[]> {
-  const attempts: Array<Parameters<typeof queryTry>[0]> = [
-    { withPublished: true, orderBy: "sort", limit },
-    { withPublished: true, orderBy: "published_at", limit },
-    { withPublished: true, orderBy: "created_at", limit },
-    { withPublished: true, orderBy: "id", limit },
-    { withPublished: false, orderBy: "sort", limit },
-    { withPublished: false, orderBy: "created_at", limit },
-    { withPublished: false, orderBy: "id", limit },
-  ];
+async function fetchWithFallback(): Promise<ThtVideo[]> {
+const attempts: Array<Parameters<typeof queryTry>[0]> = [
+  { withPublished: true, orderBy: "sort" },
+  { withPublished: true, orderBy: "published_at" },
+  { withPublished: true, orderBy: "created_at" },
+  { withPublished: true, orderBy: "id" },
+  { withPublished: false, orderBy: "sort" },
+  { withPublished: false, orderBy: "created_at" },
+  { withPublished: false, orderBy: "id" },
+];
 
   for (const a of attempts) {
     try {
       const rows = await queryTry(a);
       if (rows.length) return rows;
     } catch {
-      // ignore and try next
+     
     }
   }
   return [];
 }
 
 router.get("/", async (req: Request, res: Response) => {
-  const limit = Math.min(
-    Math.max(parseInt(String(req.query.limit ?? "48"), 10) || 48, 1),
-    48
-  );
+
+
   const allowEmpty = String(req.query.allowEmpty ?? "0") === "1";
   const fresh = now() - memCache.updatedAt < memCache.ttlMs;
 
   try {
     if (fresh && memCache.items.length > 0) {
       res.setHeader("X-Source", "memory-cache");
-      return res.json({ ok: true, items: memCache.items.slice(0, limit) });
+      return res.json({ ok: true, items:memCache.items });
     }
 
-    const items = await fetchWithFallback(limit);
+    const items = await fetchWithFallback();
 
     if (items.length > 0) {
       memCache.items = items;
       memCache.updatedAt = now();
       writeDiskCache(items);
       res.setHeader("X-Source", "db");
-      return res.json({ ok: true, items });
+      return res.json({
+  ok: true,
+  items,
+});
     }
 
     if (memCache.items.length > 0) {
       res.setHeader("X-Source", "stale-mem-cache");
-      return res.json({ ok: true, items: memCache.items.slice(0, limit) });
+      return res.json({ ok: true, items: memCache.items });
     }
 
     const diskItems = readDiskCache();
@@ -140,7 +141,7 @@ router.get("/", async (req: Request, res: Response) => {
       memCache.items = diskItems;
       memCache.updatedAt = now();
       res.setHeader("X-Source", "disk-cache");
-      return res.json({ ok: true, items: diskItems.slice(0, limit) });
+      return res.json({ ok: true, items: diskItems });
     }
 
     res.setHeader("X-Source", "db-empty");
@@ -157,7 +158,7 @@ router.get("/", async (req: Request, res: Response) => {
       res.setHeader("X-Source", "cache-on-error-mem");
       return res.json({
         ok: true,
-        items: memCache.items.slice(0, limit),
+        items:memCache.items,
         warning: e?.message || String(e),
       });
     }
@@ -167,7 +168,7 @@ router.get("/", async (req: Request, res: Response) => {
       res.setHeader("X-Source", "cache-on-error-disk");
       return res.json({
         ok: true,
-        items: diskItems.slice(0, limit),
+        items: diskItems,
         warning: e?.message || String(e),
       });
     }

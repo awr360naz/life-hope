@@ -6,7 +6,6 @@ import ResilientThumb from "../components/ResilientThumb";
 import ShortsegSafePlayerModal from "../components/ShortsegSafePlayerModal";
 
 const PAGE_SIZE = 15;
-const MAX_PAGES = 2;
 const LS_KEY = "kolShahr4_7kayat_cache_v1";
 
 function uniqBy(arr, keyFn) {
@@ -69,7 +68,6 @@ export default function KolShahr4_7kayatPage() {
   useEffect(() => {
     let alive = true;
     const ac = new AbortController();
-    const need = MAX_PAGES * PAGE_SIZE;
 
     const tryFetch = async (url) => {
       const res = await fetch(url, {
@@ -78,7 +76,9 @@ export default function KolShahr4_7kayatPage() {
       });
       const text = await res.text();
       let data = null;
-      try { data = text ? JSON.parse(text) : null; } catch {}
+      try {
+        data = text ? JSON.parse(text) : null;
+      } catch {}
       if (!res.ok) {
         throw new Error(
           data?.error || data?.message || text || `HTTP ${res.status}`
@@ -93,7 +93,7 @@ export default function KolShahr4_7kayatPage() {
 
     const fetchFast = async () => {
       const cb = Date.now();
-      const url = `/api/content/kol-shahr-4-7kayat?limit=${need}&_cb=${cb}`;
+      const url = `/api/content/kol-shahr-4-7kayat?_cb=${cb}`;
 
       const fresh = await tryFetch(url);
 
@@ -108,7 +108,7 @@ export default function KolShahr4_7kayatPage() {
       merged = uniqBy(merged, (x) => x._ytid);
       merged = sortByDbSort(merged);
 
-      return merged.slice(0, need);
+      return merged;
     };
 
     (async () => {
@@ -164,7 +164,11 @@ export default function KolShahr4_7kayatPage() {
   }, [items]);
 
   const ordered = useMemo(() => sortByDbSort(normalized), [normalized]);
-  const totalPages = MAX_PAGES;
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(ordered.length / PAGE_SIZE)
+  );
 
   useEffect(() => {
     if (page > totalPages) setPage(totalPages);

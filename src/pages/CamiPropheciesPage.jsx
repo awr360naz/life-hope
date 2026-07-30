@@ -6,7 +6,6 @@ import ResilientThumb from "../components/ResilientThumb";
 import ShortsegSafePlayerModal from "../components/ShortsegSafePlayerModal";
 
 const PAGE_SIZE = 15;
-const MAX_PAGES = 2;
 const LS_KEY = "camiProphecies_cache_v2";
 
 function uniqBy(arr, keyFn) {
@@ -69,7 +68,6 @@ export default function CamiPropheciesPage() {
   useEffect(() => {
     let alive = true;
     const ac = new AbortController();
-    const need = MAX_PAGES * PAGE_SIZE; // 30
 
     const tryFetch = async (url) => {
       const res = await fetch(url, {
@@ -96,7 +94,7 @@ export default function CamiPropheciesPage() {
     const fetchFast = async () => {
       const cb = Date.now();
       // ✅ مصدر واحد سريع + limit بس اللي نحتاجه
-      const url = `/api/content/cami-prophecies?limit=${need}&_cb=${cb}`;
+      const url = `/api/content/cami-prophecies?_cb=${cb}`;
 
       const fresh = await tryFetch(url);
 
@@ -114,7 +112,7 @@ export default function CamiPropheciesPage() {
       // ✅ ترتيب نهائي حسب sort (حتى لو رجعت من كاش)
       merged = sortByDbSort(merged);
 
-      return merged.slice(0, need);
+      return merged;
     };
 
     (async () => {
@@ -176,7 +174,10 @@ export default function CamiPropheciesPage() {
   // ✅ ضمان ترتيب حتى لو items اجت بأي ترتيب
   const ordered = useMemo(() => sortByDbSort(normalized), [normalized]);
 
-  const totalPages = MAX_PAGES;
+  const totalPages = Math.max(
+  1,
+  Math.ceil(ordered.length / PAGE_SIZE)
+);
 
   useEffect(() => {
     if (page > totalPages) setPage(totalPages);

@@ -55,18 +55,20 @@ const memCache = {
   updatedAt: 0,
   ttlMs: 3 * 60 * 1000,
 };
+
 const now = () => Date.now();
 
 async function queryTry(opts: {
   withPublished?: boolean;
   orderBy?: "sort" | "published_at" | "created_at" | "id";
-  limit: number;
 }): Promise<al7yaVideo[]> {
   const sb = getSupabase();
 
   let q = sb.from("al7ya_welamal").select("*");
 
-  if (opts.withPublished) q = q.eq("published", true);
+  if (opts.withPublished) {
+    q = q.eq("published", true);
+  }
 
   if (opts.orderBy === "sort") {
     q = q
@@ -76,70 +78,92 @@ async function queryTry(opts: {
     q = q.order(opts.orderBy as any, { ascending: false });
   }
 
-  const { data, error } = await q.limit(opts.limit);
+  const { data, error } = await q;
+
   if (error) throw error;
 
   return (data ?? []).map((r: any) => ({ ...r }));
 }
 
-async function fetchWithFallback(limit: number): Promise<al7yaVideo[]> {
+async function fetchWithFallback(): Promise<al7yaVideo[]> {
   const attempts: Array<Parameters<typeof queryTry>[0]> = [
-    { withPublished: true, orderBy: "sort", limit },
-    { withPublished: true, orderBy: "published_at", limit },
-    { withPublished: true, orderBy: "created_at", limit },
-    { withPublished: true, orderBy: "id", limit },
-    { withPublished: false, orderBy: "sort", limit },
-    { withPublished: false, orderBy: "created_at", limit },
-    { withPublished: false, orderBy: "id", limit },
+    { withPublished: true, orderBy: "sort" },
+    { withPublished: true, orderBy: "published_at" },
+    { withPublished: true, orderBy: "created_at" },
+    { withPublished: true, orderBy: "id" },
+    { withPublished: false, orderBy: "sort" },
+    { withPublished: false, orderBy: "created_at" },
+    { withPublished: false, orderBy: "id" },
   ];
 
   for (const a of attempts) {
     try {
       const rows = await queryTry(a);
-      if (rows.length) return rows;
+
+      if (rows.length) {
+        return rows;
+      }
     } catch {}
   }
+
   return [];
 }
 
 router.get("/", async (req: Request, res: Response) => {
-  const limit = Math.min(
-    Math.max(parseInt(String(req.query.limit ?? "48"), 10) || 48, 1),
-    48
-  );
   const allowEmpty = String(req.query.allowEmpty ?? "0") === "1";
   const fresh = now() - memCache.updatedAt < memCache.ttlMs;
 
   try {
     if (fresh && memCache.items.length > 0) {
       res.setHeader("X-Source", "memory-cache");
-      return res.json({ ok: true, items: memCache.items.slice(0, limit) });
+
+      return res.json({
+        ok: true,
+        items: memCache.items,
+      });
     }
 
-    const items = await fetchWithFallback(limit);
+    const items = await fetchWithFallback();
 
     if (items.length > 0) {
       memCache.items = items;
       memCache.updatedAt = now();
+
       writeDiskCache(items);
+
       res.setHeader("X-Source", "db");
-      return res.json({ ok: true, items });
+
+      return res.json({
+        ok: true,
+        items,
+      });
     }
 
     if (memCache.items.length > 0) {
       res.setHeader("X-Source", "stale-mem-cache");
-      return res.json({ ok: true, items: memCache.items.slice(0, limit) });
+
+      return res.json({
+        ok: true,
+        items: memCache.items,
+      });
     }
 
     const diskItems = readDiskCache();
+
     if (diskItems.length > 0) {
       memCache.items = diskItems;
       memCache.updatedAt = now();
+
       res.setHeader("X-Source", "disk-cache");
-      return res.json({ ok: true, items: diskItems.slice(0, limit) });
+
+      return res.json({
+        ok: true,
+        items: diskItems,
+      });
     }
 
     res.setHeader("X-Source", "db-empty");
+
     if (!allowEmpty) {
       return res.status(200).json({
         ok: true,
@@ -147,28 +171,38 @@ router.get("/", async (req: Request, res: Response) => {
         note: "empty-but-allowed=false",
       });
     }
-    return res.json({ ok: true, items: [] as al7yaVideo[] });
+
+    return res.json({
+      ok: true,
+      items: [] as al7yaVideo[],
+    });
   } catch (e: any) {
     if (memCache.items.length > 0) {
       res.setHeader("X-Source", "cache-on-error-mem");
+
       return res.json({
         ok: true,
-        items: memCache.items.slice(0, limit),
+        items: memCache.items,
         warning: e?.message || String(e),
       });
     }
 
     const diskItems = readDiskCache();
+
     if (diskItems.length > 0) {
       res.setHeader("X-Source", "cache-on-error-disk");
+
       return res.json({
         ok: true,
-        items: diskItems.slice(0, limit),
+        items: diskItems,
         warning: e?.message || String(e),
       });
     }
 
-    return res.status(500).json({ ok: false, error: e?.message || String(e) });
+    return res.status(500).json({
+      ok: false,
+      error: e?.message || String(e),
+    });
   }
 });
 

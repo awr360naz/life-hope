@@ -6,7 +6,6 @@ import ResilientThumb from "../components/ResilientThumb";
 import ShortsegSafePlayerModal from "../components/ShortsegSafePlayerModal";
 
 const PAGE_SIZE = 15;
-const MAX_PAGES = 2;
 const LS_KEY = "Al7yaWelamal_cache_v1";
 
 function uniqBy(arr, keyFn) {
@@ -69,7 +68,6 @@ export default function Al7yaWelamalPage() {
   useEffect(() => {
     let alive = true;
     const ac = new AbortController();
-    const need = MAX_PAGES * PAGE_SIZE;
 
     const tryFetch = async (url) => {
       const res = await fetch(url, {
@@ -95,7 +93,7 @@ export default function Al7yaWelamalPage() {
 
     const fetchFast = async () => {
       const cb = Date.now();
-      const url = `/api/content/al7ya_welamal?limit=${need}&_cb=${cb}`;
+      const url = `/api/content/al7ya_welamal?_cb=${cb}`;
 
       const fresh = await tryFetch(url);
 
@@ -110,7 +108,7 @@ export default function Al7yaWelamalPage() {
       merged = uniqBy(merged, (x) => x._ytid);
       merged = sortByDbSort(merged);
 
-      return merged.slice(0, need);
+      return merged;
     };
 
     (async () => {
@@ -169,7 +167,10 @@ export default function Al7yaWelamalPage() {
 
   const ordered = useMemo(() => sortByDbSort(normalized), [normalized]);
 
-  const totalPages = MAX_PAGES;
+ const totalPages = Math.max(
+  1,
+  Math.ceil(ordered.length / PAGE_SIZE)
+);
 
   useEffect(() => {
     if (page > totalPages) setPage(totalPages);

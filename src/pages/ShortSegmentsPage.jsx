@@ -1,26 +1,39 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import {
+  useSearchParams,
+} from "react-router-dom";
 import "./ShortSegmentsPage.css";
 import ResilientThumb from "../components/ResilientThumb";
 import ShortsegSafePlayerModal from "../components/ShortsegSafePlayerModal";
 
-const PAGE_SIZE = 12;
-const MAX_PAGES = 4;
+const PAGE_SIZE = 18;
 
 function getCacheKey(apiUrl) {
- if (apiUrl.includes("sabbath-shorts")) {
-  return "sabbathShorts_cache_v1";
-}
+  if (
+    apiUrl.includes(
+      "sabbath-shorts"
+    )
+  ) {
+    return "sabbathShorts_cache_v2";
+  }
 
-if (apiUrl.includes("prophecies")) {
-  return "prophecies_cache_v1";
-}
+  if (
+    apiUrl.includes("prophecies")
+  ) {
+    return "prophecies_cache_v2";
+  }
 
-  return "shortSegs_cache_v2";
+  return "shortSegs_cache_v3";
 }
 
 function sleep(ms) {
-  return new Promise((r) => setTimeout(r, ms));
+  return new Promise((r) =>
+    setTimeout(r, ms)
+  );
 }
 
 function uniqBy(arr, keyFn) {
@@ -39,25 +52,46 @@ function uniqBy(arr, keyFn) {
   return out;
 }
 
-function toYouTubeId(urlOrId = "") {
+function toYouTubeId(
+  urlOrId = ""
+) {
   if (!urlOrId) return "";
 
-  if (/^[a-zA-Z0-9_-]{10,15}$/.test(urlOrId)) {
+  if (
+    /^[a-zA-Z0-9_-]{10,15}$/.test(
+      urlOrId
+    )
+  ) {
     return urlOrId;
   }
 
   try {
     const u = new URL(urlOrId);
 
-    if (u.hostname.includes("youtu.be")) {
-      return u.pathname.split("/")[1] || "";
+    if (
+      u.hostname.includes(
+        "youtu.be"
+      )
+    ) {
+      return (
+        u.pathname.split("/")[1] ||
+        ""
+      );
     }
 
-    if (u.pathname.startsWith("/shorts/")) {
-      return u.pathname.split("/")[2] || "";
+    if (
+      u.pathname.startsWith(
+        "/shorts/"
+      )
+    ) {
+      return (
+        u.pathname.split("/")[2] ||
+        ""
+      );
     }
 
-    const v = u.searchParams.get("v");
+    const v =
+      u.searchParams.get("v");
 
     if (v) return v;
 
@@ -65,7 +99,11 @@ function toYouTubeId(urlOrId = "") {
       /[?&]v=([^&#]+)|youtu\.be\/([^?#/]+)|shorts\/([^?#/]+)/
     );
 
-    return m ? m[1] || m[2] || m[3] : "";
+    return m
+      ? m[1] ||
+          m[2] ||
+          m[3]
+      : "";
   } catch {
     return "";
   }
@@ -75,42 +113,72 @@ export default function ShortSegmentsPage({
   apiUrl = "/api/content/short-segments?limit=200",
   title = "فقرات قصيرة",
 }) {
-  const LS_KEY = getCacheKey(apiUrl);
-const MIN_REQUIRED =
-  apiUrl.includes("sabbath-shorts") ||
-  apiUrl.includes("prophecies")
-    ? 1
-    : 24;
-  const [searchParams] = useSearchParams();
-  const focusId = searchParams.get("focus");
+  const LS_KEY =
+    getCacheKey(apiUrl);
 
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState("");
-  const [player, setPlayer] = useState({
-    open: false,
-    item: null,
-  });
+  const MIN_REQUIRED =
+    apiUrl.includes(
+      "sabbath-shorts"
+    ) ||
+    apiUrl.includes(
+      "prophecies"
+    )
+      ? 1
+      : 24;
 
-  const [page, setPage] = useState(1);
+  const [searchParams] =
+    useSearchParams();
+
+  const focusId =
+    searchParams.get("focus");
+
+  const [items, setItems] =
+    useState([]);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [err, setErr] =
+    useState("");
+
+  const [player, setPlayer] =
+    useState({
+      open: false,
+      item: null,
+    });
+
+  const [page, setPage] =
+    useState(1);
 
   useEffect(() => {
     let alive = true;
 
-    const ac = new AbortController();
+    const ac =
+      new AbortController();
 
-    const tryFetch = async (url) => {
-      const res = await fetch(url, {
-        headers: { Accept: "application/json" },
-        signal: ac.signal,
-      });
+    const tryFetch = async (
+      url
+    ) => {
+      const res = await fetch(
+        url,
+        {
+          headers: {
+            Accept:
+              "application/json",
+          },
+          signal: ac.signal,
+        }
+      );
 
-      const text = await res.text();
+      const text =
+        await res.text();
 
       let data = null;
 
       try {
-        data = text ? JSON.parse(text) : null;
+        data = text
+          ? JSON.parse(text)
+          : null;
       } catch {}
 
       if (!res.ok) {
@@ -122,108 +190,143 @@ const MIN_REQUIRED =
         );
       }
 
-      return Array.isArray(data?.items)
+      return Array.isArray(
+        data?.items
+      )
         ? data.items
         : Array.isArray(data)
         ? data
         : [];
     };
 
-    const fetchResilient = async () => {
-      const cb = Date.now();
+    const fetchResilient =
+      async () => {
+        const cb = Date.now();
 
-      const sources = [
-        `${apiUrl}&_cb=${cb}`,
-      ];
+        const sources = [
+          `${apiUrl}&_cb=${cb}`,
+        ];
 
-      const attempts = [200, 600, 1200, 2000];
+        const attempts = [
+          200,
+          600,
+          1200,
+          2000,
+        ];
 
-      let best = [];
+        let best = [];
 
-      for (let i = 0; i < attempts.length; i++) {
-        if (!alive) return best;
+        for (
+          let i = 0;
+          i < attempts.length;
+          i++
+        ) {
+          if (!alive) {
+            return best;
+          }
 
-        try {
-          const results = await Promise.allSettled(
-            sources.map((s) => tryFetch(s))
-          );
+          try {
+            const results =
+              await Promise.allSettled(
+                sources.map((s) =>
+                  tryFetch(s)
+                )
+              );
 
-          let merged = [];
+            let merged = [];
 
-          for (const r of results) {
-            if (
-              r.status === "fulfilled" &&
-              Array.isArray(r.value)
-            ) {
-              merged = merged.concat(r.value);
+            for (const r of results) {
+              if (
+                r.status ===
+                  "fulfilled" &&
+                Array.isArray(r.value)
+              ) {
+                merged =
+                  merged.concat(
+                    r.value
+                  );
+              }
             }
-          }
 
-          merged = merged
-            .map((it) => {
-              const id =
-                it._ytid ||
-                it.youtube_id ||
-                toYouTubeId(
-                  it.youtube_url ||
-                    it.url ||
-                    it.video_url ||
-                    it.short_url ||
-                    ""
-                );
+            merged = merged
+              .map((it) => {
+                const id =
+                  it._ytid ||
+                  it.youtube_id ||
+                  toYouTubeId(
+                    it.youtube_url ||
+                      it.url ||
+                      it.video_url ||
+                      it.short_url ||
+                      ""
+                  );
 
-              return id
-                ? { ...it, _ytid: id }
-                : null;
-            })
-            .filter(Boolean);
+                return id
+                  ? {
+                      ...it,
+                      _ytid: id,
+                    }
+                  : null;
+              })
+              .filter(Boolean);
 
-          merged = uniqBy(merged, (x) => x._ytid);
+            merged = uniqBy(
+              merged,
+              (x) => x._ytid
+            );
 
-          merged.sort((a, b) => {
-            const ta =
-              new Date(
-                a.published_at ||
-                  a.created_at ||
-                  0
-              ).getTime() || 0;
+            merged.sort(
+              (a, b) => {
+                const ta =
+                  new Date(
+                    a.published_at ||
+                      a.created_at ||
+                      0
+                  ).getTime() || 0;
 
-            const tb =
-              new Date(
-                b.published_at ||
-                  b.created_at ||
-                  0
-              ).getTime() || 0;
+                const tb =
+                  new Date(
+                    b.published_at ||
+                      b.created_at ||
+                      0
+                  ).getTime() || 0;
 
-            return tb - ta;
-          });
+                return tb - ta;
+              }
+            );
 
-          merged = merged.slice(
-            0,
-            MAX_PAGES * PAGE_SIZE
+            if (
+              merged.length >=
+              MIN_REQUIRED
+            ) {
+              return merged;
+            } else if (
+              merged.length >
+              best.length
+            ) {
+              best = merged;
+            }
+          } catch {}
+
+          await sleep(
+            attempts[i]
           );
+        }
 
-          if (merged.length >= MIN_REQUIRED) {
-            return merged;
-          } else if (merged.length > best.length) {
-            best = merged;
-          }
-        } catch {}
-
-        await sleep(attempts[i]);
-      }
-
-      return best;
-    };
+        return best;
+      };
 
     (async () => {
       setLoading(true);
       setErr("");
 
       try {
-        const cached = JSON.parse(
-          localStorage.getItem(LS_KEY) || "[]"
-        );
+        const cached =
+          JSON.parse(
+            localStorage.getItem(
+              LS_KEY
+            ) || "[]"
+          );
 
         if (
           Array.isArray(cached) &&
@@ -235,11 +338,15 @@ const MIN_REQUIRED =
       } catch {}
 
       try {
-        const fresh = await fetchResilient();
+        const fresh =
+          await fetchResilient();
 
         if (!alive) return;
 
-        if (fresh.length >= MIN_REQUIRED) {
+        if (
+          fresh.length >=
+          MIN_REQUIRED
+        ) {
           setItems(fresh);
 
           localStorage.setItem(
@@ -267,7 +374,8 @@ const MIN_REQUIRED =
         if (!alive) return;
 
         setErr(
-          e?.message || "فشل الجلب"
+          e?.message ||
+            "فشل الجلب"
         );
       } finally {
         if (alive) {
@@ -298,7 +406,10 @@ const MIN_REQUIRED =
             );
 
           return id
-            ? { ...it, _ytid: id }
+            ? {
+                ...it,
+                _ytid: id,
+              }
             : null;
         })
         .filter(Boolean),
@@ -306,13 +417,21 @@ const MIN_REQUIRED =
   );
 
   useEffect(() => {
-    if (!focusId || !normalized.length) return;
+    if (
+      !focusId ||
+      !normalized.length
+    ) {
+      return;
+    }
 
-    const match = normalized.find(
-      (it) =>
-        String(it.id) === String(focusId) ||
-        String(it.slug) === String(focusId)
-    );
+    const match =
+      normalized.find(
+        (it) =>
+          String(it.id) ===
+            String(focusId) ||
+          String(it.slug) ===
+            String(focusId)
+      );
 
     if (match) {
       setPlayer({
@@ -322,7 +441,14 @@ const MIN_REQUIRED =
     }
   }, [focusId, normalized]);
 
-  const totalPages = MAX_PAGES;
+  const totalPages =
+    Math.max(
+      1,
+      Math.ceil(
+        normalized.length /
+          PAGE_SIZE
+      )
+    );
 
   useEffect(() => {
     if (page > totalPages) {
@@ -334,13 +460,17 @@ const MIN_REQUIRED =
     }
   }, [totalPages]);
 
-  const start = (page - 1) * PAGE_SIZE;
-  const end = start + PAGE_SIZE;
+  const start =
+    (page - 1) * PAGE_SIZE;
 
-  const paginatedItems = normalized.slice(
-    start,
-    end
-  );
+  const end =
+    start + PAGE_SIZE;
+
+  const paginatedItems =
+    normalized.slice(
+      start,
+      end
+    );
 
   const onCardClick = (it) =>
     setPlayer({
@@ -358,7 +488,10 @@ const MIN_REQUIRED =
       }
     };
 
-    window.addEventListener("keydown", onKey);
+    window.addEventListener(
+      "keydown",
+      onKey
+    );
 
     return () =>
       window.removeEventListener(
@@ -369,17 +502,21 @@ const MIN_REQUIRED =
 
   return (
     <div
-  className={`shortseg-page wrap ${
-    apiUrl.includes("sabbath-shorts")
-      ? "sabbath-shorts-page"
-      : ""
-  }`}
->
+      className={`shortseg-page wrap ${
+        apiUrl.includes(
+          "sabbath-shorts"
+        )
+          ? "sabbath-shorts-page"
+          : ""
+      }`}
+    >
       <h2 className="shortseg-heading">
         {title}
       </h2>
 
-      {loading && <p>جار التحميل...</p>}
+      {loading && (
+        <p>جار التحميل...</p>
+      )}
 
       {err && (
         <p className="shortseg-error">
@@ -390,58 +527,65 @@ const MIN_REQUIRED =
       {!loading && !err && (
         <>
           <div className="shortseg-grid">
-            {paginatedItems.map((it) => {
-              const title =
-                it.title || "";
+            {paginatedItems.map(
+              (it) => {
+                const title =
+                  it.title || "";
 
-              return (
-                <button
-                  key={
-                    it.id ||
-                    it.slug ||
-                    it._ytid
-                  }
-                  className="shortseg-card"
-                  onClick={() =>
-                    onCardClick(it)
-                  }
-                  type="button"
-                >
-                  <div className="shortseg-thumb">
-                    <ResilientThumb
-                      item={it}
-                      alt={title}
-                    />
+                return (
+                  <button
+                    key={
+                      it.id ||
+                      it.slug ||
+                      it._ytid
+                    }
+                    className="shortseg-card"
+                    onClick={() =>
+                      onCardClick(it)
+                    }
+                    type="button"
+                  >
+                    <div className="shortseg-thumb">
+                      <ResilientThumb
+                        item={it}
+                        alt={title}
+                      />
 
-                    <span
-                      className="shortseg-play"
-                      aria-hidden
-                    >
-                      ▶
-                    </span>
-                  </div>
+                      <span
+                        className="shortseg-play"
+                        aria-hidden
+                      >
+                        ▶
+                      </span>
+                    </div>
 
-                  <div className="shortseg-body">
-                    <h3
-                      className="shortseg-title"
-                      title={title}
-                    >
-                      {title}
-                    </h3>
-                  </div>
-                </button>
-              );
-            })}
+                    <div className="shortseg-body">
+                      <h3
+                        className="shortseg-title"
+                        title={title}
+                      >
+                        {title}
+                      </h3>
+                    </div>
+                  </button>
+                );
+              }
+            )}
           </div>
 
           <div className="shortseg-pager">
             <button
               type="button"
               className="shortseg-btn nav-btn"
-              disabled={page <= 1}
+              disabled={
+                page <= 1
+              }
               onClick={() =>
                 setPage((p) =>
-                  Math.max(1, p - 1)
+                  Math.max(
+                    1,
+                    p - 1
+                  )
                 )
               }
             >
@@ -450,7 +594,10 @@ const MIN_REQUIRED =
 
             <div className="shortseg-numbers">
               {Array.from(
-                { length: totalPages },
+                {
+                  length:
+                    totalPages,
+                },
                 (_, i) => i + 1
               ).map((n) => (
                 <button
@@ -473,7 +620,10 @@ const MIN_REQUIRED =
             <button
               type="button"
               className="shortseg-btn nav-btn"
-              disabled={page >= totalPages}
+              disabled={
+                page >=
+                totalPages
+              }
               onClick={() =>
                 setPage((p) =>
                   Math.min(
@@ -492,7 +642,9 @@ const MIN_REQUIRED =
       <ShortsegSafePlayerModal
         open={!!player.open}
         item={player.item}
-        title={player.item?.title}
+        title={
+          player.item?.title
+        }
         onClose={() =>
           setPlayer({
             open: false,
