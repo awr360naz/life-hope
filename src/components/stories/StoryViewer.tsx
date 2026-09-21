@@ -259,9 +259,9 @@ if (event.key === "ArrowLeft") {
               }
             }}
           >
-            <span aria-hidden="true">🔗</span>
+            <span aria-hidden="true"></span>
 
-            {currentStory.link_text || "شاهد الحلقة"}
+            {currentStory.link_text || ""}
           </button>
         )}
         {currentStory.caption && (

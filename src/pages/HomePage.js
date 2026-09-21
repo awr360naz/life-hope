@@ -22,6 +22,7 @@ import SehaAfdalCarousel from "../components/SehaAfdalCarousel";
 import SbahAlkherCarousel from "../components/SbahAlkherCarousel";
 import KolShahr4_7kayatCarousel from "../components/KolShahr4_7kayatCarousel";
 import WamdatRaw7yeCarousel from "../components/WamdatRaw7yeCarousel";
+import DaniealCarousel from "../components/DaniealCaeousel";
 import Al7yaWelamalCarousel from "../components/Al7yaWelamalCarousel";
 import useScrollReveal from "./useScrollReveal";
 import VisitorCounter from "./VisitorCounter";
@@ -197,16 +198,21 @@ export default function HomePage() {
 
 
 <br></br><br></br><br></br><br></br>
-{/*
+{/* */} 
  <Stories />
-*/}
+
    <ProgramsCarousel title="برامجنا" 
    className="scroll-animate"
    />
+
    <br></br>
  <CamiPropheciesCarousel 
  className="scroll-animate"
  />
+       <br></br>
+<DaniealCarousel
+  className="scroll-animate"
+/>
   <br></br>
   <MrayaAlrohCarousel
 className="scroll-animate"
