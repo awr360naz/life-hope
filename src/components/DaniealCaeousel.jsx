@@ -37,7 +37,7 @@ function useResponsivePerView(defaultPerView = 4) {
 }
 
 export default function DaniealCarousel({
-  title = "دانيال",
+  title = "إنتظرونا قريبًا ...",
   perView = 4,
   step = 1,
   apiUrl = "/api/content/danieal?limit=24",

@@ -20,7 +20,7 @@ function uniqBy(arr, keyFn) {
   }
   return out;
 }
-
+ 
 function toYouTubeId(urlOrId = "") {
   if (!urlOrId) return "";
   if (/^[a-zA-Z0-9_-]{10,15}$/.test(urlOrId)) return urlOrId;
@@ -212,7 +212,7 @@ export default function DaniealPage() {
 
   return (
     <div className="cami-page wrap">
-      <h2 className="cami-heading">دانيال</h2>
+      <h2 className="cami-heading">إنتظرونا قريبًا ...</h2>
 
       {loading && <p>جار التحميل...</p>}
       {err && <p className="cami-error">صار خطأ: {err}</p>}
@@ -251,6 +251,7 @@ export default function DaniealPage() {
     </button>
   );
 })}
+
 
           </div>
 
