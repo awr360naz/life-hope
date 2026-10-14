@@ -28,6 +28,7 @@ import useScrollReveal from "./useScrollReveal";
 import VisitorCounter from "./VisitorCounter";
 import SabbathShortsCarousel from "../components/SabbathShortsCarousel";
 import PropheciesCarousel from "../components/PropheciesCarousel";
+import MnaratktabehCarousel from "../components/MnaratktabehCarousel";
 import Stories from "../components/stories/Stories.tsx";
 export default function HomePage() { 
   useEffect(() => {
@@ -237,6 +238,9 @@ className="scroll-animate"
 />
  <br></br>
 <SabbathShortsCarousel />
+
+ <br></br>
+<MnaratktabehCarousel />
 
  <br></br>
 <PropheciesCarousel />

@@ -21,6 +21,15 @@ function getCacheKey(apiUrl) {
     return "sabbathShorts_cache_v2";
   }
 
+   if (
+    apiUrl.includes(
+      "mnarat_ktabeh"
+    )
+  ) {
+    return "mnarat_ktabeh_cache_v2";
+  }
+
+
   if (
     apiUrl.includes("prophecies")
   ) {
@@ -123,8 +132,14 @@ export default function ShortSegmentsPage({
     apiUrl.includes(
       "prophecies"
     )
+    ||
+    apiUrl.includes(
+      "mnarat_ktabeh"
+    )
       ? 1
       : 24;
+
+      
 
   const [searchParams] =
     useSearchParams();

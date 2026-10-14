@@ -31,6 +31,10 @@ import sabbathShortsRouter from "./routes/sabbathShorts.routes.js";
 import propheciesRouter from "./routes/prophecies.routes.js";
 import searchRoutes from "./routes/search.routes.js";
 import storyRoutes from "./routes/storyRoutes.js";
+import mnarat_ktabehRouter from "./routes/mnarat_ktabeh.routes.js";
+
+
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -125,6 +129,7 @@ app.use(categoriesRouter);
 app.use(shortSegmentsRouter);
 app.use(sabbathShortsRouter);
 app.use(propheciesRouter);
+app.use(mnarat_ktabehRouter);
 app.use("/api/content/our-picks", ourPicksRouter);
 app.use("/api/content/quizzes", quizzesRouter);
 app.use("/api/content", sabbathRoutes);

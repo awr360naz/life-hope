@@ -27,9 +27,8 @@ function toYouTubeIdSafe(idOrUrl = "") {
 
 function buildEmbedUrl(id) {
   if (!id) return "";
-  return `https://www.youtube.com/embed/${id}?autoplay=1&playsinline=1&rel=0&modestbranding=1`;
+  return `https://www.youtube.com/embed/${id}?autoplay=1&playsinline=1&rel=0&modestbranding=1&cc_load_policy=0&cc_lang_pref=ar`;
 }
-
 function buildYouTubePageUrl(id, asShort = true) {
   if (!id) return "#";
   return asShort ? `https://www.youtube.com/shorts/${id}` : `https://www.youtube.com/watch?v=${id}`;
