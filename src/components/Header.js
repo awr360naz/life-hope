@@ -393,7 +393,7 @@ export default function Header() {
           className="logo-link"
         >
           <img
-            src="/new_awrlogo.jpg"
+            src="/awr_logo_2.png"
             alt="AWR360 Logo"
             className="header-logo"
           />

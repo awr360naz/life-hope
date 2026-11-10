@@ -1,6 +1,6 @@
 import React from "react";
 import "./AudioLive.css";
-import AdAwr from "./AdAwr.jpg";
+import AdAwr from "./live-photo.png";
 
 export default function Mp3LivePage() {
   return (

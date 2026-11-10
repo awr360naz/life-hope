@@ -15,7 +15,7 @@ const Footer = () => {
           <div className="footer-right-stack">
       
             <img
-              src="/new_awrlogo.jpg"
+              src="/awr_logo_2.png"
               alt="AWR360 Logo"
               className="header-logo footer-logo-img"
             />

@@ -34,7 +34,7 @@ export default function VedioAudioLive() {
   <header className="va-frame-title" id="va-audio-title">البث الصوتي</header>
   <div className="va-frame-body va-audio-block">
     {/* صورة */}
-    <img src={require("./AdAwr.jpg")} alt="Ad AWR" className="va-audio-img" />
+    <img src={require("./live-photo.png")} alt="Ad AWR" className="va-audio-img" />
 
     {/* النص مع السهم */}
     <div className="va-audio-heading">

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./LivePage.css";
-import AdAwr from "./AdAwr.jpg";
+import AdAwr from "./live-photo.png";
 
 export default function LivePage() {
   const [headerH, setHeaderH] = useState(0);
