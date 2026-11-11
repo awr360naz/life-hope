@@ -1,6 +1,48 @@
 @import "~slick-carousel/slick/slick.css";
 @import "~slick-carousel/slick/slick-theme.css";
 
+@font-face {
+  font-family: 'DIN Next Arabic';
+  src: url('./DIN NEXT™ ARABIC ULTRALIGHT.otf') format('opentype');
+  font-weight: 100;
+}
+
+@font-face {
+  font-family: 'DIN Next Arabic';
+  src: url('./DIN NEXT™ ARABIC LIGHT.otf') format('opentype');
+  font-weight: 300;
+}
+
+@font-face {
+  font-family: 'DIN Next Arabic';
+  src: url('./DIN NEXT™ ARABIC REGULAR.otf') format('opentype');
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: 'DIN Next Arabic';
+  src: url('./DIN NEXT™ ARABIC MEDIUM.otf') format('opentype');
+  font-weight: 500;
+}
+
+@font-face {
+  font-family: 'DIN Next Arabic';
+  src: url('./DIN NEXT™ ARABIC BOLD.otf') format('opentype');
+  font-weight: 700;
+}
+
+@font-face {
+  font-family: 'DIN Next Arabic';
+  src: url('./DIN NEXT™ ARABIC HEAVY.otf') format('opentype');
+  font-weight: 800;
+}
+
+@font-face {
+  font-family: 'DIN Next Arabic';
+  src: url('./DIN NEXT™ ARABIC BLACK.otf') format('opentype');
+  font-weight: 900;
+}
+
 html, body, #root {
   height: 100%;
   min-height: 100dvh; 

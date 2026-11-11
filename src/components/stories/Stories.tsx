@@ -6,7 +6,7 @@ import {
 
 import type { StoriesResponse, Story } from "../../pages/src/story";
 import StoryViewer from "./StoryViewer.tsx";
-import "./stories.css";
+//import "./stories.css";
 
 type StoriesProps = {
   apiUrl?: string;
@@ -135,3 +135,6 @@ export default function Stories({
     </>
   );
 }
+
+
+
